@@ -2,487 +2,448 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>معمل الضوء الافتراضي الاحترافي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معمل الفيزياء التفاعلي | المرحلة الثانوية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #1a1a2e, #0f0f1a);
-            color: white;
+        * {
             margin: 0;
-            padding: 20px;
+            padding: 0;
             box-sizing: border-box;
-            overflow-y: auto;
         }
-        .container {
-            text-align: center;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 40px 60px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
-            animation: fadeIn 1s ease-out;
-            max-width: 1200px;
-            width: 100%;
+
+        :root {
+            --primary: #0f172a;
+            --primary-dark: #020617;
+            --secondary: #3b82f6;
+            --accent: #f59e0b;
+            --accent-light: #fbbf24;
+            --glass: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(15, 23, 42, 0.85);
+            --text-light: #f1f5f9;
+            --text-muted: #94a3b8;
+            --shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.4);
+            --transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
-        h1 {
-            color: #00e6e6;
-            margin-bottom: 20px;
-            font-size: 2.5em;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: radial-gradient(ellipse at 30% 40%, #0a0f1e, #030614);
+            color: var(--text-light);
+            line-height: 1.5;
+            overflow-x: hidden;
         }
-        p {
-            font-size: 1.1em;
-            color: #ccc;
-            margin-bottom: 30px;
-        }
-        .buttons {
-            display: flex;
-            gap: 25px;
-            margin-top: 30px;
-            justify-content: center;
-        }
-        a {
-            text-decoration: none;
-            color: white;
-            background: linear-gradient(45deg, #007bff, #00c6ff);
-            padding: 18px 40px;
-            border-radius: 30px;
-            transition: 0.4s ease;
-            font-size: 1.3em;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-            box-shadow: 0 5px 15px rgba(0, 198, 255, 0.3);
-            border: none;
-            position: relative;
-            overflow: hidden;
-        }
-        a:hover {
-            background: linear-gradient(45deg, #00c6ff, #007bff);
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 198, 255, 0.5);
-        }
-        a::before {
+
+        body::before {
             content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: skewX(-20deg);
-            transition: 0.7s;
-        }
-        a:hover::before {
-            left: 100%;
-        }
-
-        /* فيديو كبير */
-        .video-large {
-            margin-top: 40px;
-            display: flex;
-            justify-content: center;
-        }
-        .video-large video {
-            width: 100%;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.3);
-            border: 2px solid #00e6e6;
-        }
-
-        /* قسم ملف PDF */
-        .pdf-section {
-            background: rgba(255, 255, 255, 0.92);
-            border-radius: 18px;
-            padding: 30px;
-            margin-top: 30px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            position: relative;
-        }
-        .pdf-section::before {
-            content: "";
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            height: 6px;
-            background: linear-gradient(to right, var(--primary), var(--success));
-            border-radius: 18px 18px 0 0;
-        }
-.pdf-container {
             width: 100%;
-            height: 600px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(59,130,246,0.15), transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(245,158,11,0.1), transparent 60%);
+            pointer-events: none;
+            z-index: -1;
         }
-        
-        .pdf-header {
-            background: linear-gradient(135deg, var(--primary), #2980b9);
-            color: white;
-            padding: 15px 20px;
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            background: rgba(8, 12, 24, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .navbar-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-radius: 12px 12px 0 0;
+            padding: 1rem 2rem;
         }
-        
-        .pdf-title {
-            font-size: 20px;
-            font-weight: bold;
-        }
-        
-        .pdf-controls {
+
+        .logo {
             display: flex;
+            align-items: center;
             gap: 10px;
-        }
-        .pdf-control-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
+            font-size: 1.8rem;
+            font-weight: 800;
             color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo i {
+            color: var(--accent);
+            font-size: 1.8rem;
+        }
+
+        .nav-links {
             display: flex;
-            align-items: center;
-            justify-content: center;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 600;
+            transition: 0.2s;
+            font-size: 1rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .mobile-menu {
+            display: none;
+            font-size: 1.5rem;
             cursor: pointer;
-            transition: all 0.3s;
+            color: white;
         }
-        
-        .pdf-control-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
-        }
-        
-        .pdf-content {
-            flex: 1;
+
+        /* hero */
+        .hero {
+            min-height: 85vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            background: #f8f9fa;
-        }
-        
-        .pdf-placeholder {
             text-align: center;
-            color: #6c757d;
+            margin-top: 80px;
+            position: relative;
         }
-        
-        .pdf-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            color: #e74c3c;
+
+        .hero-content h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, var(--accent-light), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
         }
-        
-        .pdf-text {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
+
+        .hero-content p {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
         }
-        
-        .pdf-subtext {
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-        
-        .pdf-download-btn {
-            background: linear-gradient(to bottom, var(--primary), #2980b9);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+
+        .btn-hero {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-        }
-        
-        .pdf-download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.25);
-        }
-
-        /* ثلاثة فيديوهات جنب بعض */
-        .video-row {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 40px;
-        }
-        .video-row video {
-            width: calc(33.333% - 14px);
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.3);
-            border: 2px solid #00e6e6;
-        }
-
-        /* قسم الأسئلة */
-        .quiz-section {
-            margin-top: 60px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 20px;
-            padding: 30px;
-            border: 1px solid #00e6e6;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
-        }
-        .quiz-title {
-            color: #00e6e6;
-            font-size: 2em;
-            margin-bottom: 30px;
-            text-shadow: 0 0 5px cyan;
-        }
-        .question {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            text-align: right;
-            border-right: 4px solid #00e6e6;
-        }
-        .question-text {
-            font-size: 1.3em;
-            margin-bottom: 15px;
-            color: #fff;
-        }
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: flex-start;
-        }
-        .option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            background: rgba(0, 230, 230, 0.1);
-            padding: 10px 20px;
-            border-radius: 30px;
-            width: fit-content;
-            transition: 0.2s;
-            border: 1px solid transparent;
-        }
-        .option:hover {
-            background: rgba(0, 230, 230, 0.2);
-            border-color: #00e6e6;
-        }
-        .option input[type="radio"] {
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border: 2px solid #00e6e6;
-            border-radius: 50%;
-            position: relative;
-            cursor: pointer;
-        }
-        .option input[type="radio"]:checked {
-            background: #00e6e6;
-            box-shadow: 0 0 10px #00e6e6;
-        }
-        .option input[type="radio"]:checked::after {
-            content: '';
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: #0f0f1a;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-        }
-        .check-btn {
-            background: linear-gradient(45deg, #00e6e6, #007bff);
-            border: none;
+            gap: 12px;
+            background: linear-gradient(90deg, var(--secondary), #2563eb);
             color: white;
-            padding: 15px 40px;
-            font-size: 1.3em;
-            border-radius: 40px;
-            cursor: pointer;
-            margin: 30px 0 20px;
-            transition: 0.3s;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-            font-weight: bold;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            margin-top: 2rem;
+            transition: 0.2s;
         }
-        .check-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px cyan;
+
+        .btn-hero:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px -10px rgba(59,130,246,0.5);
+            gap: 16px;
         }
-        .result {
-            font-size: 1.5em;
-            padding: 15px;
-            border-radius: 15px;
-            background: rgba(0, 230, 230, 0.1);
-            border: 1px solid #00e6e6;
+
+        /* section */
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            position: relative;
             display: inline-block;
         }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            right: 0;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            border-radius: 4px;
+        }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* year cards grid */
+        .year-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .year-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 2rem;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .year-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .year-card:hover {
+            transform: translateY(-12px);
+            border-color: rgba(59,130,246,0.4);
+            box-shadow: var(--shadow);
+        }
+        .year-card:hover::before {
+            opacity: 1;
+        }
+
+        .year-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .year-card h3 {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .year-card p {
+            color: var(--text-muted);
+            margin-bottom: 1.8rem;
+        }
+
+        .btn-year {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(59,130,246,0.2);
+            color: white;
+            padding: 0.7rem 1.8rem;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.2s;
+            border: 1px solid rgba(59,130,246,0.3);
+        }
+
+        .btn-year:hover {
+            background: var(--secondary);
+            gap: 14px;
+            border-color: transparent;
+        }
+
+        /* footer */
+        footer {
+            margin-top: 5rem;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid var(--glass-border);
+            padding: 2.5rem 0;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .footer-links a:hover { color: var(--accent); }
+
+        .copyright {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--glass-border);
+            color: var(--text-muted);
+        }
+
+        /* progress bar */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            z-index: 1001;
+        }
+        .progress-bar {
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            width: 0%;
+            transition: width 0.2s;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .mobile-menu { display: block; }
+            .hero-content h1 { font-size: 2.5rem; }
+            .section-title { font-size: 1.8rem; }
+            .container { padding: 0 1.2rem; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>✨ معمل الضوء الافتراضي المتقدم ✨</h1>
-        <p>استكشف قوانين الفيزياء الكلاسيكية بأسلوب تفاعلي وجذاب.</p>
-        <div class="buttons">
-            <a href="reflection.html">⚡️ تجربة انعكاس الضوء</a>
-            <a href="refraction.html">💧 تجربة انكسار الضوء</a>
-        </div>
 
-        <!-- فيديو كبير بنصف حجم الشاشة -->
-        <div class="video-large">
-            <video controls>
-                <source src="" type="video/mp4">
-                متصفحك لا يدعم تشغيل الفيديو.
-            </video>
-        </div>
+<div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+</div>
 
-  <!-- قسم ملف PDF -->
-        <div class="pdf-section">
-            <h3 class="section-title">ملف التجربة (PDF)</h3>
-            <div class="pdf-container">
-                <div class="pdf-header">
-                    <div class="pdf-title">شرح قانون فاراداي</div>
-                    <div class="pdf-controls">
-                        <button class="pdf-control-btn" title="تكبير"><i class="fas fa-search-plus"></i></button>
-                        <button class="pdf-control-btn" title="تصغير"><i class="fas fa-search-minus"></i></button>
-                        <button class="pdf-control-btn" title="تحميل"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <div class="pdf-content">
-                    <embed src="assets/تجربه انعكاس وانكسار الضوء .pdf" type="application/pdf" width="100%" height="100%">
-                </div>
-            </div>
-        </div>
-
-
-        <!-- ثلاثة فيديوهات جنب بعض -->
-        <div class="video-row">
-            <video controls>
-                <source src="" type="video/mp4">
-            </video>
-            <video controls>
-                <source src="assets/video/light_Transfer.mp4" type="video/mp4">
-            </video>
-            <video controls>
-                <source src="assets/video/reflition .mp4" type="video/mp4">
-            </video>
-        </div>
-
-        <!-- قسم الأسئلة التفاعلية -->
-        <div class="quiz-section">
-            <h2 class="quiz-title">📝 اختبر فهمك</h2>
-            
-            <!-- سؤال 1 -->
-            <div class="question" id="q1">
-                <div class="question-text">س1: انعكاس الضوء هو:</div>
-                <div class="options">
-                    <label class="option"><input type="radio" name="q1" value="a"> أ) مرور الضوء خلال وسط شفاف</label>
-                    <label class="option"><input type="radio" name="q1" value="b"> ب) ارتداد الضوء إلى نفس الوسط عند سقوطه على سطح عاكس</label>
-                    <label class="option"><input type="radio" name="q1" value="c"> ج) امتصاص الضوء بواسطة الأجسام</label>
-                    <label class="option"><input type="radio" name="q1" value="d"> د) تحلل الضوء إلى ألوانه</label>
-                </div>
-            </div>
-
-            <!-- سؤال 2 -->
-            <div class="question" id="q2">
-                <div class="question-text">س2: أي العبارات الآتية صحيحة طبقًا لقانون انعكاس الضوء؟</div>
-                <div class="options">
-                    <label class="option"><input type="radio" name="q2" value="a"> أ) زاوية السقوط أكبر من زاوية الانعكاس</label>
-                    <label class="option"><input type="radio" name="q2" value="b"> ب) زاوية السقوط أقل من زاوية الانعكاس</label>
-                    <label class="option"><input type="radio" name="q2" value="c"> ج) زاوية السقوط تساوي زاوية الانعكاس</label>
-                    <label class="option"><input type="radio" name="q2" value="d"> د) زاوية السقوط ضعف زاوية الانعكاس</label>
-                </div>
-            </div>
-
-            <!-- سؤال 3 -->
-            <div class="question" id="q3">
-                <div class="question-text">س3: يحدث انكسار الضوء عندما:</div>
-                <div class="options">
-                    <label class="option"><input type="radio" name="q3" value="a"> أ) يسقط الضوء على مرآة مستوية</label>
-                    <label class="option"><input type="radio" name="q3" value="b"> ب) ينتقل الضوء من وسط شفاف إلى وسط آخر مختلف في الكثافة الضوئية</label>
-                    <label class="option"><input type="radio" name="q3" value="c"> ج) يسقط الضوء عموديًا على سطح عاكس</label>
-                    <label class="option"><input type="radio" name="q3" value="d"> د) يمر الضوء في نفس الوسط</label>
-                </div>
-            </div>
-
-            <!-- سؤال 4 -->
-            <div class="question" id="q4">
-                <div class="question-text">س4: السبب الرئيسي لانكسار الضوء هو:</div>
-                <div class="options">
-                    <label class="option"><input type="radio" name="q4" value="a"> أ) زيادة شدة الضوء</label>
-                    <label class="option"><input type="radio" name="q4" value="b"> ب) تغير لون الضوء</label>
-                    <label class="option"><input type="radio" name="q4" value="c"> ج) تغير سرعة الضوء عند انتقاله من وسط لآخر</label>
-                    <label class="option"><input type="radio" name="q4" value="d"> د) انعكاس الضوء عن السطح</label>
-                </div>
-            </div>
-
-            <!-- سؤال 5 -->
-            <div class="question" id="q5">
-                <div class="question-text">س5: ينص القانون الثاني لانكسار الضوء على أن:</div>
-                <div class="options">
-                    <label class="option"><input type="radio" name="q5" value="a"> أ) زاوية السقوط تساوي زاوية الانكسار</label>
-                    <label class="option"><input type="radio" name="q5" value="b"> ب) نسبة جيب زاوية السقوط إلى جيب زاوية الانكسار مقدار ثابت</label>
-                    <label class="option"><input type="radio" name="q5" value="c"> ج) الضوء لا ينكسر في الماء</label>
-                    <label class="option"><input type="radio" name="q5" value="d"> د) الضوء ينعكس كليًا دائمًا</label>
-                </div>
-            </div>
-
-            <!-- سؤال 6 -->
-            <div class="question" id="q6">
-                <div class="question-text">س6: أي الظواهر التالية تعتمد على انكسار الضوء؟</div>
-                <div class="options">
-                    <label class="option"><input type="radio" name="q6" value="a"> أ) تكوين الظل</label>
-                    <label class="option"><input type="radio" name="q6" value="b"> ب) انعكاس الصورة في المرآة</label>
-                    <label class="option"><input type="radio" name="q6" value="c"> ج) ظهور القلم وكأنه مكسور في الماء</label>
-                    <label class="option"><input type="radio" name="q6" value="d"> د) امتصاص الضوء</label>
-                </div>
-            </div>
-
-            <button class="check-btn" onclick="checkAnswers()">🔍 تحقق من الإجابات</button>
-            <div id="quizResult" class="result"></div>
+<nav class="navbar">
+    <div class="navbar-container container">
+        <a href="#" class="logo">
+            <i class="fas fa-atom"></i> معمل الفيزياء
+        </a>
+        <ul class="nav-links">
+            <li><a href="#">الرئيسية</a></li>
+            <li><a href="#year-selection">اختيار الصف</a></li>
+            <li><a href="#about">حول</a></li>
+            <li><a href="#contact">اتصل بنا</a></li>
+        </ul>
+        <div class="mobile-menu">
+            <i class="fas fa-bars"></i>
         </div>
     </div>
+</nav>
 
-    <script>
-        // تصحيح الأسئلة
-        function checkAnswers() {
-            // الإجابات الصحيحة
-            const correctAnswers = {
-                q1: 'b',
-                q2: 'c',
-                q3: 'b',
-                q4: 'c',
-                q5: 'b',
-                q6: 'c'
-            };
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1>✨ مختبر الفيزياء الافتراضي ✨</h1>
+            <p>تجارب تفاعلية ثلاثية الأبعاد لطلاب المرحلة الثانوية. تعلم الكهرباء، المغناطيسية، الضوء والموائع بطريقة عملية وشيقة.</p>
+            <a href="#year-selection" class="btn-hero">استكشف التجارب <i class="fas fa-arrow-left"></i></a>
+        </div>
+    </div>
+</section>
 
-            let score = 0;
-            let total = Object.keys(correctAnswers).length;
+<section id="year-selection" style="padding: 3rem 0;">
+    <div class="container">
+        <h2 class="section-title">📚 اختر صفك الدراسي</h2>
+        <div class="year-cards">
+            <!-- الصف الثاني -->
+            <div class="year-card">
+                <div class="year-icon"><i class="fas fa-bolt"></i></div>
+                <h3>الصف الثاني الثانوي</h3>
+                <p>تجارب متوسطة: الدوائر الكهربائية، الضغط في السوائل، الغازات، انعكاس وانكسار الضوء.</p>
+                <a href="2nd.html" class="btn-year">التجارب <i class="fas fa-arrow-left"></i></a>
+            </div>
+            <!-- الصف الثالث -->
+            <div class="year-card">
+                <div class="year-icon"><i class="fas fa-atom"></i></div>
+                <h3>الصف الثالث الثانوي</h3>
+                <p>فيزياء متقدمة: الحث الكهرومغناطيسي، التداخل، الحيود، النظريات الحديثة.</p>
+                <a href="3rd.html" class="btn-year">التجارب <i class="fas fa-arrow-left"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
 
-            for (let question in correctAnswers) {
-                const selected = document.querySelector(`input[name="${question}"]:checked`);
-                if (selected && selected.value === correctAnswers[question]) {
-                    score++;
-                }
-            }
+<section id="about" style="padding: 2rem 0 4rem;">
+    <div class="container">
+        <div style="background: var(--card-bg); backdrop-filter: blur(12px); border-radius: 32px; padding: 2.5rem; border: 1px solid var(--glass-border);">
+            <h2 style="color: var(--accent); margin-bottom: 1.5rem;">🧪 عن معمل الفيزياء</h2>
+            <p style="font-size: 1.1rem; color: var(--text-light); margin-bottom: 1rem;">
+                منصة تعليمية تفاعلية تهدف إلى تحويل المفاهيم الفيزيائية المجردة إلى تجارب رقمية حية. جميع المحاكيات مصممة لتتماشى مع المناهج المصرية والعربية، وتسمح للطلاب بتغيير المتغيرات ورصد النتائج في الوقت الفعلي.
+            </p>
+            <p style="color: var(--text-muted);">
+                ✓ متوافق مع الأجهزة اللوحية والهواتف  ✓ واجهات عربية سهلة  ✓ محاكاة دقيقة للقوانين.
+            </p>
+        </div>
+    </div>
+</section>
 
-            const resultDiv = document.getElementById('quizResult');
-            resultDiv.innerHTML = `✅ لقد أجبت على ${score} من ${total} بشكل صحيح.`;
-        }
-    </script>
+<section id="contact" style="padding: 2rem 0 4rem;">
+    <div class="container">
+        <div style="background: var(--card-bg); backdrop-filter: blur(12px); border-radius: 32px; padding: 2rem; border: 1px solid var(--glass-border); text-align: center;">
+            <h2 style="margin-bottom: 1rem;">📞 تواصل معنا</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">لديك استفسار أو اقتراح؟ يمكنك مراسلتنا عبر البريد الإلكتروني</p>
+            <a href="mailto:info@physicslab.com" style="color: var(--accent); font-size: 1.2rem; text-decoration: none;">info@physicslab.com</a>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <div class="footer-container">
+            <div>
+                <h3 style="margin-bottom: 12px;">معمل الفيزياء</h3>
+                <p style="color:var(--text-muted)">تجارب محاكاة ثلاثية الأبعاد للمناهج المصرية والعربية.</p>
+            </div>
+            <div>
+                <h4>روابط سريعة</h4>
+                <ul class="footer-links">
+                    <li><a href="#">الرئيسية</a></li>
+                    <li><a href="#year-selection">اختيار الصف</a></li>
+                    <li><a href="2nd.html">تجارب الصف الثاني</a></li>
+                    <li><a href="3rd.html">تجارب الصف الثالث</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>© 2025 معمل الفيزياء – جميع الحقوق محفوظة</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // scroll progress bar
+    window.addEventListener('scroll', () => {
+        const winScroll = document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - window.innerHeight;
+        const scrolled = (winScroll / height) * 100;
+        document.getElementById('progressBar').style.width = scrolled + '%';
+    });
+
+    // mobile menu toggle
+    const mobileBtn = document.querySelector('.mobile-menu');
+    const navLinks = document.querySelector('.nav-links');
+    mobileBtn.addEventListener('click', () => {
+        if (navLinks.style.display === 'flex') navLinks.style.display = 'none';
+        else navLinks.style.display = 'flex';
+    });
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) navLinks.style.display = 'flex';
+        else navLinks.style.display = 'none';
+    });
+    // initial state on small screens
+    if (window.innerWidth <= 768) navLinks.style.display = 'none';
+</script>
 </body>
 </html>

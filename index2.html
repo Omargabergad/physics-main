@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>معمل الضوء الافتراضي الاحترافي</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e, #0f0f1a);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 40px 60px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+            animation: fadeIn 1s ease-out;
+            max-width: 1200px;
+            width: 100%;
+        }
+        h1 {
+            color: #00e6e6;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+        }
+        p {
+            font-size: 1.1em;
+            color: #ccc;
+            margin-bottom: 30px;
+        }
+        .buttons {
+            display: flex;
+            gap: 25px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+        a {
+            text-decoration: none;
+            color: white;
+            background: linear-gradient(45deg, #007bff, #00c6ff);
+            padding: 18px 40px;
+            border-radius: 30px;
+            transition: 0.4s ease;
+            font-size: 1.3em;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            box-shadow: 0 5px 15px rgba(0, 198, 255, 0.3);
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+        a:hover {
+            background: linear-gradient(45deg, #00c6ff, #007bff);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 198, 255, 0.5);
+        }
+        a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: skewX(-20deg);
+            transition: 0.7s;
+        }
+        a:hover::before {
+            left: 100%;
+        }
+
+        /* فيديو كبير */
+        .video-large {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+        }
+        .video-large video {
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.3);
+            border: 2px solid #00e6e6;
+        }
+
+        /* قسم ملف PDF */
+        .pdf-section {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 18px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+        .pdf-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(to right, var(--primary), var(--success));
+            border-radius: 18px 18px 0 0;
+        }
+.pdf-container {
+            width: 100%;
+            height: 600px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .pdf-header {
+            background: linear-gradient(135deg, var(--primary), #2980b9);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .pdf-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .pdf-controls {
+            display: flex;
+            gap: 10px;
+        }
+        .pdf-control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pdf-control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .pdf-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .pdf-placeholder {
+            text-align: center;
+            color: #6c757d;
+        }
+        
+        .pdf-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            color: #e74c3c;
+        }
+        
+        .pdf-text {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .pdf-subtext {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .pdf-download-btn {
+            background: linear-gradient(to bottom, var(--primary), #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .pdf-download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+        }
+
+        /* ثلاثة فيديوهات جنب بعض */
+        .video-row {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+        .video-row video {
+            width: calc(33.333% - 14px);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.3);
+            border: 2px solid #00e6e6;
+        }
+
+        /* قسم الأسئلة */
+        .quiz-section {
+            margin-top: 60px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid #00e6e6;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+        .quiz-title {
+            color: #00e6e6;
+            font-size: 2em;
+            margin-bottom: 30px;
+            text-shadow: 0 0 5px cyan;
+        }
+        .question {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: right;
+            border-right: 4px solid #00e6e6;
+        }
+        .question-text {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            background: rgba(0, 230, 230, 0.1);
+            padding: 10px 20px;
+            border-radius: 30px;
+            width: fit-content;
+            transition: 0.2s;
+            border: 1px solid transparent;
+        }
+        .option:hover {
+            background: rgba(0, 230, 230, 0.2);
+            border-color: #00e6e6;
+        }
+        .option input[type="radio"] {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #00e6e6;
+            border-radius: 50%;
+            position: relative;
+            cursor: pointer;
+        }
+        .option input[type="radio"]:checked {
+            background: #00e6e6;
+            box-shadow: 0 0 10px #00e6e6;
+        }
+        .option input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #0f0f1a;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+        }
+        .check-btn {
+            background: linear-gradient(45deg, #00e6e6, #007bff);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.3em;
+            border-radius: 40px;
+            cursor: pointer;
+            margin: 30px 0 20px;
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            font-weight: bold;
+        }
+        .check-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px cyan;
+        }
+        .result {
+            font-size: 1.5em;
+            padding: 15px;
+            border-radius: 15px;
+            background: rgba(0, 230, 230, 0.1);
+            border: 1px solid #00e6e6;
+            display: inline-block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ معمل الضوء الافتراضي المتقدم ✨</h1>
+        <p>استكشف قوانين الفيزياء الكلاسيكية بأسلوب تفاعلي وجذاب.</p>
+        <div class="buttons">
+            <a href="reflection.html">⚡️ تجربة انعكاس الضوء</a>
+            <a href="refraction.html">💧 تجربة انكسار الضوء</a>
+        </div>
+
+        <!-- فيديو كبير بنصف حجم الشاشة -->
+        <div class="video-large">
+            <video controls>
+                <source src="" type="video/mp4">
+                متصفحك لا يدعم تشغيل الفيديو.
+            </video>
+        </div>
+
+  <!-- قسم ملف PDF -->
+        <div class="pdf-section">
+            <h3 class="section-title">ملف التجربة (PDF)</h3>
+            <div class="pdf-container">
+                <div class="pdf-header">
+                    <div class="pdf-title">شرح قانون فاراداي</div>
+                    <div class="pdf-controls">
+                        <button class="pdf-control-btn" title="تكبير"><i class="fas fa-search-plus"></i></button>
+                        <button class="pdf-control-btn" title="تصغير"><i class="fas fa-search-minus"></i></button>
+                        <button class="pdf-control-btn" title="تحميل"><i class="fas fa-download"></i></button>
+                    </div>
+                </div>
+                <div class="pdf-content">
+                    <embed src="assets/تجربه انعكاس وانكسار الضوء .pdf" type="application/pdf" width="100%" height="100%">
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ثلاثة فيديوهات جنب بعض -->
+        <div class="video-row">
+            <video controls>
+                <source src="" type="video/mp4">
+            </video>
+            <video controls>
+                <source src="assets/video/light_Transfer.mp4" type="video/mp4">
+            </video>
+            <video controls>
+                <source src="assets/video/reflition .mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <!-- قسم الأسئلة التفاعلية -->
+        <div class="quiz-section">
+            <h2 class="quiz-title">📝 اختبر فهمك</h2>
+            
+            <!-- سؤال 1 -->
+            <div class="question" id="q1">
+                <div class="question-text">س1: انعكاس الضوء هو:</div>
+                <div class="options">
+                    <label class="option"><input type="radio" name="q1" value="a"> أ) مرور الضوء خلال وسط شفاف</label>
+                    <label class="option"><input type="radio" name="q1" value="b"> ب) ارتداد الضوء إلى نفس الوسط عند سقوطه على سطح عاكس</label>
+                    <label class="option"><input type="radio" name="q1" value="c"> ج) امتصاص الضوء بواسطة الأجسام</label>
+                    <label class="option"><input type="radio" name="q1" value="d"> د) تحلل الضوء إلى ألوانه</label>
+                </div>
+            </div>
+
+            <!-- سؤال 2 -->
+            <div class="question" id="q2">
+                <div class="question-text">س2: أي العبارات الآتية صحيحة طبقًا لقانون انعكاس الضوء؟</div>
+                <div class="options">
+                    <label class="option"><input type="radio" name="q2" value="a"> أ) زاوية السقوط أكبر من زاوية الانعكاس</label>
+                    <label class="option"><input type="radio" name="q2" value="b"> ب) زاوية السقوط أقل من زاوية الانعكاس</label>
+                    <label class="option"><input type="radio" name="q2" value="c"> ج) زاوية السقوط تساوي زاوية الانعكاس</label>
+                    <label class="option"><input type="radio" name="q2" value="d"> د) زاوية السقوط ضعف زاوية الانعكاس</label>
+                </div>
+            </div>
+
+            <!-- سؤال 3 -->
+            <div class="question" id="q3">
+                <div class="question-text">س3: يحدث انكسار الضوء عندما:</div>
+                <div class="options">
+                    <label class="option"><input type="radio" name="q3" value="a"> أ) يسقط الضوء على مرآة مستوية</label>
+                    <label class="option"><input type="radio" name="q3" value="b"> ب) ينتقل الضوء من وسط شفاف إلى وسط آخر مختلف في الكثافة الضوئية</label>
+                    <label class="option"><input type="radio" name="q3" value="c"> ج) يسقط الضوء عموديًا على سطح عاكس</label>
+                    <label class="option"><input type="radio" name="q3" value="d"> د) يمر الضوء في نفس الوسط</label>
+                </div>
+            </div>
+
+            <!-- سؤال 4 -->
+            <div class="question" id="q4">
+                <div class="question-text">س4: السبب الرئيسي لانكسار الضوء هو:</div>
+                <div class="options">
+                    <label class="option"><input type="radio" name="q4" value="a"> أ) زيادة شدة الضوء</label>
+                    <label class="option"><input type="radio" name="q4" value="b"> ب) تغير لون الضوء</label>
+                    <label class="option"><input type="radio" name="q4" value="c"> ج) تغير سرعة الضوء عند انتقاله من وسط لآخر</label>
+                    <label class="option"><input type="radio" name="q4" value="d"> د) انعكاس الضوء عن السطح</label>
+                </div>
+            </div>
+
+            <!-- سؤال 5 -->
+            <div class="question" id="q5">
+                <div class="question-text">س5: ينص القانون الثاني لانكسار الضوء على أن:</div>
+                <div class="options">
+                    <label class="option"><input type="radio" name="q5" value="a"> أ) زاوية السقوط تساوي زاوية الانكسار</label>
+                    <label class="option"><input type="radio" name="q5" value="b"> ب) نسبة جيب زاوية السقوط إلى جيب زاوية الانكسار مقدار ثابت</label>
+                    <label class="option"><input type="radio" name="q5" value="c"> ج) الضوء لا ينكسر في الماء</label>
+                    <label class="option"><input type="radio" name="q5" value="d"> د) الضوء ينعكس كليًا دائمًا</label>
+                </div>
+            </div>
+
+            <!-- سؤال 6 -->
+            <div class="question" id="q6">
+                <div class="question-text">س6: أي الظواهر التالية تعتمد على انكسار الضوء؟</div>
+                <div class="options">
+                    <label class="option"><input type="radio" name="q6" value="a"> أ) تكوين الظل</label>
+                    <label class="option"><input type="radio" name="q6" value="b"> ب) انعكاس الصورة في المرآة</label>
+                    <label class="option"><input type="radio" name="q6" value="c"> ج) ظهور القلم وكأنه مكسور في الماء</label>
+                    <label class="option"><input type="radio" name="q6" value="d"> د) امتصاص الضوء</label>
+                </div>
+            </div>
+
+            <button class="check-btn" onclick="checkAnswers()">🔍 تحقق من الإجابات</button>
+            <div id="quizResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // تصحيح الأسئلة
+        function checkAnswers() {
+            // الإجابات الصحيحة
+            const correctAnswers = {
+                q1: 'b',
+                q2: 'c',
+                q3: 'b',
+                q4: 'c',
+                q5: 'b',
+                q6: 'c'
+            };
+
+            let score = 0;
+            let total = Object.keys(correctAnswers).length;
+
+            for (let question in correctAnswers) {
+                const selected = document.querySelector(`input[name="${question}"]:checked`);
+                if (selected && selected.value === correctAnswers[question]) {
+                    score++;
+                }
+            }
+
+            const resultDiv = document.getElementById('quizResult');
+            resultDiv.innerHTML = `✅ لقد أجبت على ${score} من ${total} بشكل صحيح.`;
+        }
+    </script>
+</body>
+</html>
