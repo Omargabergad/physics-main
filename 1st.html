@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تجارب الصف الأول | مستكشف معمل الفيزياء</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent1: #e74c3c;
+            --accent2: #f39c12;
+            --accent3: #1abc9c;
+            --dark: #121212;
+            --light: #f8f9fa;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --glow: 0 0 20px rgba(52, 152, 219, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: #333;
+            font-family: 'Raleway', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+            direction: rtl;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 4rem;
+            color: var(--primary);
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            position: relative;
+            margin-bottom: 3rem;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 0;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to left, var(--accent2), var(--accent1));
+        }
+
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 2rem;
+        }
+
+        section {
+            padding: 5rem 0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-size: 1.1rem;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .logo i {
+            margin-left: 10px;
+            color: var(--accent1);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-right: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent1);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent1);
+        }
+
+        .mobile-menu {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 50%, #3498db 100%);
+            overflow: hidden;
+            margin-top: 80px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 80% 80%, rgba(52, 152, 219, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 20% 20%, rgba(231, 76, 60, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 60% 40%, rgba(26, 188, 156, 0.15) 0%, transparent 50%);
+            animation: pulse 15s ease-in-out infinite;
+        }
+
+        .hero-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-text {
+            flex: 1;
+            max-width: 600px;
+            padding-left: 2rem;
+            color: white;
+        }
+
+        .hero-text h1 {
+            color: white;
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-text p {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .hero-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            height: 500px;
+        }
+
+        .floating-elements {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.2),
+                inset 0 0 20px rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+            animation: float 6s ease-in-out infinite;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+
+        .floating-element:hover {
+            transform: scale(1.1);
+            box-shadow: 
+                0 15px 40px rgba(0, 0, 0, 0.3),
+                inset 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+
+        .floating-element:nth-child(1) {
+            width: 120px;
+            height: 120px;
+            top: 50px;
+            right: 50px;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            width: 100px;
+            height: 100px;
+            top: 200px;
+            right: 100px;
+            background: linear-gradient(135deg, var(--secondary), var(--accent3));
+            animation-delay: 1s;
+        }
+
+        .floating-element:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            top: 100px;
+            right: 250px;
+            background: linear-gradient(135deg, var(--accent3), var(--secondary));
+            animation-delay: 2s;
+        }
+
+        .floating-element:nth-child(4) {
+            width: 90px;
+            height: 90px;
+            top: 300px;
+            right: 200px;
+            background: linear-gradient(135deg, var(--accent2), var(--accent1));
+            animation-delay: 1.5s;
+        }
+
+        .floating-element i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .floating-element .element-label {
+            position: absolute;
+            bottom: -30px;
+            font-size: 0.8rem;
+            color: white;
+            opacity: 0;
+            transition: var(--transition);
+            text-align: center;
+            width: 100%;
+        }
+
+        .floating-element:hover .element-label {
+            opacity: 1;
+        }
+
+        .hero-scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            right: 50%;
+            transform: translateX(50%);
+            color: white;
+            font-size: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: bounce 2s infinite;
+            cursor: pointer;
+        }
+
+        .hero-scroll-indicator i {
+            margin-top: 10px;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat {
+            text-align: center;
+            color: white;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--accent2);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(50%); }
+            40% { transform: translateY(-10px) translateX(50%); }
+            60% { transform: translateY(-5px) translateX(50%); }
+        }
+
+        .experiments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            width: 100%;
+        }
+
+        .experiment-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transform: translateY(30px);
+            position: relative;
+        }
+
+        .experiment-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .experiment-card:hover {
+            transform: translateY(-10px) rotateY(-5deg);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .experiment-img {
+            height: 200px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .experiment-img::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .experiment-card:hover .experiment-img::after {
+            opacity: 1;
+        }
+
+        .experiment-content {
+            padding: 1.5rem;
+        }
+
+        .experiment-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .experiment-content p {
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .experiment-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 1rem;
+        }
+
+        .experiment-objectives {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        .experiment-objectives h4 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .objectives-list {
+            list-style: none;
+        }
+
+        .objectives-list li {
+            margin-bottom: 0.3rem;
+            position: relative;
+            padding-right: 1.2rem;
+            font-size: 0.9rem;
+        }
+
+        .objectives-list li::before {
+            content: '✓';
+            position: absolute;
+            right: 0;
+            color: var(--accent3);
+            font-weight: bold;
+        }
+
+        .filters {
+            background: white;
+            padding: 2rem 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            position: sticky;
+            top: 80px;
+            z-index: 100;
+        }
+
+        .filter-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .filter-btn {
+            padding: 0.7rem 1.5rem;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 100%;
+            background: var(--primary);
+            transition: var(--transition);
+            z-index: -1;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .filter-btn.active::before {
+            width: 100%;
+        }
+
+        .filter-btn:hover:not(.active)::before {
+            width: 100%;
+            background: rgba(44, 62, 80, 0.1);
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.7rem 2.5rem 0.7rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            font-family: 'Raleway', sans-serif;
+            transition: var(--transition);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+
+        .progress-container {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            z-index: 1001;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: linear-gradient(to left, var(--accent1), var(--accent2));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .floating-action-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--accent1), var(--accent2));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 999;
+            transition: var(--transition);
+        }
+
+        .floating-action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        .learning-path {
+            background: linear-gradient(135deg, rgba(44, 62, 80, 0.03) 0%, rgba(52, 152, 219, 0.03) 100%);
+        }
+
+        .path-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .path-step {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .path-step:hover {
+            transform: translateY(-10px);
+        }
+
+        .path-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 50px;
+            left: -10%;
+            width: 20%;
+            height: 2px;
+            background: var(--accent1);
+            opacity: 0.5;
+        }
+
+        .step-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, var(--accent1), var(--accent2));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            margin: 0 auto 1.5rem;
+            transition: var(--transition);
+        }
+
+        .path-step:hover .step-icon {
+            transform: scale(1.1);
+            box-shadow: var(--glow);
+        }
+
+        .card-3d {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .card-3d:hover {
+            transform: rotateY(-5deg) rotateX(5deg);
+        }
+
+        .magnetic-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .magnetic-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .magnetic-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(45deg, var(--accent1), var(--accent2), var(--accent3), var(--secondary));
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradient-shift 5s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            overflow-y: auto;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalFadeIn 0.5s ease-out;
+            overflow: hidden;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            padding: 2rem 2rem 1rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            position: relative;
+        }
+
+        .modal-header h2 {
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-header h2::after {
+            display: none;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .modal-media {
+            width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .modal-media img, .modal-media video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .modal-description {
+            margin-bottom: 1rem;
+        }
+
+        .modal-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        footer {
+            background: var(--primary);
+            color: white;
+            padding: 4rem 0 2rem;
+        }
+
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-column h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--accent1);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: white;
+            padding-right: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--accent1);
+            transform: translateY(-5px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .particles-container {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(52, 152, 219, 0.1);
+            animation: float-particle 15s infinite linear;
+        }
+
+        @keyframes float-particle {
+            0% {
+                transform: translateY(0) translateX(0);
+            }
+            100% {
+                transform: translateY(-100vh) translateX(-100px);
+            }
+        }
+
+        .interactive-particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @media (max-width: 992px) {
+            .hero-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero-text {
+                padding-left: 0;
+                margin-bottom: 3rem;
+            }
+            
+            .filter-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .search-box {
+                max-width: 100%;
+            }
+            
+            .path-steps {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .path-step:not(:last-child)::after {
+                display: none;
+            }
+
+            .hero-visual {
+                height: 400px;
+            }
+
+            .modal-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            h2 {
+                font-size: 2rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-menu {
+                display: block;
+            }
+            
+            .experiments-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-text h1 {
+                font-size: 2.8rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .floating-element:nth-child(4) {
+                display: none;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="particles-container" id="particlesContainer"></div>
+
+    <div class="floating-action-btn" id="floatingActionBtn">
+        <i class="fas fa-rocket"></i>
+    </div>
+
+    <nav class="navbar">
+        <div class="navbar-container container">
+            <a href="Home.html" class="logo">
+                <i class="fas fa-atom"></i>
+                معمل الفيزياء
+            </a>
+            <ul class="nav-links">
+                <li><a href="Home.html">الرئيسية</a></li>
+                <li><a href="Home.html#year-selection">اختيار الصف</a></li>
+                <li><a href="Home.html#about">حول</a></li>
+                <li><a href="Home.html#resources">المصادر</a></li>
+                <li><a href="Home.html#contact">اتصل بنا</a></li>
+            </ul>
+            <div class="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>تجارب <span class="gradient-text">الفيزياء</span> للصف الأول</h1>
+                    <p>اكتشف مفاهيم الفيزياء الأساسية من خلال تجارب تفاعلية مصممة خصيصًا لطلاب الصف الأول الثانوي. ابنِ أساسًا قويًا من خلال التعلم العملي.</p>
+                    <div class="hero-buttons">
+                        <a href="#experiments" class="btn btn-primary magnetic-btn">استكشف التجارب</a>
+                        <a href="#learning-path" class="btn btn-outline magnetic-btn" style="background: rgba(255,255,255,0.2); color: white; border-color: white;">عرض مسار التعلم</a>
+                    </div>
+
+                </div>
+                <div class="hero-visual">
+                    <div class="floating-elements">
+                        <div class="floating-element">
+                            <i class="fas fa-running"></i>
+                            <div class="element-label">الحركة</div>
+                        </div>
+                        <div class="floating-element">
+                            <i class="fas fa-clock"></i>
+                            <div class="element-label">الزمن</div>
+                        </div>
+                        <div class="floating-element">
+                            <i class="fas fa-water"></i>
+                            <div class="element-label">الميوﻋات</div>
+                        </div>
+                        <div class="floating-element">
+                            <i class="fas fa-sun"></i>
+                            <div class="element-label">الضوء</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-scroll-indicator" id="scrollIndicator">
+            مرر لأسفل للاستكشاف
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </section>
+
+    <section class="filters">
+        <div class="container">
+            <div class="filter-container">
+                <div class="filter-group">
+                    <button class="filter-btn active magnetic-btn" data-filter="all">كل التجارب</button>
+                    <button class="filter-btn magnetic-btn" data-filter="mechanics">الميكانيكا</button>
+                    <button class="filter-btn magnetic-btn" data-filter="thermodynamics">الديناميكا الحرارية</button>
+                    <button class="filter-btn magnetic-btn" data-filter="waves">الموجات والبصريات</button>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="ابحث في التجارب...">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="experiments" id="experiments">
+        <div class="container">
+            <h2>التجارب <span class="gradient-text">المتاحة</span></h2>
+            <div class="experiments-grid" id="experimentsGrid">
+            </div>
+        </div>
+    </section>
+    <section class="learning-path" id="learning-path">
+        <div class="container">
+            <h2>مسار <span class="gradient-text">التعلم المقترح</span></h2>
+            <p>اتبع هذا التسلسل الموصى به لبناء معرفتك في الفيزياء خطوة بخطوة:</p>
+            <div class="path-steps">
+                <div class="path-step card-3d">
+                    <div class="step-icon">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <h3>القوى والحركة</h3>
+                    <p>ابدأ بقوانين نيوتن ومفاهيم الحركة الأساسية لفهم كيفية تحرك الأجسام.</p>
+                    <a href="#" class="btn btn-outline" style="margin-top: 1rem;">استكشف</a>
+                </div>
+                <div class="path-step card-3d">
+                    <div class="step-icon">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <h3>الطاقة والحرارة</h3>
+                    <p>استكشف تحولات الطاقة ومبادئ الديناميكا الحرارية في الظواهر اليومية.</p>
+                    <a href="#" class="btn btn-outline" style="margin-top: 1rem;">استكشف</a>
+                </div>
+                <div class="path-step card-3d">
+                    <div class="step-icon">
+                        <i class="fas fa-wave-square"></i>
+                    </div>
+                    <h3>الموجات والصوت</h3>
+                    <p>افهم خصائص الموجات وظواهر الصوت من خلال المحاكاة التفاعلية.</p>
+                    <a href="#" class="btn btn-outline" style="margin-top: 1rem;">استكشف</a>
+                </div>
+                <div class="path-step card-3d">
+                    <div class="step-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3>الضوء والبصريات</h3>
+                    <p>اكتشف كيف يتصرف الضوء واستكشف المبادئ البصرية باستخدام أدوات افتراضية.</p>
+                    <a href="#" class="btn btn-outline" style="margin-top: 1rem;">استكشف</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-column">
+                    <h3>معمل الفيزياء</h3>
+                    <p>تحويل تعليم الفيزياء من خلال التجارب والمحاكاة التفاعلية.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>روابط سريعة</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">الرئيسية</a></li>
+                        <li><a href="index.html#year-selection">اختيار الصف</a></li>
+                        <li><a href="index.html#about">حول</a></li>
+                        <li><a href="index.html#resources">المصادر</a></li>
+                        <li><a href="index.html#contact">اتصل بنا</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>التجارب</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" class="active">تجارب الصف الأول</a></li>
+                        <li><a href="#">تجارب الصف الثاني</a></li>
+                        <li><a href="#">تجارب الصف الثالث</a></li>
+                        <li><a href="#">المحاكاة المتقدمة</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>النشرة الإخبارية</h3>
+                    <p>اشترك في نشرتنا الإخبارية للحصول على تحديثات حول التجارب والميزات الجديدة.</p>
+                    <form>
+                        <div class="search-box">
+                            <input type="email" placeholder="عنوان بريدك الإلكتروني" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary magnetic-btn" style="margin-top: 1rem;">اشترك</button>
+                    </form>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 مستكشف معمل الفيزياء. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+    <div class="modal" id="experimentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">عنوان التجربة</h2>
+                <span class="close-modal" id="closeModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="modal-media" id="modalMedia">
+                </div>
+                <div class="modal-description">
+                    <p id="modalDescription">وصف التجربة سيظهر هنا.</p>
+                </div>
+                <div class="modal-details">
+                    <div class="detail-item">
+                        <span class="detail-label">المدة</span>
+                        <span class="detail-value" id="modalDuration">30 دقيقة</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">الصعوبة</span>
+                        <span class="detail-value" id="modalDifficulty">مبتدئ</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">التصنيف</span>
+                        <span class="detail-value" id="modalCategory">الميكانيكا</span>
+                    </div>
+                </div>
+                <div class="experiment-objectives">
+                    <h4>أهداف التعلم</h4>
+                    <ul class="objectives-list" id="modalObjectives">
+                    </ul>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary magnetic-btn" onclick="redirectTo(currentExperimentLink)">ابدأ التجربة</button>
+                    <button class="btn btn-outline magnetic-btn" id="closeModalBtn">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const experimentsData = [
+            {
+                id: 1,
+                title: "قوانين نيوتن للحركة",
+                description: "استكشف كيف تتحرك الأجسام وتتفاعل من خلال القوانين الثلاثة الأساسية لنيوتن. تحقق من القصور الذاتي والقوة وأزواج الفعل ورد الفعل. تتيح لك هذه التجربة معالجة أجسام ذات كتل مختلفة ومراقبة كيفية استجابتها للقوى المطبقة في بيئة افتراضية.",
+                duration: "45 دقيقة",
+                difficulty: "مبتدئ",
+                category: "mechanics",
+                icon: "fas fa-running",
+                media: "https://placehold.co/800x450/2c3e50/ffffff?text=محاكاة+قوانين+نيوتن",
+                mediaType: "image",
+                objectives: ["فهم قانون نيوتن الأول", "تطبيق قانون نيوتن الثاني", "تحديد أزواج الفعل ورد الفعل", "حساب التسارع من القوة والكتلة"],
+                link:"https://phet.colorado.edu/ar_SA/simulations/build-a-nucleus"
+            },
+            {
+                id: 2,
+                title: "البندول البسيط",
+                description: "تحقق من العلاقة بين طول البندول وفترة التذبذب. اكتشف كيف تؤثر الجاذبية على الحركة الدورية. اضبط طول وكتلة وسعة البندول لترى كيف تؤثر هذه العوامل على حركته.",
+                duration: "30 دقيقة",
+                difficulty: "مبتدئ",
+                category: "mechanics",
+                icon: "fas fa-clock",
+                media: "https://placehold.co/800x450/3498db/ffffff?text=تجربة+البندول",
+                mediaType: "image",
+                objectives: ["قياس فترة البندول", "ربط الطول بالفترة", "فهم الحركة التوافقية البسيطة", "حساب تسارع الجاذبية"],
+            },
+            {
+                id: 3,
+                title: "الكثافة والطفو",
+                description: "اكتشف لماذا تطفو بعض الأجسام بينما تغرق أخرى في سوائل مختلفة. استكشف مبدأ أرخميدس في العمل. اختبر أجسامًا مختلفة في سوائل مختلفة لفهم العلاقة بين الكثافة والطفو والطفو.",
+                duration: "40 دقيقة",
+                difficulty: "مبتدئ",
+                category: "mechanics",
+                icon: "fas fa-water",
+                media: "https://placehold.co/800x450/e74c3c/ffffff?text=تجربة+الطفو",
+                mediaType: "image",
+                objectives: ["حساب الكثافة", "فهم قوة الطفو", "تطبيق مبدأ أرخميدس", "التنبؤ بما إذا كانت الأجسام ستطفو أم تغرق"]
+            },
+            {
+                id: 4,
+                title: "انعكاس الضوء",
+                description: "ادرس كيف ينعكس الضوء عن الأسطح المختلفة وتحقق من قوانين الانعكاس باستخدام المرايا ومصادر الضوء. تحكم في زوايا السقوط ولاحظ كيف تؤثر على زاوية الانعكاس.",
+                duration: "35 دقيقة",
+                difficulty: "مبتدئ",
+                category: "waves",
+                icon: "fas fa-sun",
+                media: "https://placehold.co/800x450/f39c12/ffffff?text=انعكاس+الضوء",
+                mediaType: "image",
+                objectives: ["التحقق من قانون الانعكاس", "مقارنة الانعكاس المنتظم مقابل المنتشر", "فهم تكوين الصورة", "تحديد مواقع الصور في المرايا المستوية"]
+            },
+            {
+                id: 5,
+                title: "انتقال الحرارة",
+                description: "تحقق من التوصيل والحمل والإشعاع - الطرق الثلاث لانتقال الحرارة باستخدام مواد يومية. لاحظ كيف تتحرك الحرارة عبر مواد مختلفة وفهم التوصيل الحراري.",
+                duration: "50 دقيقة",
+                difficulty: "مبتدئ",
+                category: "thermodynamics",
+                icon: "fas fa-temperature-high",
+                media: "https://placehold.co/800x450/1abc9c/ffffff?text=انتقال+الحرارة",
+                mediaType: "image",
+                objectives: ["التفريق بين طرق انتقال الحرارة", "قياس التوصيل الحراري", "فهم تيارات الحمل", "تحديد أمثلة على الإشعاع"]
+            },
+            {
+                id: 6,
+                title: "الموجات الصوتية",
+                description: "استكشف كيف ينتقل الصوت عبر وسائط مختلفة وافحص العلاقة بين النغمة والتردد والسعة. أنشئ موجات صوتية مختلفة ولاحظ خصائصها في راسم اهتزاز افتراضي.",
+                duration: "40 دقيقة",
+                difficulty: "مبتدئ",
+                category: "waves",
+                icon: "fas fa-wave-square",
+                media: "https://placehold.co/800x450/9b59b6/ffffff?text=الموجات+الصوتية",
+                mediaType: "image",
+                objectives: ["فهم الصوت كموجات", "ربط النغمة بالتردد", "استكشاف الصوت في وسائط مختلفة", "التفريق بين الشدة والنغمة"]
+            },
+            {
+                id: 7,
+                title: "قوى الاحتكاك",
+                description: "قياس الاحتكاك الساكن والحركي بين أسطح مختلفة وفهم كيف يؤثر الاحتكاك على الحركة. اختبر مواد وأوزانًا مختلفة لتحديد معاملات الاحتكاك.",
+                duration: "45 دقيقة",
+                difficulty: "مبتدئ",
+                category: "mechanics",
+                icon: "fas fa-shoe-prints",
+                media: "https://placehold.co/800x450/34495e/ffffff?text=قوى+الاحتكاك",
+                mediaType: "image",
+                objectives: ["قياس معاملات الاحتكاك", "التفريق بين الاحتكاك الساكن/الحركي", "فهم تطبيقات الاحتكاك", "تحليل العوامل المؤثرة على الاحتكاك"]
+            },
+            {
+                id: 8,
+                title: "انكسار الضوء",
+                description: "لاحظ كيف ينحني الضوء عند المرور بين مواد شفافة مختلفة واحسب معاملات الانكسار. استخدم المناشير والعدسات الافتراضية لاستكشاف قانون سنيل وظواهر انحناء الضوء.",
+                duration: "40 دقيقة",
+                difficulty: "مبتدئ",
+                category: "waves",
+                icon: "fas fa-eye",
+                media: "https://placehold.co/800x450/e67e22/ffffff?text=انكسار+الضوء",
+                mediaType: "image",
+                objectives: ["فهم الانكسار", "تطبيق قانون سنيل", "حساب معامل الانكسار", "شرح ظواهر الانكسار في العالم الحقيقي"]
+            }
+        ];
+
+        const experimentsGrid = document.getElementById('experimentsGrid');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const searchInput = document.getElementById('searchInput');
+        const progressBar = document.getElementById('progressBar');
+        const particlesContainer = document.getElementById('particlesContainer');
+        const floatingActionBtn = document.getElementById('floatingActionBtn');
+        const navbar = document.querySelector('.navbar');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const scrollIndicator = document.getElementById('scrollIndicator');
+        const stat1 = document.getElementById('stat1');
+        const stat2 = document.getElementById('stat2');
+        const stat3 = document.getElementById('stat3');
+        const magneticBtns = document.querySelectorAll('.magnetic-btn');
+        const card3dElements = document.querySelectorAll('.card-3d');
+
+        const modal = document.getElementById('experimentModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDescription = document.getElementById('modalDescription');
+        const modalMedia = document.getElementById('modalMedia');
+        const modalDuration = document.getElementById('modalDuration');
+        const modalDifficulty = document.getElementById('modalDifficulty');
+        const modalCategory = document.getElementById('modalCategory');
+        const modalObjectives = document.getElementById('modalObjectives');
+        const closeModal = document.getElementById('closeModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const startExperimentBtn = document.getElementById('startExperimentBtn');
+        let currentExperimentId = null;
+        function initPage() {
+            displayExperiments(experimentsData);
+            createParticles();
+            setupEventListeners();
+            animateCounter(stat1, 8, 1500);
+            animateCounter(stat2, 24, 2000);
+            animateCounter(stat3, 12500, 2500);
+        }
+        function displayExperiments(experiments) {
+            experimentsGrid.innerHTML = '';
+            
+            experiments.forEach(experiment => {
+                const experimentCard = document.createElement('div');
+                experimentCard.className = 'experiment-card card-3d';
+                experimentCard.setAttribute('data-category', experiment.category);
+                experimentCard.innerHTML = `
+                    <div class="experiment-img">
+                        <i class="${experiment.icon}"></i>
+                    </div>
+                    <div class="experiment-content">
+                        <h3>${experiment.title}</h3>
+                        <p>${experiment.description}</p>
+                        <div class="experiment-meta">
+                            <span><i class="far fa-clock"></i> ${experiment.duration}</span>
+                            <span><i class="fas fa-signal"></i> ${experiment.difficulty}</span>
+                        </div>
+                        <div class="experiment-objectives">
+                            <h4>أهداف التعلم:</h4>
+                            <ul class="objectives-list">
+                                ${experiment.objectives.map(obj => `<li>${obj}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <video src=""> </video>
+                          <video src=""></video>
+                            <video src="">  </video>
+                        <button class="btn btn-outline magnetic-btn view-experiment-btn" data-id="${experiment.id}">عرض التجربة</button>
+                    </div>
+                `;
+                experimentsGrid.appendChild(experimentCard);
+                setTimeout(() => {
+                    experimentCard.classList.add('visible');
+                }, 100);
+            });
+            document.querySelectorAll('.view-experiment-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    currentExperimentLink = experimentsData.find(exp => exp.id === id).link;
+                    openExperimentModal(id);
+                });
+            });
+        }
+        function redirectTo(link) {
+  window.location.href = link;
+}
+
+        function openExperimentModal(id) {
+            const experiment = experimentsData.find(exp => exp.id === id);
+            if (!experiment) return;
+            
+            currentExperimentId = id;
+            
+            modalTitle.textContent = experiment.title;
+            modalDescription.textContent = experiment.description;
+            modalDuration.textContent = experiment.duration;
+            modalDifficulty.textContent = experiment.difficulty;
+            modalCategory.textContent = getCategoryName(experiment.category);
+            modalMedia.innerHTML = '';
+            if (experiment.mediaType === 'image') {
+                const img = document.createElement('img');
+                img.src = experiment.media;
+                img.alt = experiment.title;
+                modalMedia.appendChild(img);
+            } else if (experiment.mediaType === 'video') {
+                const video = document.createElement('video');
+                video.src = experiment.media;
+                video.controls = true;
+                modalMedia.appendChild(video);
+            }
+            modalObjectives.innerHTML = '';
+            experiment.objectives.forEach(obj => {
+                const li = document.createElement('li');
+                li.textContent = obj;
+                modalObjectives.appendChild(li);
+            });
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        function getCategoryName(category) {
+            const categories = {
+                'mechanics': 'الميكانيكا',
+                'thermodynamics': 'الديناميكا الحرارية',
+                'waves': 'الموجات والبصريات'
+            };
+            return categories[category] || category;
+        }
+        function closeExperimentModal() {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        function startExperiment() {
+            if (currentExperimentId) {
+                alert(`بدء التجربة رقم ${currentExperimentId}. في التنفيذ الحقيقي، سيتم إطلاق التجربة التفاعلية.`);
+                closeExperimentModal();
+            }
+        }
+        function filterExperiments(category) {
+            if (category === 'all') {
+                displayExperiments(experimentsData);
+                return;
+            }
+            
+            const filteredExperiments = experimentsData.filter(exp => exp.category === category);
+            displayExperiments(filteredExperiments);
+        }
+
+        function searchExperiments(query) {
+            const filteredExperiments = experimentsData.filter(exp => 
+                exp.title.toLowerCase().includes(query.toLowerCase()) || 
+                exp.description.toLowerCase().includes(query.toLowerCase())
+            );
+            displayExperiments(filteredExperiments);
+        }
+        function createParticles() {
+            const particleCount = 20;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                const size = Math.random() * 20 + 5;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.animationDelay = `${Math.random() * 15}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        function animateCounter(element, target, duration = 2000) {
+            let start = 0;
+            const increment = target / (duration / 16);
+            const timer = setInterval(() => {
+                start += increment;
+                if (start >= target) {
+                    element.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(start);
+                }
+            }, 16);
+        }
+        magneticBtns.forEach(btn => {
+            btn.addEventListener('mousemove', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                this.style.transform = `translate(${(x - rect.width/2) / 10}px, ${(y - rect.height/2) / 10}px)`;
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translate(0, 0)';
+            });
+        });
+        card3dElements.forEach(card => {
+            card.addEventListener('mousemove', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateY = (x - centerX) / 10;
+                const rotateX = (centerY - y) / 10;
+                
+                this.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+            });
+        });
+        function setupEventListeners() {
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    filterExperiments(this.getAttribute('data-filter'));
+                });
+            });
+            searchInput.addEventListener('input', function() {
+                searchExperiments(this.value);
+            });
+            floatingActionBtn.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+            scrollIndicator.addEventListener('click', function() {
+                document.getElementById('experiments').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+            mobileMenu.addEventListener('click', function() {
+                const navLinks = document.querySelector('.nav-links');
+                navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+            });
+            closeModal.addEventListener('click', closeExperimentModal);
+            closeModalBtn.addEventListener('click', closeExperimentModal);
+            startExperimentBtn.addEventListener('click', startExperiment);
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeExperimentModal();
+                }
+            });
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 100) {
+                    navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+                    navbar.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.1)';
+                } else {
+                    navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                    navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+                }
+
+                const winHeight = window.innerHeight;
+                const docHeight = document.documentElement.scrollHeight;
+                const scrollTop = window.pageYOffset;
+                const scrollPercent = (scrollTop) / (docHeight - winHeight);
+                const progressPercent = scrollPercent * 100;
+                progressBar.style.width = progressPercent + '%';
+            });
+        }
+        document.addEventListener('click', function(e) {
+            const particle = document.createElement('div');
+            particle.classList.add('interactive-particle');
+            particle.style.left = `${e.clientX}px`;
+            particle.style.top = `${e.clientY}px`;
+            particle.style.width = '10px';
+            particle.style.height = '10px';
+            particle.style.background = `hsl(${Math.random() * 360}, 70%, 60%)`;
+            
+            document.body.appendChild(particle);
+
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = 2 + Math.random() * 3;
+            const vx = Math.cos(angle) * velocity;
+            const vy = Math.sin(angle) * velocity;
+            
+            let x = e.clientX;
+            let y = e.clientY;
+            let opacity = 1;
+            
+            const animate = () => {
+                x += vx;
+                y += vy;
+                opacity -= 0.02;
+                
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+                particle.style.opacity = opacity;
+                
+                if (opacity > 0) {
+                    requestAnimationFrame(animate);
+                } else {
+                    document.body.removeChild(particle);
+                }
+            };
+            
+            animate();
+        });
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>

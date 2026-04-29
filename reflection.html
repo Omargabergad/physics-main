@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>معمل الانعكاس - محاكاة فيزيائية</title>
+    <style>
+        body { 
+            margin: 0; 
+            background: linear-gradient(to right top, #283048, #859398); 
+            color: white; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* لوحة التحكم الجانبية */
+        .sidebar {
+            width: 320px;
+            background: rgba(20, 20, 30, 0.95);
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            border-left: 2px solid #444;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 20px;
+        }
+
+        h1 { 
+            color: #FFD700; 
+            font-size: 1.8em; 
+            margin: 0 0 10px 0; 
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5); 
+        }
+
+        .description {
+            color: #aaa;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        .control-group { 
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .label-text { 
+            font-weight: bold; 
+            display: block; 
+            margin-bottom: 10px; 
+            color: #00BFFF; 
+        }
+
+        .angle-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .angle-value {
+            background: rgba(0, 191, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        input[type=range] { 
+            width: 100%; 
+            height: 8px;
+            background: #555;
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #00BFFF;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+
+        .color-btns { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 10px; 
+            margin-top: 10px; 
+        }
+
+        .color-btn { 
+            width: 50px; 
+            height: 50px; 
+            border-radius: 50%; 
+            border: 3px solid #555; 
+            cursor: pointer; 
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .color-btn.active { 
+            border-color: white; 
+            transform: scale(1.1); 
+            box-shadow: 0 0 15px currentColor; 
+        }
+
+        .color-btn.active::after {
+            content: "✓";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 0 5px black;
+        }
+
+        .canvas-container {
+            position: relative;
+            background: #0d0d0d;
+            border-radius: 15px;
+            border: 4px solid #444;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            overflow: hidden;
+        }
+
+        canvas { 
+            display: block;
+        }
+
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 300px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .law-display {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .law-formula {
+            font-size: 1.5em;
+            color: #FFD700;
+            text-align: center;
+            margin: 10px 0;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .back-btn {
+            margin-top: auto;
+            background: transparent;
+            color: #FF6347;
+            text-decoration: none;
+            padding: 12px;
+            border: 2px solid #FF6347;
+            border-radius: 8px;
+            transition: 0.3s;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .back-btn:hover { 
+            background: #FF6347; 
+            color: white; 
+        }
+
+        .controls-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-reset:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-grid {
+            background: rgba(0, 191, 255, 0.2);
+            color: #00BFFF;
+            border: 1px solid #00BFFF;
+        }
+
+        .btn-grid:hover {
+            background: rgba(0, 191, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div>
+            <h1>✨ محاكاة الانعكاس الضوئي</h1>
+            <p class="description">محاكاة تفاعلية لقانون الانعكاس في الفيزياء</p>
+        </div>
+        
+        <div class="control-group">
+            <span class="label-text">زاوية السقوط (θi):</span>
+            <div class="angle-display">
+                <span>درجة</span>
+                <span class="angle-value" id="angleVal">45°</span>
+            </div>
+            <input type="range" id="angleInput" min="5" max="85" value="45">
+        </div>
+
+        <div class="control-group">
+            <span class="label-text">اختر لون الليزر:</span>
+            <div class="color-btns">
+                <div class="color-btn active" style="background: #ff0000;" data-color="#ff0000"></div>
+                <div class="color-btn" style="background: #00ff00;" data-color="#00ff00"></div>
+                <div class="color-btn" style="background: #00bfff;" data-color="#00bfff"></div>
+                <div class="color-btn" style="background: #ffff00;" data-color="#ffff00"></div>
+                <div class="color-btn" style="background: #ff00ff;" data-color="#ff00ff"></div>
+                <div class="color-btn" style="background: #ffffff;" data-color="#ffffff"></div>
+            </div>
+            
+            <div class="controls-footer">
+                <button class="btn btn-reset" id="resetBtn">إعادة تعيين</button>
+                <button class="btn btn-grid" id="toggleGrid">شبكة/بدون</button>
+            </div>
+        </div>
+
+        <a href="index.html" class="back-btn">← العودة للقائمة الرئيسية</a>
+    </div>
+
+    <div class="main-content">
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
+            
+            <div class="info-panel">
+                <h3>📌 قانون الانعكاس</h3>
+                <p>زاوية السقوط (θi) = زاوية الانعكاس (θr)</p>
+                <p>الشعاع الساقط والشعاع المنعكس والخط العمودي يقعون في نفس المستوى</p>
+            </div>
+            
+            <div class="law-display">
+                <h3>📐 الصيغة الرياضية</h3>
+                <div class="law-formula">θ<sub>i</sub> = θ<sub>r</sub></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // العناصر الأساسية
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const angleInput = document.getElementById('angleInput');
+        const angleVal = document.getElementById('angleVal');
+        const resetBtn = document.getElementById('resetBtn');
+        const toggleGridBtn = document.getElementById('toggleGrid');
+        
+        // المتغيرات
+        let laserColor = "#ff0000";
+        let showGrid = true;
+        
+        // ضبط أبعاد الـcanvas
+        canvas.width = 900;
+        canvas.height = 600;
+        const surfaceY = 400;
+        const centerX = canvas.width / 2;
+        
+        // إعداد أحداث الأزرار
+        document.querySelectorAll('.color-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // إزالة النشط من جميع الأزرار
+                document.querySelectorAll('.color-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                // إضافة النشط للزر المضغوط
+                this.classList.add('active');
+                laserColor = this.getAttribute('data-color');
+            });
+        });
+        
+        // حدث إعادة التعيين
+        resetBtn.addEventListener('click', function() {
+            angleInput.value = 45;
+            angleVal.textContent = "45°";
+            laserColor = "#ff0000";
+            
+            // إعادة ألوان الأزرار
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-color') === "#ff0000") {
+                    btn.classList.add('active');
+                }
+            });
+        });
+        
+        // حدث تبديل الشبكة
+        toggleGridBtn.addEventListener('click', function() {
+            showGrid = !showGrid;
+            this.textContent = showGrid ? "بدون شبكة" : "عرض الشبكة";
+        });
+        
+        // تحديث قيمة الزاوية
+        angleInput.addEventListener('input', function() {
+            angleVal.textContent = this.value + "°";
+        });
+        
+        // رسم بندقية الليزر
+        function drawLaserGun(x, y, angleRad) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angleRad + Math.PI/2);
+            
+            // جسم البندقية
+            ctx.fillStyle = '#333';
+            ctx.beginPath();
+            // الرسم باستخدام خطوط وأقواس بدلاً من roundRect غير المدعم
+            ctx.roundRect = ctx.roundRect || function(x, y, w, h, r) {
+                if (w < 2 * r) r = w / 2;
+                if (h < 2 * r) r = h / 2;
+                this.beginPath();
+                this.moveTo(x + r, y);
+                this.arcTo(x + w, y, x + w, y + h, r);
+                this.arcTo(x + w, y + h, x, y + h, r);
+                this.arcTo(x, y + h, x, y, r);
+                this.arcTo(x, y, x + w, y, r);
+                this.closePath();
+            };
+            
+            ctx.roundRect(-15, -50, 30, 60, 5);
+            ctx.fill();
+            
+            // أنبوب الليزر
+            ctx.fillStyle = '#555';
+            ctx.fillRect(-18, 0, 36, 12);
+            
+            // عدسة الليزر
+            ctx.fillStyle = laserColor;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = laserColor;
+            ctx.beginPath();
+            ctx.arc(0, 18, 7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+        
+        // رسم الشبكة
+        function drawGrid() {
+            if (!showGrid) return;
+            
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.lineWidth = 1;
+            
+            // خطوط أفقية
+            for (let y = 50; y < canvas.height; y += 50) {
+                ctx.beginPath();
+                ctx.moveTo(50, y);
+                ctx.lineTo(canvas.width - 50, y);
+                ctx.stroke();
+            }
+            
+            // خطوط رأسية
+            for (let x = 50; x < canvas.width; x += 50) {
+                ctx.beginPath();
+                ctx.moveTo(x, 50);
+                ctx.lineTo(x, canvas.height - 50);
+                ctx.stroke();
+            }
+        }
+        
+        // الرسم الرئيسي
+        function draw() {
+            // مسح الـcanvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // رسم الخلفية
+            ctx.fillStyle = "#0d0d0d";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // رسم الشبكة
+            drawGrid();
+            
+            // الحصول على الزاوية
+            const angleDeg = parseInt(angleInput.value);
+            const angleRad = (angleDeg * Math.PI) / 180;
+            
+            // رسم السطح العاكس
+            ctx.strokeStyle = "#B0C4DE";
+            ctx.lineWidth = 8;
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            ctx.moveTo(50, surfaceY);
+            ctx.lineTo(canvas.width - 50, surfaceY);
+            ctx.stroke();
+            
+            // رسم الخط العمودي
+            ctx.setLineDash([10, 8]);
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(centerX, surfaceY);
+            ctx.lineTo(centerX, 100);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // حساب طول الشعاع ونقطة انطلاقه
+            const rayLength = 350;
+            const sourceX = centerX - Math.sin(angleRad) * rayLength;
+            const sourceY = surfaceY - Math.cos(angleRad) * rayLength;
+            
+            // رسم الشعاع الساقط
+            ctx.strokeStyle = laserColor;
+            ctx.lineWidth = 5;
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = laserColor;
+            ctx.beginPath();
+            ctx.moveTo(sourceX, sourceY);
+            ctx.lineTo(centerX, surfaceY);
+            ctx.stroke();
+            
+            // رسم الشعاع المنعكس
+            ctx.beginPath();
+            ctx.moveTo(centerX, surfaceY);
+            ctx.lineTo(centerX + Math.sin(angleRad) * rayLength, surfaceY - Math.cos(angleRad) * rayLength);
+            ctx.stroke();
+            
+            // إزالة الظل
+            ctx.shadowBlur = 0;
+            
+            // رسم بندقية الليزر
+            drawLaserGun(sourceX, sourceY, angleRad);
+            
+            // رسم النقاط
+            ctx.fillStyle = laserColor;
+            ctx.beginPath();
+            ctx.arc(sourceX, sourceY, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.arc(centerX, surfaceY, 10, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // تسميات الزوايا
+            ctx.fillStyle = "#FFD700";
+            ctx.font = "bold 18px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(`θi = ${angleDeg}°`, centerX - 80, surfaceY - 30);
+            ctx.fillText(`θr = ${angleDeg}°`, centerX + 80, surfaceY - 30);
+            
+            // رسم أقواس الزوايا
+            ctx.strokeStyle = "#FFD700";
+            ctx.lineWidth = 2;
+            
+            // زاوية السقوط
+            ctx.beginPath();
+            ctx.arc(centerX, surfaceY, 60, -angleRad, 0);
+            ctx.stroke();
+            
+            // زاوية الانعكاس
+            ctx.beginPath();
+            ctx.arc(centerX, surfaceY, 60, Math.PI, Math.PI + angleRad);
+            ctx.stroke();
+            
+            // الاستدعاء التالي للرسم
+            requestAnimationFrame(draw);
+        }
+        
+        // بدء الرسم
+        draw();
+    </script>
+</body>
+</html>

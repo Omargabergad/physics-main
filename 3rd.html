@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>تجارب الصف الثالث | معمل الفيزياء المتقدم</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0f172a;
+            --primary-dark: #020617;
+            --secondary: #8b5cf6;
+            --accent: #f59e0b;
+            --accent-light: #fbbf24;
+            --glass: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(15, 23, 42, 0.85);
+            --text-light: #f1f5f9;
+            --text-muted: #94a3b8;
+            --shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.4);
+            --transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: radial-gradient(ellipse at 30% 40%, #0a0f1e, #030614);
+            color: var(--text-light);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(139,92,246,0.15), transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(245,158,11,0.1), transparent 60%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            background: rgba(8, 12, 24, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo i {
+            color: var(--accent);
+            font-size: 1.8rem;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 600;
+            transition: 0.2s;
+            font-size: 1rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .mobile-menu {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+        }
+
+        .hero {
+            min-height: 65vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin-top: 80px;
+            position: relative;
+        }
+
+        .hero-content h1 {
+            font-size: 3.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, var(--accent-light), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .hero-content p {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            position: relative;
+            display: inline-block;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            right: 0;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            border-radius: 4px;
+        }
+
+        .experiments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .exp-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 1.8rem;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .exp-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .exp-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(139,92,246,0.4);
+            box-shadow: var(--shadow);
+        }
+
+        .exp-card:hover::before {
+            opacity: 1;
+        }
+
+        .exp-icon {
+            font-size: 3rem;
+            margin-bottom: 1.2rem;
+            color: var(--accent);
+        }
+
+        .exp-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .exp-desc {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .exp-meta {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.8rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .exp-meta i {
+            margin-left: 6px;
+            width: 18px;
+        }
+
+        .btn-exp {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(90deg, var(--secondary), #6d28d9);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            width: fit-content;
+            transition: 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-exp:hover {
+            background: linear-gradient(90deg, #6d28d9, var(--secondary));
+            transform: scale(1.02);
+            gap: 12px;
+        }
+
+        footer {
+            margin-top: 5rem;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid var(--glass-border);
+            padding: 2.5rem 0;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .footer-links a:hover { color: var(--accent); }
+
+        .copyright {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--glass-border);
+            color: var(--text-muted);
+        }
+
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            z-index: 1001;
+        }
+        .progress-bar {
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            width: 0%;
+            transition: width 0.2s;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .mobile-menu { display: block; }
+            .hero-content h1 { font-size: 2.5rem; }
+            .section-title { font-size: 1.8rem; }
+            .container { padding: 0 1.2rem; }
+            .exp-card { padding: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<nav class="navbar">
+    <div class="navbar-container container">
+        <a href="Home.html" class="logo">
+            <i class="fas fa-atom"></i> معمل الفيزياء
+        </a>
+        <ul class="nav-links">
+            <li><a href="Home.html">الرئيسية</a></li>
+            <li><a href="Home.html#year-selection">اختيار الصف</a></li>
+            <li><a href="Home.html#about">حول</a></li>
+            <li><a href="Home.html#contact">اتصل بنا</a></li>
+        </ul>
+        <div class="mobile-menu">
+            <i class="fas fa-bars"></i>
+        </div>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1>⚛️ تجارب الصف الثالث الثانوي ⚛️</h1>
+            <p>فيزياء الكم، الحث الكهرومغناطيسي، تداخل الموجات والميكانيكا المتقدمة – محاكيات عالية الدقة.</p>
+        </div>
+    </div>
+</section>
+
+<section style="padding: 3rem 0;">
+    <div class="container">
+        <h2 class="section-title">🧪 التجارب المتقدمة</h2>
+        <div class="experiments-grid" id="experimentsGrid"></div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <div class="footer-container">
+            <div>
+                <h3 style="margin-bottom: 12px;">معمل الفيزياء</h3>
+                <p style="color:var(--text-muted)">منصة متكاملة لتجارب الفيزياء التفاعلية للمرحلة الثانوية.</p>
+            </div>
+            <div>
+                <h4>روابط سريعة</h4>
+                <ul class="footer-links">
+                    <li><a href="Home.html">الرئيسية</a></li>
+                    <li><a href="2nd.html">الصف الثاني</a></li>
+                    <li><a href="3rd.html">الصف الثالث</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>© 2025 معمل الفيزياء – جميع الحقوق محفوظة</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // تجارب الصف الثالث (متقدم)
+    const experiments = [
+        {
+            title: "قانون فاراداي للحث الكهرومغناطيسي",
+            desc: "محاكاة متكاملة لدائرة كهربائية مغلقة مع مغناطيس متحرك وجلفانومتر، لاستكشاف قانون فاراداي وقاعدة لينز.",
+            duration: "60 دقيقة",
+            difficulty: "متقدم",
+            icon: "fas fa-magnet",
+            link: "test.html"
+        },
+        {
+            title: "تجربة توماس يونج (تداخل الضوء)",
+            desc: "محاكاة تفاعلية لظاهرة تداخل الضوء عبر الشق المزدوج مع تحكم بطول الموجة وعدد الشقوق والمسافة.",
+            duration: "55 دقيقة",
+            difficulty: "متقدم",
+            icon: "fas fa-wave-square",
+            link: "light.html"
+        },
+        {
+            title: "المكبس الهيدروليكي (قانون باسكال)",
+            desc: "محاكاة عالية الدقة لنظام هيدروليكي مع إمكانية إضافة أوزان ومراقبة الضغط والقوة الخارجة.",
+            duration: "70 دقيقة",
+            difficulty: "متقدم",
+            icon: "fas fa-oil-can",
+            link: "exp3.html"
+        },
+        {
+            title: "المولد الكهربائي (الحث المتبادل)",
+            desc: "تجربة تفاعلية لفريق فاراداي لتوليد التيار الكهربائي عن طريق الحث الكهرومغناطيسي.",
+            duration: "50 دقيقة",
+            difficulty: "متقدم",
+            icon: "fas fa-bolt",
+            link: "projecttest.html"
+        }
+    ];
+
+    const grid = document.getElementById('experimentsGrid');
+
+    function buildCards() {
+        grid.innerHTML = '';
+        experiments.forEach(exp => {
+            const card = document.createElement('div');
+            card.className = 'exp-card';
+            card.innerHTML = `
+                <div class="exp-icon"><i class="${exp.icon}"></i></div>
+                <div class="exp-title">${exp.title}</div>
+                <div class="exp-desc">${exp.desc}</div>
+                <div class="exp-meta">
+                    <span><i class="far fa-clock"></i> ${exp.duration}</span>
+                    <span><i class="fas fa-chart-line"></i> ${exp.difficulty}</span>
+                </div>
+                <a href="${exp.link}" class="btn-exp" target="_self">جرب المحاكاة <i class="fas fa-arrow-left"></i></a>
+            `;
+            grid.appendChild(card);
+        });
+    }
+    buildCards();
+
+    // scroll progress
+    window.addEventListener('scroll', () => {
+        const winScroll = document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - window.innerHeight;
+        const scrolled = (winScroll / height) * 100;
+        document.getElementById('progressBar').style.width = scrolled + '%';
+    });
+
+    // mobile menu toggle
+    document.querySelector('.mobile-menu').addEventListener('click', () => {
+        const nav = document.querySelector('.nav-links');
+        nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
+        if (window.innerWidth > 768) nav.style.display = 'flex';
+    });
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) document.querySelector('.nav-links').style.display = 'flex';
+        else document.querySelector('.nav-links').style.display = 'none';
+    });
+    if (window.innerWidth <= 768) document.querySelector('.nav-links').style.display = 'none';
+</script>
+</body>
+</html>

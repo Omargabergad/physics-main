@@ -1,0 +1,3138 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مختبر فاراداي: التجارب التفاعلية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;800&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --glass: rgba(15, 23, 32, 0.75);
+            --border: rgba(255, 255, 255, 0.12);
+            --neon-blue: #00f3ff;
+            --neon-red: #ff0055;
+            --neon-gold: #ffcc00;
+            --neon-purple: #bc13fe;
+            --text-main: #e0e6ed;
+        }
+
+        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background-color: #020204;
+            background-image: radial-gradient(circle at 50% 50%, #111 0%, #000 100%);
+            color: var(--text-main);
+            font-family: 'Tajawal', sans-serif;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- SCROLL INDICATOR --- */
+        .scroll-indicator {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.7);
+            color: var(--neon-gold);
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+        
+        .scroll-indicator:hover {
+            background: rgba(20, 20, 40, 0.8);
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 204, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0); }
+        }
+
+        /* --- SIMULATION CONTAINER --- */
+        .simulation-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- LAYERS --- */
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        #bgCanvas { z-index: 0; opacity: 0.4; pointer-events: none; }
+        #simCanvas { z-index: 1; cursor: grab; }
+        #simCanvas:active { cursor: grabbing; }
+        #uiLayer { z-index: 2; pointer-events: none; width: 100%; height: 100%; position: absolute; }
+
+        /* --- GALVANOMETER STYLES --- */
+        .galvo-container {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            width: 220px;
+            height: 160px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            pointer-events: auto;
+        }
+
+        #galvoCanvas {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            border-radius: 12px;
+        }
+
+        .galvo-label {
+            position: absolute;
+            bottom: 10px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            color: #888;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+
+        /* --- UI SIDEBAR --- */
+        .sidebar {
+            position: absolute;
+            right: 0; top: 0; bottom: 0;
+            width: 360px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-left: 1px solid var(--border);
+            padding: 25px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+            box-shadow: -10px 0 40px rgba(0,0,0,0.6);
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        h2 { 
+            margin: 0 0 15px 0; 
+            font-weight: 800; 
+            text-align: center; 
+            color: var(--neon-gold); 
+            letter-spacing: 0px; 
+            font-size: 1.5rem;
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.4); 
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
+        }
+
+        /* --- WIDGETS --- */
+        .power-meter {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 5px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .pm-label { font-size: 0.8rem; color: #888; display: flex; justify-content: space-between; }
+        .pm-bar-bg { height: 6px; background: #333; border-radius: 3px; margin-top: 5px; overflow: hidden; }
+        .pm-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple)); transition: width 0.1s; }
+        .pm-value { font-family: 'Rajdhani'; color: var(--neon-blue); font-weight: 700; }
+
+        /* --- BUTTONS --- */
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            pointer-events: auto;
+        }
+        .btn::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0));
+            pointer-events: none;
+        }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.15); }
+        .btn:active { transform: scale(0.97); }
+
+        .btn-purple { background: linear-gradient(135deg, #662D8C, #ED1E79); }
+        .btn-orange { background: linear-gradient(135deg, #F2994A, #F2C94C); color: #000; text-shadow: none; }
+        .btn-red { background: linear-gradient(135deg, #cb2d3e, #ef473a); }
+        .btn-blue { background: linear-gradient(135deg, #1A2980, #26D0CE); }
+
+        /* --- SLIDERS --- */
+        .control-group { 
+            background: rgba(255,255,255,0.03); 
+            padding: 12px; 
+            border-radius: 10px; 
+            pointer-events: auto;
+        }
+        .label-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 500; font-size: 0.85rem; color: #ccc; }
+        .value-disp { font-family: 'Rajdhani', monospace; font-weight: 700; color: var(--neon-gold); }
+
+        input[type=range] {
+            width: 100%; -webkit-appearance: none; background: transparent; cursor: pointer;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: var(--text-main); margin-top: -6px; box-shadow: 0 0 10px rgba(255,255,255,0.5); 
+            transition: transform 0.1s;
+        }
+        input[type=range]:hover::-webkit-slider-thumb { transform: scale(1.2); background: var(--neon-gold); }
+
+        /* --- TOGGLES --- */
+        .checkbox-group { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; pointer-events: auto; }
+        .chk-row { display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 0.9rem; color: #aaa; transition: 0.2s; }
+        .chk-row:hover { color: #fff; }
+        .chk-box {
+            width: 20px; height: 20px; border: 2px solid #555; border-radius: 5px;
+            display: flex; align-items: center; justify-content: center; transition: 0.2s;
+        }
+        input:checked + .chk-box { background: var(--neon-blue); border-color: var(--neon-blue); color: #000; }
+        input:checked + .chk-box::after { content: '✔'; font-weight: 900; font-size: 0.7rem; }
+
+        /* --- SCOPE --- */
+        .scope-container {
+            position: absolute; bottom: 30px; left: 30px;
+            width: 360px; height: 140px;
+            background: rgba(10, 15, 20, 0.9);
+            border: 1px solid #444; border-radius: 12px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.7);
+            z-index: 5;
+            overflow: hidden;
+            display: flex; flex-direction: column;
+            pointer-events: auto;
+        }
+        .scope-header { 
+            font-size: 0.75rem; padding: 8px 12px; 
+            background: rgba(255,255,255,0.05);
+            color: #888; font-family: 'Rajdhani'; 
+            border-bottom: 1px solid #333; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .legend { display: flex; gap: 10px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        #scopeCanvas { width: 100%; height: 100%; }
+
+        /* --- ALERTS --- */
+        .mode-badge {
+            position: absolute; top: 30px; 
+            left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.6); border: 1px solid var(--neon-gold);
+            color: var(--neon-gold); padding: 8px 16px; border-radius: 20px;
+            font-family: 'Tajawal'; font-weight: 700;
+            text-shadow: 0 0 10px rgba(255,204,0,0.5);
+            pointer-events: none; opacity: 0; transition: opacity 0.5s;
+            z-index: 20;
+        }
+        .show-badge { opacity: 1; }
+
+        /* --- AI VIDEO SECTION (NEW) --- */
+        .ai-video-section {
+            width: 100%;
+            padding: 40px 20px;
+            background: linear-gradient(to bottom, #0a0a1a, #020204);
+            position: relative;
+            z-index: 1;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .ai-video-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 243, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+        
+        .ai-video-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .ai-video-title {
+            font-size: 2.5rem;
+            color: var(--neon-blue);
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .ai-video-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+        }
+        
+        .ai-video-subtitle {
+            color: #ccc;
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .ai-video-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 992px) {
+            .ai-video-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .ai-video-player-container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+        }
+        
+        .ai-video-player {
+            width: 100%;
+            height: 400px;
+            background: #000;
+            position: relative;
+        }
+        
+        .ai-video-player video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .ai-video-controls {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .ai-video-sidebar {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .ai-parameters {
+            margin-bottom: 30px;
+        }
+        
+        .parameter-group {
+            margin-bottom: 25px;
+        }
+        
+        .parameter-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: var(--neon-gold);
+            font-weight: 700;
+        }
+        
+        .parameter-value {
+            color: var(--neon-blue);
+            font-family: 'Rajdhani', monospace;
+        }
+        
+        .parameter-slider {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        .parameter-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--neon-blue);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+        
+        .ai-generate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .ai-generate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 243, 255, 0.3);
+        }
+        
+        .ai-generate-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .ai-generate-btn .loading-spinner {
+            display: none;
+        }
+        
+        .ai-generate-btn.generating .loading-spinner {
+            display: inline-block;
+        }
+        
+        .ai-generate-btn.generating .btn-text {
+            display: none;
+        }
+        
+        .ai-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .ai-feature {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .ai-feature:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-blue);
+            box-shadow: 0 10px 20px rgba(0, 243, 255, 0.1);
+        }
+        
+        .ai-feature-icon {
+            font-size: 40px;
+            color: var(--neon-blue);
+            margin-bottom: 15px;
+        }
+        
+        .ai-feature-title {
+            color: white;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .ai-feature-desc {
+            color: #aaa;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* --- CONTENT SECTIONS --- */
+        .content-sections {
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(to bottom, #020204, #0a0a1a);
+        }
+        
+        .section {
+            padding: 60px 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .section-title {
+            font-size: 2.2rem;
+            color: var(--neon-gold);
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+        }
+        
+        .responsive-video {
+            position: relative;
+            width: 100%;
+            height: 450px;
+            background: #000;
+        }
+        
+        .responsive-video video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .video-upload-area {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px dashed rgba(0, 243, 255, 0.3);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            margin: 20px auto;
+            max-width: 800px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .video-upload-area:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--neon-blue);
+        }
+        
+        .video-upload-area.dragover {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: var(--neon-blue);
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 60px;
+            color: var(--neon-blue);
+            margin-bottom: 20px;
+        }
+        
+        .upload-text {
+            font-size: 1.2rem;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+        
+        .upload-hint {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 20px;
+        }
+        
+        .upload-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 243, 255, 0.3);
+        }
+        
+        .video-description {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            border-right: 3px solid var(--neon-purple);
+        }
+        
+        /* VIDEO CONTROLS */
+        .video-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .control-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .control-btn.primary {
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+        }
+        
+        .control-btn.secondary {
+            background: linear-gradient(135deg, var(--neon-gold), #ff9900);
+            color: #000;
+        }
+        
+        /* VIDEO LIST */
+        .video-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .video-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .video-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-blue);
+            box-shadow: 0 10px 20px rgba(0, 243, 255, 0.1);
+        }
+        
+        .video-item-header {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .video-item-title {
+            font-weight: 700;
+            color: white;
+            font-size: 1.1rem;
+        }
+        
+        .video-item-size {
+            font-size: 0.8rem;
+            color: #888;
+        }
+        
+        .video-item-preview {
+            width: 100%;
+            height: 150px;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .video-item-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .video-item-actions {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .action-btn.play {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+        
+        .action-btn.delete {
+            background: rgba(255, 85, 85, 0.2);
+            color: #ff5555;
+        }
+        
+        /* PDF SECTION */
+        .pdf-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 0 auto;
+            max-width: 800px;
+        }
+        
+        .pdf-viewer-container {
+            width: 100%;
+            height: 600px;
+            background: #111;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .pdf-viewer {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .pdf-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .pdf-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 243, 255, 0.1);
+            color: var(--neon-blue);
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            cursor: pointer;
+        }
+        
+        .pdf-btn:hover {
+            background: rgba(0, 243, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .pdf-btn.download {
+            background: linear-gradient(135deg, #ff5555, #ff3366);
+            color: white;
+            border: none;
+        }
+        
+        .pdf-btn.download:hover {
+            background: linear-gradient(135deg, #ff3366, #ff5555);
+            box-shadow: 0 5px 15px rgba(255, 85, 85, 0.3);
+        }
+        
+        .pdf-info {
+            text-align: center;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+        
+        .pdf-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .stat {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            min-width: 150px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            color: var(--neon-gold);
+            font-weight: 700;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+        
+        /* QUESTIONS SECTION */
+        .questions-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .question-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .question-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-blue);
+            box-shadow: 0 10px 20px rgba(0, 243, 255, 0.1);
+        }
+        
+        .question-text {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .option {
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .option:hover {
+            background: rgba(0, 243, 255, 0.15);
+            transform: translateX(5px);
+        }
+        
+        .option.selected {
+            background: rgba(0, 243, 255, 0.2);
+            border-right: 3px solid var(--neon-blue);
+        }
+        
+        .option.correct {
+            background: rgba(0, 255, 136, 0.2);
+            border-right: 3px solid #00ff88;
+        }
+        
+        .option.incorrect {
+            background: rgba(255, 85, 85, 0.2);
+            border-right: 3px solid #ff5555;
+        }
+        
+        .feedback {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .feedback.correct {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            color: #00ff88;
+            display: block;
+        }
+        
+        .feedback.incorrect {
+            background: rgba(255, 85, 85, 0.1);
+            border: 1px solid rgba(255, 85, 85, 0.3);
+            color: #ff5555;
+            display: block;
+        }
+        
+        .check-answer-btn {
+            background: linear-gradient(135deg, var(--neon-purple), #9d4edd);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            margin-top: 10px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .check-answer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(157, 78, 221, 0.3);
+        }
+        
+        .quiz-results {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 40px;
+            text-align: center;
+            display: none;
+        }
+        
+        .quiz-results.show {
+            display: block;
+        }
+        
+        .results-title {
+            font-size: 1.5rem;
+            color: var(--neon-gold);
+            margin-bottom: 15px;
+        }
+        
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(var(--neon-blue) 0% 0%, #333 0% 100%);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .score-circle-inner {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+        }
+        
+        .score-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        
+        .restart-quiz-btn {
+            background: linear-gradient(135deg, var(--neon-gold), #ff9900);
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .restart-quiz-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 204, 0, 0.3);
+        }
+        
+        /* BACK TO SIMULATION BUTTON */
+        .back-to-sim {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 100;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            display: none;
+        }
+        
+        .back-to-sim.show {
+            display: flex;
+        }
+        
+        .back-to-sim:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 243, 255, 0.3);
+        }
+        
+        /* LOADING SPINNER */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: var(--neon-blue);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* PROGRESS BAR */
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: rgba(20, 25, 35, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--neon-gold);
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .close-modal:hover {
+            color: white;
+        }
+        
+        /* PRACTICAL VIDEOS SECTION - ENHANCED WITH FLEX */
+        .practical-videos-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+        }
+        
+        .practical-video-item {
+            flex: 1;
+            min-width: 350px;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+        
+        .practical-video-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-blue);
+            box-shadow: 0 10px 20px rgba(0, 243, 255, 0.1);
+        }
+        
+        .practical-video-header {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .practical-video-title {
+            font-size: 1.3rem;
+            color: var(--neon-gold);
+            margin-bottom: 8px;
+        }
+        
+        .practical-video-desc {
+            color: #ccc;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+        
+        .practical-video-upload {
+            padding: 15px;
+            margin-top: auto;
+        }
+        
+        /* Adjust video container inside practical items */
+        .practical-video-item .video-container {
+            margin: 15px;
+            border-radius: 8px;
+            flex-grow: 1;
+        }
+        
+        .practical-video-item .responsive-video {
+            height: 200px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .practical-video-item {
+                min-width: 300px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .practical-videos-section {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .practical-video-item {
+                max-width: 600px;
+                width: 100%;
+            }
+            
+            .practical-video-item .responsive-video {
+                height: 200px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .practical-video-item {
+                min-width: 100%;
+            }
+            
+            .practical-video-item .responsive-video {
+                height: 250px;
+            }
+            
+            .section {
+                padding: 40px 20px;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+            
+            .ai-video-title {
+                font-size: 2rem;
+            }
+            
+            .ai-video-content {
+                gap: 20px;
+            }
+            
+            .ai-video-player {
+                height: 300px;
+            }
+        }
+        
+        /* Adjust video description in practical items */
+        .practical-video-item .video-description {
+            margin-top: 10px;
+            padding: 15px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="simulation-container">
+        <canvas id="bgCanvas"></canvas>
+        <canvas id="simCanvas"></canvas>
+        
+        <div id="uiLayer">
+            <div id="modeBadge" class="mode-badge">التجربة 1: قانون فاراداي (المغناطيس المتحرك)</div>
+        </div>
+
+        <div class="galvo-container">
+            <canvas id="galvoCanvas"></canvas>
+            <div class="galvo-label">GALVANOMETER</div>
+        </div>
+
+        <div class="scope-container" id="scopeContainer">
+            <div class="scope-header">
+                <div class="legend">
+                    <span><span class="dot" style="background:#0f0"></span> الجهد (EMF)</span>
+                    <span><span class="dot" style="background:#fa0"></span> الفيض (Flux)</span>
+                </div>
+                <span id="voltage-readout" style="color:#fff; font-weight:bold">0.00 mV</span>
+            </div>
+            <canvas id="scopeCanvas"></canvas>
+        </div>
+
+        <div class="sidebar">
+            <h2>مختبر الحث الكهرومغناطيسي</h2>
+
+            <div class="power-meter">
+                <div class="pm-label">
+                    <span>القدرة اللحظية (Power)</span>
+                    <span class="pm-value" id="val-power">0.0 W</span>
+                </div>
+                <div class="pm-bar-bg"><div class="pm-bar-fill" id="bar-power"></div></div>
+            </div>
+
+            <button class="btn btn-purple" id="btn-mode" onclick="toggleMode()">
+                <span>⇄</span> الانتقال للتجربة الثانية (المحول)
+            </button>
+
+            <button class="btn btn-orange" id="btn-ac">
+                <span>⏻</span> تيار متردد (مولد تلقائي)
+            </button>
+
+            <button class="btn btn-red" onclick="resetSim()">
+                <span>↻</span> إعادة التعيين
+            </button>
+
+            <button class="btn btn-blue" id="btn-polarity" onclick="togglePolarity()">
+                <span>⇄</span> عكس الأقطاب
+            </button>
+
+            <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 5px 0;"></div>
+
+            <div class="control-group">
+                <div class="label-row">
+                    <span>عدد اللفات (N)</span>
+                    <span class="value-disp" id="val-turns">12</span>
+                </div>
+                <input type="range" id="inp-turns" min="4" max="24" step="2" value="12">
+            </div>
+
+            <div class="control-group">
+                <div class="label-row">
+                    <span id="lbl-strength">قوة المغناطيس (B)</span>
+                    <span class="value-disp" id="val-strength">1.0 T</span>
+                </div>
+                <input type="range" id="inp-strength" min="0.1" max="2.0" step="0.1" value="1.0">
+            </div>
+
+            <div class="control-group">
+                <div class="label-row">
+                    <span>المقاومة (R)</span>
+                    <span class="value-disp" id="val-res">10 Ω</span>
+                </div>
+                <input type="range" id="inp-res" min="2" max="50" value="10">
+            </div>
+
+            <div class="checkbox-group">
+                <label class="chk-row">
+                    <input type="checkbox" id="chk-field" checked>
+                    <div class="chk-box"></div>
+                    <span>خطوط المجال (Field Lines)</span>
+                </label>
+
+                <label class="chk-row">
+                    <input type="checkbox" id="chk-lenz" checked>
+                    <div class="chk-box"></div>
+                    <span>متجه قانون لينز (Lenz Vector)</span>
+                </label>
+
+                <label class="chk-row">
+                    <input type="checkbox" id="chk-scope" checked>
+                    <div class="chk-box"></div>
+                    <span>راسم الإشارة (Oscilloscope)</span>
+                </label>
+            </div>
+        </div>
+    </div>
+    <!-- Scroll indicator -->
+    <div class="scroll-indicator" id="scrollIndicator">
+        <i class="fas fa-chevron-down"></i>
+        <span>مرر لأسفل لرؤية المحتوى التعليمي</span>
+    </div>
+    
+    <!-- Back to simulation button -->
+    <div class="back-to-sim" id="backToSim">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+    
+    <!-- Modal for video upload -->
+    <div class="modal" id="videoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">إضافة فيديو جديد</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="video-upload-area" id="modalUploadArea">
+                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                <div class="upload-text">اسحب وأفلت الفيديو هنا أو انقر للاختيار</div>
+                <div class="upload-hint">MP4, WebM, OGG (الحد الأقصى: 100 ميجابايت)</div>
+                <button class="upload-btn" onclick="document.getElementById('modalVideoInput').click()">
+                    <i class="fas fa-folder-open"></i>
+                    اختيار فيديو
+                </button>
+                <input type="file" id="modalVideoInput" accept="video/mp4,video/webm,video/ogg" style="display: none;" onchange="handleModalVideoUpload(this.files)">
+            </div>
+            <div class="video-info" style="margin-top: 20px; display: none;" id="videoInfo">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span>اسم الفيديو:</span>
+                    <span id="videoName" style="color: var(--neon-blue);"></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span>الحجم:</span>
+                    <span id="videoSize" style="color: var(--neon-blue);"></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                    <span>المدة:</span>
+                    <span id="videoDuration" style="color: var(--neon-blue);"></span>
+                </div>
+                <input type="text" id="videoTitle" placeholder="أدخل عنوان للفيديو" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; margin-bottom: 20px;">
+                <textarea id="videoDescription" placeholder="أدخل وصف للفيديو" rows="3" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; margin-bottom: 20px; resize: vertical;"></textarea>
+                <button class="control-btn primary" style="width: 100%;" onclick="saveVideo()">
+                    <i class="fas fa-save"></i>
+                    حفظ الفيديو
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Content Sections -->
+    <div class="content-sections" id="contentSections">
+        <!-- Video Explanation Section -->
+        <section class="section" id="videoSection">
+            <h2 class="section-title">فيديو شرح التجربة</h2>
+            
+            <div class="video-container">
+                <div class="responsive-video" id="mainVideoPlayer">
+                    <video id="mainVideo" controls>
+                        <source id="videoSource" src="assets/video/frad1.mp4" type="video/mp4">
+                        متصفحك لا يدعم تشغيل الفيديو.
+                    </video>
+                </div>
+            </div>
+            
+            <div class="video-controls">
+                <button class="control-btn primary" onclick="openModal('main')">
+                    <i class="fas fa-upload"></i>
+                    رفع فيديو جديد
+                </button>
+                <button class="control-btn" onclick="toggleFullscreen('mainVideo')">
+                    <i class="fas fa-expand"></i>
+                    ملء الشاشة
+                </button>
+                <button class="control-btn" onclick="downloadVideo('mainVideo')">
+                    <i class="fas fa-download"></i>
+                    تنزيل الفيديو
+                </button>
+            </div>
+            
+            <div class="video-description" id="mainVideoDescription">
+                <h3 style="color: var(--neon-gold); margin-bottom: 10px;" id="mainVideoTitle">فيديو شرح قانون فاراداي</h3>
+                <p id="mainVideoDesc">قم برفع فيديو لشرح قانون فاراداي للحث الكهرومغناطيسي. يجب أن يتضمن الفيديو شرحاً للقانون والتجارب العملية والتطبيقات.</p>
+                <div style="display: flex; justify-content: space-between; margin-top: 15px; color: #888; font-size: 0.9rem;">
+                    <span id="mainVideoInfo">لم يتم رفع فيديو بعد</span>
+                    <span id="mainVideoStats">0 دقيقة • 0 ميجابايت</span>
+                </div>
+            </div>
+        </section>
+        
+        <!-- PDF Section -->
+        <section class="section" id="pdfSection">
+            <h2 class="section-title">ملف PDF للتحميل</h2>
+            
+            <div class="pdf-container">
+                <div class="pdf-viewer-container">
+                    <iframe 
+                        src="assets/DOC-20251117-WA0031..pdf" 
+                        class="pdf-viewer"
+                        title="كتاب الحث الكهرومغناطيسي">
+                    </iframe>
+                </div>
+                
+                <div class="pdf-controls">
+                    <button class="pdf-btn" onclick="zoomInPdf()">
+                        <i class="fas fa-search-plus"></i>
+                        تكبير
+                    </button>
+                    <button class="pdf-btn" onclick="zoomOutPdf()">
+                        <i class="fas fa-search-minus"></i>
+                        تصغير
+                    </button>
+                    <button class="pdf-btn" onclick="resetZoomPdf()">
+                        <i class="fas fa-sync-alt"></i>
+                        إعادة ضبط
+                    </button>
+                    <a href="https://mohamedrabeea.net/books/read/full/1419" class="pdf-btn download" target="_blank" download="electromagnetic_induction.pdf">
+                        <i class="fas fa-download"></i>
+                        تنزيل PDF
+                    </a>
+                </div>
+                
+                <div class="pdf-info">
+                    <h3 style="color: var(--neon-gold); margin-bottom: 15px;">كتاب الحث الكهرومغناطيسي وتطبيقاته</h3>
+                    <p style="line-height: 1.6; color: #ccc;">
+                        كتاب شامل يغطي جميع جوانب الحث الكهرومغناطيسي، بدءاً من التجارب الأولى لفاراداي وحتى التطبيقات الحديثة في الهندسة الكهربائية. يحتوي على شرح مفصل للنظريات، مع أمثلة عملية وتمارين محلولة.
+                    </p>
+                    
+                    <div class="pdf-stats">
+                        <div class="stat">
+                            <div class="stat-value">245</div>
+                            <div class="stat-label">عدد الصفحات</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">عدد الفصول</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">85</div>
+                            <div class="stat-label">تمرين محلول</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">18.5</div>
+                            <div class="stat-label">ميجابايت</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Interactive Questions Section -->
+        <section class="section" id="questionsSection">
+            <h2 class="section-title">أسئلة تفاعلية</h2>
+            
+            <div class="questions-container">
+                <!-- Question 1 -->
+                <div class="question-card" data-question="1">
+                    <div class="question-text">
+                        1. ما هو قانون فاراداي للحث الكهرومغناطيسي؟
+                    </div>
+                    
+                    <div class="options-container">
+                        <div class="option" data-correct="true" onclick="selectOption(this, 1)">
+                            القوة الدافعة الكهربائية المستحثة تتناسب طرديًا مع معدل تغير التدفق المغناطيسي
+                        </div>
+                        <div class="option" data-correct="false" onclick="selectOption(this, 1)">
+                            القوة الدافعة الكهربائية المستحثة تتناسب عكسيًا مع معدل تغير التدفق المغناطيسي
+                        </div>
+                        <div class="option" data-correct="false" onclick="selectOption(this, 1)">
+                            القوة الدافعة الكهربائية المستحثة تتناسب طرديًا مع شدة المجال المغناطيسي فقط
+                        </div>
+                        <div class="option" data-correct="false" onclick="selectOption(this, 1)">
+                            القوة الدافعة الكهربائية المستحثة تتناسب طرديًا مع عدد اللفات فقط
+                        </div>
+                    </div>
+                    
+                    <div class="feedback" id="feedback1"></div>
+                    
+                    <button class="check-answer-btn" onclick="checkAnswer(1)">
+                        التحقق من الإجابة
+                    </button>
+                </div>
+                
+                <!-- Question 2 -->
+                <div class="question-card" data-question="2">
+                    <div class="question-text">
+                        2. ما هو اتجاه التيار المستحث حسب قانون لينز؟
+                    </div>
+                    
+                    <div class="options-container">
+                        <div class="option" data-correct="true" onclick="selectOption(this, 2)">
+                            يعمل في اتجاه يعاكس التغير في التدفق المغناطيسي الذي سببه
+                        </div>
+                        <div class="option" data-correct="false" onclick="selectOption(this, 2)">
+                            يعمل في نفس اتجاه التغير في التدفق المغناطيسي الذي سببه
+                        </div>
+                        <div class="option" data-correct="false" onclick="selectOption(this, 2)">
+                            يعتمد على قوة المجال المغناطيسي فقط
+                        </div>
+                        <div class="option" data-correct="false" onclick="selectOption(this, 2)">
+                            يعتمد على سرعة حركة المغناطيس فقط
+                        </div>
+                    </div>
+                    
+                    <div class="feedback" id="feedback2"></div>
+                    
+                    <button class="check-answer-btn" onclick="checkAnswer(2)">
+                        التحقق من الإجابة
+                    </button>
+                </div>
+                
+                <!-- Question 3 -->
+                <div class="question-card" data-question="3">
+                    <div class="question-text">
+                        3. ما العوامل التي تؤثر على مقدار القوة الدافعة الكهربائية المستحثة في ملف؟
+                    </div>
+                    
+                    <div class="options-container">
+                        <div class="option" data-correct="false" onclick="selectOption(this, 3)">
+                            عدد اللفات فقط
+                        </div>
+                        <div class="option" data-correct="false" onclick="selectOption(this, 3)">
+                            سرعة تغير التدفق المغناطيسي فقط
+                        </div>
+                        <div class="option" data-correct="true" onclick="selectOption(this, 3)">
+                            عدد اللفات وسرعة تغير التدفق المغناطيسي
+                        </div>
+                        <div class="option" data-correct="false" onclick="selectOption(this, 3)">
+                            لون الملف ودرجة حرارة الوسط
+                        </div>
+                    </div>
+                    
+                    <div class="feedback" id="feedback3"></div>
+                    
+                    <button class="check-answer-btn" onclick="checkAnswer(3)">
+                        التحقق من الإجابة
+                    </button>
+                </div>
+            </div>
+            
+            <div class="quiz-results" id="quizResults">
+                <h3 class="results-title">نتيجة الاختبار</h3>
+                <div class="score-circle">
+                    <div class="score-circle-inner">
+                        <div class="score-value" id="scoreValue">0%</div>
+                        <div class="score-label">نسبة النجاح</div>
+                    </div>
+                </div>
+                <p id="resultMessage" style="color: #ccc; margin-bottom: 20px; line-height: 1.6;"></p>
+                <button class="restart-quiz-btn" onclick="restartQuiz()">
+                    <i class="fas fa-redo"></i>
+                    إعادة الاختبار
+                </button>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="quizProgress"></div>
+            </div>
+            
+            <button class="btn btn-purple" onclick="submitAllAnswers()" style="width: 100%; margin-top: 20px;">
+                <i class="fas fa-check-circle"></i>
+                إنهاء الاختبار وعرض النتيجة
+            </button>
+        </section>
+        
+        <!-- Practical Videos Section - Enhanced with Flex -->
+        <section class="section" id="practicalVideos">
+            <h2 class="section-title">فيديوهات تطبيقات عملية</h2>
+            
+            <div class="practical-videos-section">
+                <!-- Practical Video 1 -->
+                <div class="practical-video-item">
+                    <div class="practical-video-header">
+                        <h3 class="practical-video-title">المحولات الكهربائية</h3>
+                        <p class="practical-video-desc">
+                            تطبيق عملي لقانون فاراداي في المحولات الكهربائية المستخدمة في رفع وخفض الجهد في شبكات التوزيع الكهربائي.
+                        </p>
+                    </div>
+                    <div class="video-container" style="margin: 15px; border-radius: 8px;">
+                        <div class="responsive-video" id="practicalVideo1Player">
+                            <video id="practicalVideo1" controls>
+                                <source src="assets/video/frad1.mp4" type="video/mp4">
+                                متصفحك لا يدعم تشغيل الفيديو.
+                            </video>
+                        </div>
+                    </div>
+                    <div class="practical-video-upload">
+                        <div class="video-controls">
+                            <button class="control-btn primary" onclick="openModal('practical1')">
+                                <i class="fas fa-upload"></i>
+                                رفع فيديو المحولات الكهربائية
+                            </button>
+                            <button class="control-btn" onclick="toggleFullscreen('practicalVideo1')">
+                                <i class="fas fa-expand"></i>
+                                ملء الشاشة
+                            </button>
+                        </div>
+                        <div class="video-description" style="margin-top: 15px;">
+                            <div style="display: flex; justify-content: space-between; color: #888; font-size: 0.9rem;">
+                                <span id="practicalVideo1Info">لم يتم رفع فيديو بعد</span>
+                                <span id="practicalVideo1Stats">0 دقيقة • 0 ميجابايت</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Practical Video 2 -->
+                <div class="practical-video-item">
+                    <div class="practical-video-header">
+                        <h3 class="practical-video-title">مولدات التيار الكهربائي</h3>
+                        <p class="practical-video-desc">
+                            كيف يعمل مولد التيار الكهربائي باستخدام مبادئ الحث الكهرومغناطيسي لتوليد الكهرباء من الطاقة الميكانيكية.
+                        </p>
+                    </div>
+                    <div class="video-container" style="margin: 15px; border-radius: 8px;">
+                        <div class="responsive-video" id="practicalVideo2Player">
+                            <video id="practicalVideo2" controls>
+                                <source src="assets/video/frad2.mp4" type="video/mp4">
+                                متصفحك لا يدعم تشغيل الفيديو.
+                            </video>
+                        </div>
+                    </div>
+                    <div class="practical-video-upload">
+                        <div class="video-controls">
+                            <button class="control-btn primary" onclick="openModal('practical2')">
+                                <i class="fas fa-upload"></i>
+                                رفع فيديو مولدات التيار
+                            </button>
+                            <button class="control-btn" onclick="toggleFullscreen('practicalVideo2')">
+                                <i class="fas fa-expand"></i>
+                                ملء الشاشة
+                            </button>
+                        </div>
+                        <div class="video-description" style="margin-top: 15px;">
+                            <div style="display: flex; justify-content: space-between; color: #888; font-size: 0.9rem;">
+                                <span id="practicalVideo2Info">لم يتم رفع فيديو بعد</span>
+                                <span id="practicalVideo2Stats">0 دقيقة • 0 ميجابايت</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Practical Video 3 -->
+                <div class="practical-video-item">
+                    <div class="practical-video-header">
+                        <h3 class="practical-video-title">تطبيقات الحث الكهرومغناطيسي</h3>
+                        <p class="practical-video-desc">
+                            شرح كيفية استخدام الحث الكهرومغناطيسي في تطبيقات عملية مثل الفرامل الكهرومغناطيسية وأجهزة الاستشعار.
+                        </p>
+                    </div>
+                    <div class="video-container" style="margin: 15px; border-radius: 8px;">
+                        <div class="responsive-video" id="practicalVideo3Player">
+                            <video id="practicalVideo3" controls>
+                                <source src="assets/video/frad1.mp4" type="video/mp4">
+                                متصفحك لا يدعم تشغيل الفيديو.
+                            </video>
+                        </div>
+                    </div>
+                    <div class="practical-video-upload">
+                        <div class="video-controls">
+                            <button class="control-btn primary" onclick="openModal('practical3')">
+                                <i class="fas fa-upload"></i>
+                                رفع فيديو التطبيقات العملية
+                            </button>
+                            <button class="control-btn" onclick="toggleFullscreen('practicalVideo3')">
+                                <i class="fas fa-expand"></i>
+                                ملء الشاشة
+                            </button>
+                        </div>
+                        <div class="video-description" style="margin-top: 15px;">
+                            <div style="display: flex; justify-content: space-between; color: #888; font-size: 0.9rem;">
+                                <span id="practicalVideo3Info">لم يتم رفع فيديو بعد</span>
+                                <span id="practicalVideo3Stats">0 دقيقة • 0 ميجابايت</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+<script>
+    /** --- SYSTEM SETUP --- */
+    const cvs = document.getElementById('simCanvas');
+    const ctx = cvs.getContext('2d');
+    const bCvs = document.getElementById('bgCanvas');
+    const bCtx = bCvs.getContext('2d');
+    const sCvs = document.getElementById('scopeCanvas');
+    const sCtx = sCvs.getContext('2d');
+    
+    // Galvanometer Setup
+    const gCvs = document.getElementById('galvoCanvas');
+    const gCtx = gCvs.getContext('2d');
+    let galvoNeedleAngle = 0;
+
+    let W, H;
+    
+    // Core Settings
+    const settings = {
+        turns: 12, strength: 1.0, res: 10,
+        showField: true, showLenz: true, showScope: true, 
+        polarity: 1, // 1 or -1
+        mode: 0 // 0 = Faraday (Magnet), 1 = Transformer (Dual Coil)
+    };
+    
+    // Physics State
+    const state = {
+        // Object Position (Magnet or Primary Coil)
+        objX: 0, objY: 0, vel: 0, 
+        // Interaction
+        drag: false, dragOff: 0, lastX: 0,
+        // Electrical
+        voltage: 0, current: 0, flux: 0, dFlux: 0,
+        power: 0,
+        // Time & animation
+        time: 0, ac: false
+    };
+
+    // Visual Elements
+    const sparks = [];
+    
+    // --- CIRCUIT DIMENSIONS ---
+    const coilWidth = 360; 
+    const circuitDrop = 180; 
+    const perimeter = (coilWidth) + (circuitDrop * 2) + (coilWidth); 
+
+    // Initialize electrons
+    const electrons = Array.from({length: 80}, () => ({
+        p: Math.random() * perimeter, 
+        r: 1.5 + Math.random()
+    }));
+    let vectors = [];
+
+    /** --- INITIALIZATION --- */
+    function resize() {
+        W = cvs.width = bCvs.width = window.innerWidth;
+        H = cvs.height = bCvs.height = window.innerHeight;
+        sCvs.width = 360; sCvs.height = 110;
+        gCvs.width = 220; gCvs.height = 160;
+        
+        state.objY = H/2;
+        if(!state.drag && !state.ac) state.objX = W*0.2;
+
+        // Init Field Vectors Grid
+        vectors = [];
+        const spacing = 45;
+        for(let y=0; y<H; y+=spacing) {
+            for(let x=0; x<W; x+=spacing) {
+                vectors.push({x, y, ang: 0, len: 0});
+            }
+        }
+        
+        updateBadge();
+        
+        // Adjust practical videos height
+        adjustPracticalVideosHeight();
+    }
+    window.addEventListener('resize', resize);
+    setTimeout(resize, 10);
+
+    /** --- UI BINDINGS --- */
+    const linkSlider = (id, key, dispId, suffix='') => {
+        document.getElementById(id).oninput = function() {
+            settings[key] = parseFloat(this.value);
+            document.getElementById(dispId).innerText = this.value + suffix;
+        }
+    };
+    linkSlider('inp-turns', 'turns', 'val-turns');
+    linkSlider('inp-strength', 'strength', 'val-strength', ' T');
+    linkSlider('inp-res', 'res', 'val-res', ' Ω');
+
+    document.getElementById('chk-field').onchange = e => settings.showField = e.target.checked;
+    document.getElementById('chk-lenz').onchange = e => settings.showLenz = e.target.checked;
+    document.getElementById('chk-scope').onchange = e => 
+        document.getElementById('scopeContainer').style.display = e.target.checked ? 'flex' : 'none';
+
+    window.togglePolarity = () => { settings.polarity *= -1; };
+    
+    window.toggleMode = () => {
+        settings.mode = settings.mode === 0 ? 1 : 0;
+        resetSim();
+        updateBadge();
+        
+        const btn = document.getElementById('btn-mode');
+        const lbl = document.getElementById('lbl-strength');
+        const btnPol = document.getElementById('btn-polarity');
+        
+        if(settings.mode === 1) {
+            btn.innerHTML = '<span>⇄</span> العودة للتجربة الأولى (فاراداي)';
+            lbl.innerText = 'تردد المصدر (Hz)';
+            document.getElementById('val-strength').innerText = settings.strength + ' Hz';
+            btnPol.style.display = 'none'; // Polarity irrelevant in AC transformer
+            state.ac = true; 
+        } else {
+            btn.innerHTML = '<span>⇄</span> الانتقال للتجربة الثانية (المحول)';
+            lbl.innerText = 'قوة المغناطيس (B)';
+            document.getElementById('val-strength').innerText = settings.strength + ' T';
+            btnPol.style.display = 'flex';
+            state.ac = false;
+        }
+        
+        // Update AI video section
+        updateAiVideoParameters();
+    };
+
+    window.resetSim = () => { 
+        state.objX = W*0.2; state.vel=0; state.voltage=0; state.flux=0;
+        state.ac = settings.mode === 1; // Default to AC if in transformer mode
+        sparks.length = 0;
+    };
+
+    function updateBadge() {
+        const b = document.getElementById('modeBadge');
+        b.innerText = settings.mode === 0 
+            ? "التجربة 1: قانون فاراداي (المغناطيس المتحرك)" 
+            : "التجربة 2: الحث المتبادل (المحول الكهربائي)";
+        b.classList.add('show-badge');
+        setTimeout(() => b.classList.remove('show-badge'), 3000);
+    }
+
+    document.getElementById('btn-ac').onclick = () => { 
+        if(settings.mode === 1) return; // Always AC in mode 1
+        state.ac = !state.ac; 
+        state.vel = 0;
+    };
+
+    /** --- INTERACTION --- */
+    const getPos = e => e.touches ? e.touches[0].clientX : e.clientX;
+    const start = e => {
+        const x = getPos(e);
+        const y = e.touches ? e.touches[0].clientY : e.clientY;
+        if(Math.abs(x - state.objX) < 140 && Math.abs(y - state.objY) < 80) {
+            state.drag = true; 
+            state.dragOff = x - state.objX; 
+            state.lastX = x; 
+            state.vel = 0;
+            if(settings.mode === 0) state.ac = false; 
+        }
+    };
+    const move = e => {
+        if(!state.drag) return;
+        e.preventDefault();
+        const x = getPos(e);
+        state.objX = x - state.dragOff;
+        
+        let rawVel = x - state.lastX;
+        state.vel = state.vel * 0.5 + rawVel * 0.5;
+        
+        state.lastX = x;
+    };
+    const end = () => state.drag = false;
+
+    window.addEventListener('mousedown', start);
+    window.addEventListener('touchstart', start, {passive:false});
+    window.addEventListener('mousemove', move);
+    window.addEventListener('touchmove', move, {passive:false});
+    window.addEventListener('mouseup', end);
+    window.addEventListener('touchend', end);
+
+    /** --- PHYSICS ENGINE --- */
+    function update() {
+        const cx = W/2;
+        state.time += 0.05;
+
+        // 1. Motion Logic
+        if(state.ac && settings.mode === 0) {
+            let targetX = cx + Math.sin(state.time * 2) * 250;
+            let dx = targetX - state.objX;
+            state.vel = dx * 0.1;
+            state.objX += state.vel;
+        } else if (!state.drag) {
+            state.objX += state.vel;
+            state.vel *= 0.92; 
+            if(state.objX < 100) { state.objX = 100; state.vel *= -0.4; }
+            if(state.objX > W-100) { state.objX = W-100; state.vel *= -0.4; }
+        }
+
+        // 2. Electromagnetic Calculations
+        const dist = state.objX - cx; 
+        
+        if(settings.mode === 0) {
+            // --- MODE 1: FARADAY ---
+            const maxFlux = 100 * settings.strength;
+            const sigma = 140; 
+            state.flux = maxFlux * Math.exp(- (dist*dist)/(2*sigma*sigma) ) * settings.polarity;
+            
+            const dFlux_dx = -state.flux * (dist / (sigma*sigma));
+            state.dFlux = dFlux_dx * state.vel * 20; 
+            
+            state.voltage = -settings.turns * state.dFlux;
+
+        } else {
+            // --- MODE 2: TRANSFORMER ---
+            const freq = settings.strength * 2.0; 
+            const I_p = Math.sin(state.time * freq);
+            
+            const coupling = 1 / (1 + Math.abs(dist)/150);
+            
+            state.flux = 80 * I_p * coupling;
+            
+            const dIp_dt = Math.cos(state.time * freq) * freq;
+            state.dFlux = 80 * coupling * dIp_dt * 0.2; 
+            
+            state.voltage = -settings.turns * state.dFlux * 5;
+        }
+
+        // 3. Electrical Load & Power Calculations
+        // الجهد يتأثر طردياً بعدد اللفات
+        state.current = state.voltage / settings.res; 
+
+        // القدرة تتناسب عكسياً مع المقاومة وطردياً مع مربع الجهد (الذي يعتمد على اللفات)
+        state.power = (state.voltage * state.voltage) / settings.res; 
+
+        // تحديث العدادات في الواجهة
+        document.getElementById('val-power').innerText = (state.power * 0.1).toFixed(1) + " W";
+        // جعل شريط القدرة حساساً أكثر للتغيرات
+        document.getElementById('bar-power').style.width = Math.min(100, state.power * 2) + "%";
+
+        // 4. Sparks
+        if(state.power > 15 && Math.random() > 0.6) {
+            sparks.push({
+                x: cx + (Math.random()-0.5)*20, 
+                y: state.objY + 180, 
+                vx: (Math.random()-0.5)*4, 
+                vy: Math.random()*2,
+                life: 1.0, 
+                color: state.voltage>0 ? '#0ff' : '#f0a'
+            });
+        }
+    }
+
+    /** --- RENDERER --- */
+    function draw() {
+        ctx.clearRect(0,0,W,H);
+        if(settings.showField) {
+            bCtx.fillStyle = '#000'; 
+            bCtx.clearRect(0,0,W,H); 
+        } else {
+            bCtx.clearRect(0,0,W,H);
+        }
+
+        const cx = W/2; const cy = H/2;
+        const coilColor = state.power > 200 ? '#ffaa55' : '#cd7f32';
+
+        // --- 1. FIELD LINES ---
+        if(settings.showField) {
+            bCtx.strokeStyle = 'rgba(0, 243, 255, 0.15)';
+            bCtx.lineWidth = 1;
+            bCtx.beginPath();
+            
+            let objPol = settings.mode===0 ? settings.polarity : (Math.sin(state.time*settings.strength*2)>0?1:-1);
+            let mx = state.objX;
+            let poleOff = 60 * objPol;
+
+            vectors.forEach(v => {
+                let dx = v.x - mx; let dy = v.y - cy;
+                let dist = Math.sqrt(dx*dx+dy*dy);
+                if(dist < 50) return; 
+
+                let angN = Math.atan2(cy - v.y, (mx - poleOff) - v.x);
+                let angS = Math.atan2(cy - v.y, (mx + poleOff) - v.x);
+                
+                let combinedAng = (angN - angS) * 2; 
+                if(settings.mode === 0) combinedAng += Math.PI; 
+
+                let len = 15 * (400/(dist+100)); 
+                
+                let tx = v.x + Math.cos(combinedAng)*len;
+                let ty = v.y + Math.sin(combinedAng)*len;
+                
+                bCtx.moveTo(v.x, v.y);
+                bCtx.lineTo(tx, ty);
+                
+                bCtx.moveTo(tx, ty);
+                bCtx.lineTo(tx - Math.cos(combinedAng+0.5)*4, ty - Math.sin(combinedAng+0.5)*4);
+            });
+            bCtx.stroke();
+        }
+
+        // --- 2. CIRCUIT ---
+        let bright = Math.min(1, Math.abs(state.voltage)/60);
+        let eColor = state.voltage > 0 ? '#00f3ff' : '#ff0055';
+        
+        ctx.shadowBlur = bright * 30;
+        ctx.shadowColor = eColor;
+        ctx.strokeStyle = `rgba(200,200,200, ${0.4 + bright*0.6})`;
+        ctx.lineWidth = 5;
+        
+        const halfW = coilWidth / 2;
+        ctx.beginPath();
+        ctx.moveTo(cx - halfW, cy); 
+        ctx.lineTo(cx - halfW, cy + circuitDrop);
+        ctx.lineTo(cx + halfW, cy + circuitDrop);
+        ctx.lineTo(cx + halfW, cy);
+        
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = eColor;
+        electrons.forEach(e => {
+            e.speed = state.current * 3; 
+            e.p += e.speed;
+            
+            if(e.p > perimeter) e.p -= perimeter;
+            if(e.p < 0) e.p += perimeter;
+            
+            const pos = getCircuitPoint(e.p, cx, cy);
+
+            if(bright > 0.01) {
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, e.r, 0, Math.PI*2);
+                ctx.fill();
+            }
+        });
+
+        // --- 3. COIL (Back Loop) ---
+        // UPDATE: Spacing calculated to fit N rings exactly across coilWidth
+        const spacing = coilWidth / (settings.turns - 1);
+
+        ctx.strokeStyle = '#5a3a22'; 
+        ctx.lineWidth = 6;
+        for(let i=0; i<settings.turns; i++) {
+            let x = cx - coilWidth/2 + i*spacing;
+            ctx.beginPath();
+            ctx.ellipse(x, cy, 30, 80, 0, Math.PI/2, 3*Math.PI/2);
+            ctx.stroke();
+        }
+
+        // --- 4. THE OBJECT ---
+        if(settings.mode === 0) {
+            drawMagnet(ctx, state.objX, cy);
+        } else {
+            drawPrimaryCoil(ctx, state.objX, cy);
+        }
+
+        // --- 5. COIL (Front Loop) ---
+        ctx.strokeStyle = coilColor;
+        if(state.power > 100) { ctx.shadowBlur = 20; ctx.shadowColor = '#f50'; }
+        
+        for(let i=0; i<settings.turns; i++) {
+            let x = cx - coilWidth/2 + i*spacing;
+            ctx.beginPath();
+            ctx.ellipse(x, cy, 30, 80, 0, 3*Math.PI/2, Math.PI/2);
+            ctx.stroke();
+        }
+        ctx.shadowBlur = 0;
+
+        // --- 6. LENZ'S LAW ---
+        if(settings.showLenz && Math.abs(state.current) > 0.1) {
+            const forceDir = -Math.sign(state.vel * (state.objX < cx ? 1 : -1)); 
+            if(Math.abs(state.vel) > 2) {
+                ctx.save();
+                ctx.translate(cx, cy - 120);
+                
+                ctx.fillStyle = '#fff';
+                ctx.font = '14px Tajawal';
+                ctx.textAlign = 'center';
+                ctx.fillText("قوة لينز (Lenz Force)", 0, -25);
+
+                ctx.beginPath();
+                ctx.strokeStyle = '#ffcc00';
+                ctx.lineWidth = 4;
+                let arrowLen = 60 * forceDir;
+                ctx.moveTo(-arrowLen/2, 0);
+                ctx.lineTo(arrowLen/2, 0);
+                ctx.lineTo(arrowLen/2 - 10*forceDir, -10);
+                ctx.moveTo(arrowLen/2, 0);
+                ctx.lineTo(arrowLen/2 - 10*forceDir, 10);
+                ctx.stroke();
+                
+                ctx.font = 'bold 40px Rajdhani';
+                ctx.fillStyle = 'rgba(255, 204, 0, 0.8)';
+                ctx.fillText(state.voltage > 0 ? 'S' : 'N', cx, cy);
+
+                ctx.restore();
+            }
+        }
+
+        // --- 7. BULB (Dynamic Glow) ---
+        const bulbY = cy + circuitDrop; 
+        ctx.fillStyle = '#111';
+        ctx.beginPath(); ctx.arc(cx, bulbY, 20, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = '#444'; ctx.lineWidth = 2; ctx.stroke();
+
+        // حساب شدة الإضاءة بناءً على القدرة
+        // تقسيم القدرة على معامل لجعل التوهج منطقياً بصرياً
+        let glowIntensity = Math.min(1.5, state.power / 50); 
+
+        if(glowIntensity > 0.05) {
+            // إنشاء تدرج ضوئي يتوسع مع زيادة القدرة
+            let glowRadius = 50 + (glowIntensity * 100); 
+            let grad = ctx.createRadialGradient(cx, bulbY, 5, cx, bulbY, glowRadius);
+            
+            grad.addColorStop(0, '#fff');
+            grad.addColorStop(0.2, eColor);
+            grad.addColorStop(0.5, `rgba(${state.voltage > 0 ? '0, 243, 255' : '255, 0, 85'}, 0.3)`);
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            
+            ctx.save();
+            ctx.globalCompositeOperation = 'screen';
+            ctx.fillStyle = grad;
+            // إضافة تأثير "هالة" (Bloom)
+            ctx.shadowBlur = 20 * glowIntensity;
+            ctx.shadowColor = eColor;
+            
+            ctx.beginPath(); 
+            ctx.arc(cx, bulbY, glowRadius, 0, Math.PI*2); 
+            ctx.fill();
+            
+            // رسم خيوط المصباح المتوهجة
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2 * glowIntensity;
+            ctx.beginPath();
+            ctx.moveTo(cx - 10, bulbY);
+            ctx.bezierCurveTo(cx - 5, bulbY - 15, cx + 5, bulbY - 15, cx + 10, bulbY);
+            ctx.stroke();
+            
+            ctx.restore();
+        }
+
+        sparks.forEach((p, i) => {
+            p.x += p.vx; p.y += p.vy; 
+            p.vy += 0.2; 
+            if(p.y > H) { p.y = H; p.vy *= -0.6; }
+            p.life -= 0.02;
+            if(p.life <= 0) sparks.splice(i, 1);
+            
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.life;
+            ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, Math.PI*2); ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+
+        updateScope();
+        drawGalvanometer();
+
+        requestAnimationFrame(update);
+        requestAnimationFrame(draw);
+    }
+
+    function getCircuitPoint(dist, cx, cy) {
+        const halfW = coilWidth / 2;
+        const h = circuitDrop;
+        
+        if(dist < coilWidth) {
+            return { x: cx - halfW + dist, y: cy };
+        } 
+        dist -= coilWidth;
+        
+        if(dist < h) {
+            return { x: cx + halfW, y: cy + dist };
+        }
+        dist -= h;
+
+        if(dist < coilWidth) {
+            return { x: cx + halfW - dist, y: cy + h };
+        }
+        dist -= coilWidth;
+
+        return { x: cx - halfW, y: cy + h - dist };
+    }
+
+    function drawMagnet(c, x, y) {
+        const w = 180, h = 60;
+        c.save();
+        c.translate(x, y);
+        
+        c.shadowColor = 'black'; c.shadowBlur = 30;
+        c.fillStyle = 'rgba(0,0,0,0.5)';
+        c.fillRect(-w/2+10, -h/2+10, w, h);
+        c.shadowBlur = 0;
+
+        let nColor = settings.polarity===1 ? '#d00' : '#00a';
+        let sColor = settings.polarity===1 ? '#00a' : '#d00';
+        
+        c.fillStyle = nColor; c.fillRect(-w/2, -h/2, w/2, h);
+        c.fillStyle = sColor; c.fillRect(0, -h/2, w/2, h);
+        
+        let grad = c.createLinearGradient(0, -h/2, 0, h/2);
+        grad.addColorStop(0, 'rgba(255,255,255,0.4)');
+        grad.addColorStop(0.4, 'rgba(255,255,255,0)');
+        grad.addColorStop(0.6, 'rgba(255,255,255,0)');
+        grad.addColorStop(1, 'rgba(255,255,255,0.2)');
+        c.fillStyle = grad;
+        c.fillRect(-w/2, -h/2, w, h);
+
+        c.fillStyle = '#fff'; c.font='bold 28px Rajdhani'; c.textAlign='center'; c.textBaseline='middle';
+        c.fillText(settings.polarity===1?'N':'S', -w/4, 2);
+        c.fillText(settings.polarity===1?'S':'N', w/4, 2);
+        
+        c.restore();
+    }
+
+    function drawPrimaryCoil(c, x, y) {
+        c.save();
+        c.translate(x, y);
+        
+        const pulse = Math.sin(state.time * settings.strength * 2);
+        const color = `rgba(0, 243, 255, ${0.3 + Math.abs(pulse)*0.7})`;
+        
+        c.shadowColor = color; c.shadowBlur = 20;
+        c.strokeStyle = '#444'; c.lineWidth = 10;
+        
+        for(let i=-2; i<=2; i++) {
+            c.beginPath();
+            c.ellipse(i*15, 0, 10, 40, 0, 0, Math.PI*2);
+            c.stroke();
+            c.strokeStyle = color; c.lineWidth = 3;
+            c.stroke();
+            c.strokeStyle = '#444'; c.lineWidth = 10;
+        }
+        
+        c.shadowBlur = 0;
+        c.fillStyle = '#fff'; c.font = '14px Tajawal'; c.textAlign='center';
+        c.fillText("الملف الابتدائي (Primary)", 0, 60);
+        c.fillStyle = '#aaa'; c.font = '10px Tajawal';
+        c.fillText("AC Source", 0, 75);
+        
+        c.restore();
+    }
+
+    function drawGalvanometer() {
+        gCtx.clearRect(0, 0, gCvs.width, gCvs.height);
+        const cx = gCvs.width / 2;
+        const cy = gCvs.height - 30; 
+        const radius = 90;
+
+        gCtx.beginPath();
+        gCtx.arc(cx, cy, radius, Math.PI, 2 * Math.PI);
+        gCtx.strokeStyle = 'rgba(255,255,255,0.1)';
+        gCtx.lineWidth = 15;
+        gCtx.stroke();
+
+        gCtx.font = '10px Rajdhani';
+        gCtx.textAlign = 'center';
+        gCtx.textBaseline = 'middle';
+        
+        for (let i = -5; i <= 5; i++) {
+            const angle = Math.PI * 1.5 + (i * 0.15); 
+            const isMajor = i === 0 || i === -5 || i === 5;
+            
+            const rOut = radius + (isMajor ? 5 : 0);
+            const rIn = radius - (isMajor ? 10 : 5);
+            const tx1 = cx + Math.cos(angle) * rOut;
+            const ty1 = cy + Math.sin(angle) * rOut;
+            const tx2 = cx + Math.cos(angle) * rIn;
+            const ty2 = cy + Math.sin(angle) * rIn;
+
+            gCtx.strokeStyle = isMajor ? '#fff' : 'rgba(255,255,255,0.3)';
+            gCtx.lineWidth = isMajor ? 2 : 1;
+            gCtx.beginPath(); gCtx.moveTo(tx1, ty1); gCtx.lineTo(tx2, ty2); gCtx.stroke();
+
+            if (isMajor) {
+                const txText = cx + Math.cos(angle) * (radius - 25);
+                const tyText = cy + Math.sin(angle) * (radius - 25);
+                gCtx.fillStyle = '#aaa';
+                let label = i === 0 ? '0' : (i > 0 ? '+' : '-');
+                gCtx.fillText(label, txText, tyText);
+            }
+        }
+
+        let targetAngle = (state.current * 8.0); 
+        targetAngle = Math.max(-0.8, Math.min(0.8, targetAngle));
+        galvoNeedleAngle += (targetAngle - galvoNeedleAngle) * 0.1;
+
+        const nAngle = Math.PI * 1.5 + galvoNeedleAngle;
+        const tipX = cx + Math.cos(nAngle) * (radius - 5);
+        const tipY = cy + Math.sin(nAngle) * (radius - 5);
+
+        gCtx.shadowBlur = 10; 
+        gCtx.shadowColor = state.current > 0 ? '#00f3ff' : (state.current < 0 ? '#ff0055' : '#fff');
+
+        gCtx.beginPath();
+        gCtx.moveTo(cx, cy);
+        gCtx.lineTo(tipX, tipY);
+        gCtx.strokeStyle = gCtx.shadowColor;
+        gCtx.lineWidth = 3;
+        gCtx.stroke();
+        gCtx.shadowBlur = 0;
+
+        gCtx.beginPath();
+        gCtx.arc(cx, cy, 5, 0, Math.PI*2);
+        gCtx.fillStyle = '#333';
+        gCtx.fill();
+        gCtx.strokeStyle = '#888';
+        gCtx.stroke();
+    }
+
+    const traceV = new Array(360).fill(0);
+    const traceF = new Array(360).fill(0);
+
+    function updateScope() {
+        if(!settings.showScope) return;
+
+        let vVal = state.voltage * 2; 
+        let fVal = state.flux * 0.5; 
+        
+        if(settings.mode === 1) { 
+            vVal *= 2; 
+        }
+
+        traceV.push(vVal); traceV.shift();
+        traceF.push(fVal); traceF.shift();
+        
+        document.getElementById('voltage-readout').innerText = state.voltage.toFixed(2) + " mV";
+
+        sCtx.fillStyle = 'rgba(10,15,20,1)';
+        sCtx.fillRect(0,0,360,110);
+        
+        sCtx.strokeStyle = '#333'; sCtx.lineWidth = 1; sCtx.beginPath();
+        sCtx.moveTo(0, 55); sCtx.lineTo(360, 55);
+        for(let i=0; i<360; i+=40) { sCtx.moveTo(i,0); sCtx.lineTo(i,110); }
+        sCtx.stroke();
+
+        drawTrace(sCtx, traceF, '#fa0', 1);
+        drawTrace(sCtx, traceV, '#0f0', 2);
+    }
+
+    function drawTrace(ctx, data, color, width) {
+        ctx.beginPath();
+        ctx.strokeStyle = color; ctx.lineWidth = width;
+        for(let i=0; i<data.length; i++) {
+            let y = 55 - data[i];
+            y = Math.max(2, Math.min(108, y));
+            if(i===0) ctx.moveTo(i, y); else ctx.lineTo(i, y);
+        }
+        ctx.stroke();
+    }
+
+    /** --- AI VIDEO SYSTEM --- */
+    
+    // AI Video Parameters
+    const aiVideoParameters = {
+        expType: 'قانون فاراداي (المغناطيس المتحرك)',
+        turns: 12,
+        strength: 1.0,
+        resistance: 10,
+        quality: 2, // 1=منخفضة, 2=متوسطة, 3=عالية
+        duration: 2 // دقائق
+    };
+    
+    // AI Video state
+    let aiVideoGenerated = false;
+    let aiVideoUrl = '';
+    let aiVideoFileName = '';
+    let aiVideoSize = 0;
+    let aiVideoDuration = 0;
+    
+    // Initialize AI video parameters from simulation settings
+    function updateAiVideoParameters() {
+        aiVideoParameters.expType = settings.mode === 0 
+            ? 'قانون فاراداي (المغناطيس المتحرك)' 
+            : 'الحث المتبادل (المحول الكهربائي)';
+        
+        aiVideoParameters.turns = settings.turns;
+        aiVideoParameters.strength = settings.strength;
+        aiVideoParameters.resistance = settings.res;
+        
+        // Update UI
+        document.getElementById('aiExpType').textContent = aiVideoParameters.expType;
+        document.getElementById('aiTurns').textContent = aiVideoParameters.turns;
+        document.getElementById('aiStrength').textContent = settings.mode === 0 
+            ? aiVideoParameters.strength + ' T' 
+            : aiVideoParameters.strength + ' Hz';
+        document.getElementById('aiStrengthLabel').textContent = settings.mode === 0 
+            ? 'قوة المغناطيس (B):' 
+            : 'تردد المصدر (Hz):';
+        document.getElementById('aiResistance').textContent = aiVideoParameters.resistance + ' Ω';
+        
+        // Update sliders
+        document.getElementById('aiTurnsSlider').value = aiVideoParameters.turns;
+        document.getElementById('aiStrengthSlider').value = aiVideoParameters.strength;
+        document.getElementById('aiResistanceSlider').value = aiVideoParameters.resistance;
+        document.getElementById('aiQualitySlider').value = aiVideoParameters.quality;
+        document.getElementById('aiDurationSlider').value = aiVideoParameters.duration;
+    }
+    
+    function updateAiParameter(param, value) {
+        aiVideoParameters[param] = parseFloat(value);
+        
+        // Update UI
+        switch(param) {
+            case 'turns':
+                document.getElementById('aiTurns').textContent = value;
+                break;
+            case 'strength':
+                document.getElementById('aiStrength').textContent = settings.mode === 0 
+                    ? value + ' T' 
+                    : value + ' Hz';
+                break;
+            case 'resistance':
+                document.getElementById('aiResistance').textContent = value + ' Ω';
+                break;
+            case 'quality':
+                const qualityLabels = ['منخفضة', 'متوسطة', 'عالية'];
+                document.getElementById('aiQuality').textContent = qualityLabels[value - 1];
+                break;
+            case 'duration':
+                document.getElementById('aiDuration').textContent = value + ' دقيقة';
+                break;
+        }
+    }
+    
+    function generateAiVideo() {
+        const generateBtn = document.getElementById('generateAiVideoBtn');
+        const statusElement = document.getElementById('aiGenerationStatus');
+        
+        // Show loading state
+        generateBtn.classList.add('generating');
+        statusElement.style.display = 'block';
+        
+        // Simulate AI video generation (in a real app, this would call an API)
+        setTimeout(() => {
+            // Simulate success
+            aiVideoGenerated = true;
+            
+            // Create a mock video URL (in a real app, this would be from the AI service)
+            aiVideoUrl = 'https://example.com/ai-generated-video.mp4'; // Placeholder
+            aiVideoFileName = `شرح_تجربة_${aiVideoParameters.expType.replace(/\s+/g, '_')}.mp4`;
+            aiVideoSize = Math.floor(Math.random() * 50 + 20) * 1024 * 1024; // 20-70 MB
+            aiVideoDuration = aiVideoParameters.duration * 60; // Convert to seconds
+            
+            // Update video player
+            const videoElement = document.getElementById('aiGeneratedVideo');
+            const sourceElement = videoElement.querySelector('source');
+            const placeholder = document.getElementById('aiVideoPlaceholder');
+            
+            // Hide placeholder and show video
+            placeholder.style.display = 'none';
+            videoElement.style.display = 'block';
+            
+            // In a real app, you would set the actual video source
+            // For now, we'll use a placeholder message
+            videoElement.innerHTML = `
+                <div style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(135deg, #0a0a1a, #020204); color: white;">
+                    <i class="fas fa-check-circle" style="font-size: 80px; margin-bottom: 20px; color: #00ff88;"></i>
+                    <h3 style="color: var(--neon-gold); margin-bottom: 10px;">تم إنشاء الفيديو بنجاح!</h3>
+                    <p style="text-align: center; max-width: 400px; line-height: 1.6; margin-bottom: 20px;">
+                        تم إنشاء فيديو شرح بتقنية الذكاء الاصطناعي بناءً على معاملات تجربتك.
+                    </p>
+                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; width: 80%; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span>نوع التجربة:</span>
+                            <span style="color: var(--neon-blue);">${aiVideoParameters.expType}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span>عدد اللفات:</span>
+                            <span style="color: var(--neon-blue);">${aiVideoParameters.turns}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span>${settings.mode === 0 ? 'قوة المغناطيس:' : 'التردد:'}</span>
+                            <span style="color: var(--neon-blue);">${aiVideoParameters.strength} ${settings.mode === 0 ? 'T' : 'Hz'}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>المقاومة:</span>
+                            <span style="color: var(--neon-blue);">${aiVideoParameters.resistance} Ω</span>
+                        </div>
+                    </div>
+                    <p style="color: #aaa; font-size: 0.9rem;">
+                        في التطبيق الحقيقي، سيكون هذا فيديو حقيقيًا تم إنشاؤه بواسطة الذكاء الاصطناعي
+                    </p>
+                </div>
+            `;
+            
+            // Show download button
+            document.getElementById('downloadAiVideoBtn').style.display = 'flex';
+            
+            // Reset loading state
+            generateBtn.classList.remove('generating');
+            statusElement.style.display = 'none';
+            
+            // Show success message
+            showNotification('تم إنشاء الفيديو بنجاح! يمكنك الآن تشغيله أو تنزيله.', 'success');
+            
+            // Scroll to AI video section
+            document.getElementById('aiVideoSection').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }, 3000); // Simulate 3 second processing time
+    }
+    
+    function playAiVideo() {
+        if (!aiVideoGenerated) {
+            showNotification('يرجى إنشاء فيديو أولاً باستخدام زر "إنشاء فيديو بالذكاء الاصطناعي"', 'warning');
+            return;
+        }
+        
+        const videoElement = document.getElementById('aiGeneratedVideo');
+        
+        // In a real app, you would play the actual video
+        // For now, show a message
+        showNotification('جاري تشغيل الفيديو... في التطبيق الحقيقي، سيكون هذا فيديو حقيقيًا', 'info');
+    }
+    
+    function downloadAiVideo() {
+        if (!aiVideoGenerated) {
+            showNotification('لا يوجد فيديو للتنزيل', 'warning');
+            return;
+        }
+        
+        // In a real app, you would trigger the actual download
+        // For now, show a message
+        showNotification('جاري تحميل الفيديو... في التطبيق الحقيقي، سيكون هذا تنزيلاً حقيقياً للفيديو', 'info');
+        
+        // Simulate download
+        setTimeout(() => {
+            showNotification(`تم تحميل الفيديو: ${aiVideoFileName} (${formatFileSize(aiVideoSize)})`, 'success');
+        }, 1500);
+    }
+    
+    function showNotification(message, type) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.style.position = 'fixed';
+        notification.style.top = '20px';
+        notification.style.left = '50%';
+        notification.style.transform = 'translateX(-50%)';
+        notification.style.padding = '15px 25px';
+        notification.style.borderRadius = '10px';
+        notification.style.color = 'white';
+        notification.style.fontWeight = '700';
+        notification.style.zIndex = '10000';
+        notification.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
+        notification.style.backdropFilter = 'blur(10px)';
+        notification.style.display = 'flex';
+        notification.style.alignItems = 'center';
+        notification.style.gap = '10px';
+        notification.style.animation = 'slideIn 0.3s ease';
+        
+        // Set color based on type
+        if (type === 'success') {
+            notification.style.background = 'linear-gradient(135deg, rgba(0, 255, 136, 0.9), rgba(0, 200, 100, 0.9))';
+            notification.style.border = '1px solid rgba(0, 255, 136, 0.3)';
+            notification.innerHTML = `<i class="fas fa-check-circle"></i><span>${message}</span>`;
+        } else if (type === 'warning') {
+            notification.style.background = 'linear-gradient(135deg, rgba(255, 204, 0, 0.9), rgba(255, 170, 0, 0.9))';
+            notification.style.border = '1px solid rgba(255, 204, 0, 0.3)';
+            notification.innerHTML = `<i class="fas fa-exclamation-triangle"></i><span>${message}</span>`;
+        } else {
+            notification.style.background = 'linear-gradient(135deg, rgba(0, 243, 255, 0.9), rgba(0, 200, 255, 0.9))';
+            notification.style.border = '1px solid rgba(0, 243, 255, 0.3)';
+            notification.innerHTML = `<i class="fas fa-info-circle"></i><span>${message}</span>`;
+        }
+        
+        document.body.appendChild(notification);
+        
+        // Remove notification after 5 seconds
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 5000);
+        
+        // Add CSS for animations if not already added
+        if (!document.querySelector('#notification-styles')) {
+            const style = document.createElement('style');
+            style.id = 'notification-styles';
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+                    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(-50%) translateY(0); opacity: 1; }
+                    to { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+    
+    /** --- VIDEO UPLOAD SYSTEM --- */
+    
+    // Video data storage
+    const videoData = {
+        main: {
+            url: '',
+            title: 'فيديو شرح قانون فاراداي',
+            description: 'قم برفع فيديو لشرح قانون فاراداي للحث الكهرومغناطيسي. يجب أن يتضمن الفيديو شرحاً للقانون والتجارب العملية والتطبيقات.',
+            size: 0,
+            duration: 0,
+            fileName: ''
+        },
+        practical1: {
+            url: '',
+            title: 'المحولات الكهربائية',
+            description: 'تطبيق عملي لقانون فاراداي في المحولات الكهربائية المستخدمة في رفع وخفض الجهد في شبكات التوزيع الكهربائي.',
+            size: 0,
+            duration: 0,
+            fileName: ''
+        },
+        practical2: {
+            url: '',
+            title: 'مولدات التيار الكهربائي',
+            description: 'كيف يعمل مولد التيار الكهربائي باستخدام مبادئ الحث الكهرومغناطيسي لتوليد الكهرباء من الطاقة الميكانيكية.',
+            size: 0,
+            duration: 0,
+            fileName: ''
+        },
+        practical3: {
+            url: '',
+            title: 'تطبيقات الحث الكهرومغناطيسي',
+            description: 'شرح كيفية استخدام الحث الكهرومغناطيسي في تطبيقات عملية مثل الفرامل الكهرومغناطيسية وأجهزة الاستشعار.',
+            size: 0,
+            duration: 0,
+            fileName: ''
+        }
+    };
+    
+    let currentVideoType = 'main';
+    
+    // Scroll to content sections
+    document.getElementById('scrollIndicator').addEventListener('click', function() {
+        document.getElementById('aiVideoSection').scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+        });
+    });
+    
+    // Back to simulation button
+    document.getElementById('backToSim').addEventListener('click', function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+    
+    // Show/hide back to simulation button based on scroll position
+    window.addEventListener('scroll', function() {
+        const backButton = document.getElementById('backToSim');
+        if (window.scrollY > 300) {
+            backButton.classList.add('show');
+        } else {
+            backButton.classList.remove('show');
+        }
+        
+        // Hide scroll indicator when user starts scrolling
+        const scrollIndicator = document.getElementById('scrollIndicator');
+        if (window.scrollY > 100) {
+            scrollIndicator.style.opacity = '0';
+            scrollIndicator.style.pointerEvents = 'none';
+        } else {
+            scrollIndicator.style.opacity = '1';
+            scrollIndicator.style.pointerEvents = 'auto';
+        }
+    });
+    
+    // PDF Viewer Controls
+    let pdfZoom = 1.0;
+    const pdfViewer = document.querySelector('.pdf-viewer');
+    
+    function zoomInPdf() {
+        pdfZoom += 0.2;
+        updatePdfZoom();
+    }
+    
+    function zoomOutPdf() {
+        if (pdfZoom > 0.5) {
+            pdfZoom -= 0.2;
+            updatePdfZoom();
+        }
+    }
+    
+    function resetZoomPdf() {
+        pdfZoom = 1.0;
+        updatePdfZoom();
+    }
+    
+    function updatePdfZoom() {
+        pdfViewer.style.transform = `scale(${pdfZoom})`;
+        pdfViewer.style.transformOrigin = 'center top';
+    }
+    
+    // Modal functions
+    function openModal(videoType) {
+        currentVideoType = videoType;
+        document.getElementById('videoModal').classList.add('show');
+        resetModalForm();
+    }
+    
+    function closeModal() {
+        document.getElementById('videoModal').classList.remove('show');
+    }
+    
+    function resetModalForm() {
+        document.getElementById('videoInfo').style.display = 'none';
+        document.getElementById('videoTitle').value = videoData[currentVideoType].title;
+        document.getElementById('videoDescription').value = videoData[currentVideoType].description;
+        document.getElementById('modalVideoInput').value = '';
+    }
+    
+    // Handle video upload in modal
+    function handleModalVideoUpload(files) {
+        if (files.length === 0) return;
+        
+        const file = files[0];
+        
+        // Check file type
+        if (!file.type.startsWith('video/')) {
+            alert('الرجاء اختيار ملف فيديو فقط (MP4, WebM, OGG)');
+            return;
+        }
+        
+        // Check file size (max 100MB)
+        if (file.size > 100 * 1024 * 1024) {
+            alert('حجم الفيديو كبير جداً! الحد الأقصى 100 ميجابايت.');
+            return;
+        }
+        
+        // Create object URL for preview
+        const url = URL.createObjectURL(file);
+        
+        // Get video duration
+        const video = document.createElement('video');
+        video.src = url;
+        video.onloadedmetadata = function() {
+            const duration = video.duration;
+            const minutes = Math.floor(duration / 60);
+            const seconds = Math.floor(duration % 60);
+            
+            // Update modal form
+            document.getElementById('videoName').textContent = file.name;
+            document.getElementById('videoSize').textContent = formatFileSize(file.size);
+            document.getElementById('videoDuration').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('videoInfo').style.display = 'block';
+            
+            // Store video data temporarily
+            videoData[currentVideoType].tempUrl = url;
+            videoData[currentVideoType].tempFile = file;
+            videoData[currentVideoType].tempSize = file.size;
+            videoData[currentVideoType].tempDuration = duration;
+            videoData[currentVideoType].tempFileName = file.name;
+        };
+    }
+    
+    function saveVideo() {
+        const title = document.getElementById('videoTitle').value;
+        const description = document.getElementById('videoDescription').value;
+        
+        if (!videoData[currentVideoType].tempUrl) {
+            alert('الرجاء رفع فيديو أولاً');
+            return;
+        }
+        
+        if (!title.trim()) {
+            alert('الرجاء إدخال عنوان للفيديو');
+            return;
+        }
+        
+        // Save video data
+        videoData[currentVideoType].url = videoData[currentVideoType].tempUrl;
+        videoData[currentVideoType].title = title;
+        videoData[currentVideoType].description = description;
+        videoData[currentVideoType].size = videoData[currentVideoType].tempSize;
+        videoData[currentVideoType].duration = videoData[currentVideoType].tempDuration;
+        videoData[currentVideoType].fileName = videoData[currentVideoType].tempFileName;
+        
+        // Update video player
+        updateVideoPlayer(currentVideoType);
+        
+        // Close modal
+        closeModal();
+        
+        // Show success message
+        showNotification('تم حفظ الفيديو بنجاح!', 'success');
+    }
+    
+    function updateVideoPlayer(videoType) {
+        const videoElement = document.getElementById(videoType === 'main' ? 'mainVideo' : 
+                                                    videoType === 'practical1' ? 'practicalVideo1' :
+                                                    videoType === 'practical2' ? 'practicalVideo2' : 'practicalVideo3');
+        
+        const sourceElement = videoElement.querySelector('source');
+        
+        if (videoData[videoType].url) {
+            sourceElement.src = videoData[videoType].url;
+            videoElement.load();
+            
+            // Update video info
+            if (videoType === 'main') {
+                document.getElementById('mainVideoTitle').textContent = videoData[videoType].title;
+                document.getElementById('mainVideoDesc').textContent = videoData[videoType].description;
+                document.getElementById('mainVideoInfo').textContent = videoData[videoType].fileName;
+                document.getElementById('mainVideoStats').textContent = 
+                    `${formatDuration(videoData[videoType].duration)} • ${formatFileSize(videoData[videoType].size)}`;
+            } else {
+                const videoNum = videoType.replace('practical', '');
+                document.getElementById(`practicalVideo${videoNum}Info`).textContent = videoData[videoType].fileName;
+                document.getElementById(`practicalVideo${videoNum}Stats`).textContent = 
+                    `${formatDuration(videoData[videoType].duration)} • ${formatFileSize(videoData[videoType].size)}`;
+            }
+        }
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' بايت';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' كيلوبايت';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' ميجابايت';
+    }
+    
+    function formatDuration(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${minutes}:${secs.toString().padStart(2, '0')} دقيقة`;
+    }
+    
+    function toggleFullscreen(videoId) {
+        const video = document.getElementById(videoId);
+        
+        // For AI video
+        if (videoId === 'aiGeneratedVideo') {
+            if (!aiVideoGenerated) {
+                showNotification('لا يوجد فيديو للعرض. يرجى إنشاء فيديو أولاً.', 'warning');
+                return;
+            }
+        } else {
+            // For other videos
+            const videoType = videoId.replace('Video', '').toLowerCase();
+            if (!videoData[videoType]?.url) {
+                showNotification('لا يوجد فيديو للعرض. يرجى رفع فيديو أولاً.', 'warning');
+                return;
+            }
+        }
+        
+        if (video.requestFullscreen) {
+            video.requestFullscreen();
+        } else if (video.webkitRequestFullscreen) {
+            video.webkitRequestFullscreen();
+        } else if (video.msRequestFullscreen) {
+            video.msRequestFullscreen();
+        }
+    }
+    
+    function downloadVideo(videoId) {
+        const videoType = videoId.replace('Video', '').toLowerCase();
+        
+        if (!videoData[videoType]?.url) {
+            showNotification('لا يوجد فيديو للتنزيل. يرجى رفع فيديو أولاً.', 'warning');
+            return;
+        }
+        
+        const link = document.createElement('a');
+        link.href = videoData[videoType].url;
+        link.download = videoData[videoType].fileName || 'video.mp4';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    
+    // Drag and drop functionality
+    const modalUploadArea = document.getElementById('modalUploadArea');
+    
+    modalUploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('dragover');
+    });
+    
+    modalUploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+    });
+    
+    modalUploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+        
+        if (e.dataTransfer.files.length) {
+            handleModalVideoUpload(e.dataTransfer.files);
+        }
+    });
+    
+    // Function to adjust video heights in the practical section
+    function adjustPracticalVideosHeight() {
+        const practicalVideos = document.querySelectorAll('.practical-video-item .responsive-video');
+        
+        // Find the tallest video
+        let maxHeight = 0;
+        practicalVideos.forEach(video => {
+            if (video.offsetHeight > maxHeight) {
+                maxHeight = video.offsetHeight;
+            }
+        });
+        
+        // Set all videos to the same height if they're in flex row layout
+        if (window.innerWidth > 992) {
+            practicalVideos.forEach(video => {
+                video.style.height = maxHeight + 'px';
+            });
+        } else {
+            // Reset to fixed height in column layout
+            practicalVideos.forEach(video => {
+                video.style.height = '200px';
+            });
+        }
+    }
+    
+    // Call this function on load and resize
+    window.addEventListener('load', () => {
+        adjustPracticalVideosHeight();
+        setTimeout(adjustPracticalVideosHeight, 500); // Wait for videos to load
+        
+        // Initialize AI video parameters
+        updateAiVideoParameters();
+    });
+    
+    window.addEventListener('resize', adjustPracticalVideosHeight);
+    
+    // Interactive Quiz System
+    const quizData = {
+        answers: {},
+        scores: {},
+        totalQuestions: 3
+    };
+    
+    function selectOption(optionElement, questionNum) {
+        // Remove selected class from all options in this question
+        const questionCard = optionElement.closest('.question-card');
+        const options = questionCard.querySelectorAll('.option');
+        options.forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        
+        // Add selected class to clicked option
+        optionElement.classList.add('selected');
+        
+        // Store the selected option
+        quizData.answers[questionNum] = {
+            element: optionElement,
+            isCorrect: optionElement.getAttribute('data-correct') === 'true'
+        };
+        
+        // Update progress bar
+        updateQuizProgress();
+    }
+    
+    function checkAnswer(questionNum) {
+        const answer = quizData.answers[questionNum];
+        const feedbackElement = document.getElementById(`feedback${questionNum}`);
+        
+        if (!answer) {
+            feedbackElement.textContent = "الرجاء اختيار إجابة أولاً";
+            feedbackElement.className = "feedback incorrect";
+            return;
+        }
+        
+        // Show correct/incorrect feedback
+        if (answer.isCorrect) {
+            feedbackElement.textContent = "إجابة صحيحة! أحسنت.";
+            feedbackElement.className = "feedback correct";
+            
+            // Mark correct option
+            answer.element.classList.add('correct');
+            answer.element.classList.remove('incorrect');
+            
+            // Store score
+            quizData.scores[questionNum] = 1;
+        } else {
+            feedbackElement.textContent = "إجابة غير صحيحة. حاول مرة أخرى.";
+            feedbackElement.className = "feedback incorrect";
+            
+            // Mark incorrect option
+            answer.element.classList.add('incorrect');
+            answer.element.classList.remove('correct');
+            
+            // Also show the correct answer
+            const optionsContainer = answer.element.parentElement;
+            const correctOption = optionsContainer.querySelector('.option[data-correct="true"]');
+            if (correctOption) {
+                correctOption.classList.add('correct');
+            }
+            
+            // Store score
+            quizData.scores[questionNum] = 0;
+        }
+    }
+    
+    function updateQuizProgress() {
+        const answeredQuestions = Object.keys(quizData.answers).length;
+        const progress = (answeredQuestions / quizData.totalQuestions) * 100;
+        document.getElementById('quizProgress').style.width = `${progress}%`;
+    }
+    
+    function submitAllAnswers() {
+        let totalScore = 0;
+        let answeredCount = 0;
+        
+        // Check all questions
+        for (let i = 1; i <= quizData.totalQuestions; i++) {
+            if (quizData.answers[i]) {
+                checkAnswer(i);
+                if (quizData.scores[i] === 1) {
+                    totalScore++;
+                }
+                answeredCount++;
+            }
+        }
+        
+        if (answeredCount < quizData.totalQuestions) {
+            showNotification(`الرجاء الإجابة على جميع الأسئلة أولاً. لديك ${quizData.totalQuestions - answeredCount} سؤال/أسئلة لم تجب عليها.`, 'warning');
+            return;
+        }
+        
+        // Calculate final score
+        const finalScore = Math.round((totalScore / quizData.totalQuestions) * 100);
+        
+        // Update results display
+        document.getElementById('scoreValue').textContent = `${finalScore}%`;
+        
+        // Update result message
+        const resultMessage = document.getElementById('resultMessage');
+        if (finalScore === 100) {
+            resultMessage.textContent = "ممتاز! لقد أجبت على جميع الأسئلة بشكل صحيح. أنت تفهم قانون فاراداي تماماً.";
+        } else if (finalScore >= 70) {
+            resultMessage.textContent = "جيد جداً! لديك فهم قوي لمبادئ الحث الكهرومغناطيسي.";
+        } else if (finalScore >= 50) {
+            resultMessage.textContent = "جيد! لديك فهم أساسي لكن يمكنك تحسين معرفتك بالتطبيقات العملية.";
+        } else {
+            resultMessage.textContent = "تحتاج إلى مراجعة المادة. ننصحك بإعادة مشاهدة الفيديو التعليمي وقراءة ملف PDF.";
+        }
+        
+        // Show results
+        document.getElementById('quizResults').classList.add('show');
+        
+        // Animate score circle
+        const scoreCircle = document.querySelector('.score-circle');
+        scoreCircle.style.background = `conic-gradient(var(--neon-blue) 0% ${finalScore}%, #333 ${finalScore}% 100%)`;
+        
+        // Scroll to results
+        document.getElementById('quizResults').scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'center'
+        });
+    }
+    
+    function restartQuiz() {
+        // Reset quiz data
+        quizData.answers = {};
+        quizData.scores = {};
+        
+        // Reset all questions
+        for (let i = 1; i <= quizData.totalQuestions; i++) {
+            const questionCard = document.querySelector(`[data-question="${i}"]`);
+            const options = questionCard.querySelectorAll('.option');
+            options.forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            const feedback = document.getElementById(`feedback${i}`);
+            feedback.textContent = '';
+            feedback.className = 'feedback';
+        }
+        
+        // Hide results
+        document.getElementById('quizResults').classList.remove('show');
+        
+        // Reset progress bar
+        document.getElementById('quizProgress').style.width = '0%';
+        
+        // Scroll to top of quiz section
+        document.getElementById('questionsSection').scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+    
+    // Initialize quiz progress
+    updateQuizProgress();
+
+    resize();
+    update();
+    draw();
+
+</script>
+</body>
+</html>

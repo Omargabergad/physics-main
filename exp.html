@@ -1,0 +1,2421 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معمل فيزياء تجربه الضغط في باطن سائل</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --accent: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: 
+                radial-gradient(ellipse at top right, rgba(120, 119, 198, 0.3), transparent 60%),
+                radial-gradient(ellipse at bottom left, rgba(255, 119, 198, 0.2), transparent 60%),
+                radial-gradient(ellipse at center, rgba(120, 219, 255, 0.15), transparent 70%),
+                linear-gradient(135deg, #1a2a6c, #2a3a7c, #3a4a8c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 1.343 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            z-index: -1;
+            opacity: 0.6;
+        }
+        
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .floating-element {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+            100% { transform: translateY(0) rotate(360deg); }
+        }
+        
+        .lab-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .lab-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(to right, var(--primary), var(--accent), var(--success));
+            border-radius: 24px 24px 0 0;
+        }
+        
+        h1 {
+            color: white;
+            margin-bottom: 25px;
+            font-size: 36px;
+            text-align: center;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+            padding-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 30%;
+            right: 30%;
+            height: 4px;
+            background: linear-gradient(to right, transparent, var(--light), transparent);
+            border-radius: 4px;
+        }
+        
+        /* إعادة تنظيم المحتوى الرئيسي */
+        .main-content {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .experiment-section {
+            flex: 2;
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .info-section {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        /* قسم عرض الصور الجديد */
+        .images-section {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-top: 30px;
+        }
+        
+        /* تصميم الحوض التفاعلي الجديد */
+        .container-setup {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .container-wrapper {
+            position: relative;
+            perspective: 1000px;
+        }
+        
+        .container {
+            width: 450px;
+            height: 600px;
+            background: linear-gradient(145deg, #e6f7ff, #f0f8ff);
+            border: 6px solid var(--primary);
+            border-radius: 16px 16px 0 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                inset 0 0 30px rgba(0,0,0,0.15),
+                0 10px 25px rgba(0,0,0,0.25);
+            transition: all 0.5s ease;
+        }
+        
+        /* إضافة غطاء للحوض */
+        .container-lid {
+            position: absolute;
+            top: -25px;
+            left: -6px;
+            right: -6px;
+            height: 50px;
+            background: linear-gradient(to bottom, #95a5a6, #7f8c8d);
+            border-radius: 16px 16px 0 0;
+            border: 6px solid var(--primary);
+            border-bottom: none;
+            transform-origin: bottom center;
+            transform: rotateX(0deg);
+            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+            z-index: 4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            overflow: hidden;
+        }
+        
+        .container-lid::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+            border-radius: 16px 16px 0 0;
+        }
+        
+        .container-lid::after {
+            content: "مغلق";
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        /* عند فتح الضغط الجوي، يفتح الغطاء */
+        .container.open-top .container-lid {
+            transform: rotateX(-90deg);
+        }
+        
+        .container.open-top .container-lid::after {
+            content: "مفتوح";
+        }
+        
+        .liquid {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(to top, #2980b9, #3498db);
+            transition: height 0.5s ease, background 0.5s ease;
+            height: 40%;
+            z-index: 2;
+        }
+        
+        /* تأثير سطح السائل عند فتح الغطاء */
+        .liquid-surface {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 15px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0.1));
+            z-index: 3;
+            border-top: 2px solid rgba(255,255,255,0.5);
+            display: none;
+        }
+        
+        .container.open-top .liquid-surface {
+            display: block;
+        }
+        
+        /* فقاعات هواء عند فتح الغطاء */
+        .bubbles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: bubble-rise 4s infinite ease-in;
+        }
+        
+        @keyframes bubble-rise {
+            0% {
+                transform: translateY(100px) scale(0.5);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-50px) scale(1);
+                opacity: 0;
+            }
+        }
+        
+        .scale {
+            position: absolute;
+            left: -50px;
+            height: 600px;
+            width: 40px;
+            display: flex;
+            flex-direction: column-reverse;
+            justify-content: space-between;
+            z-index: 1;
+        }
+        
+        .scale-mark {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 8px;
+            position: relative;
+        }
+        
+        .major-scale-line {
+            width: 30px;
+            height: 3px;
+            background-color: var(--dark);
+        }
+        
+        .minor-scale-line {
+            width: 20px;
+            height: 2px;
+            background-color: #666;
+        }
+        
+        .scale-number {
+            font-size: 15px;
+            color: var(--dark);
+            position: absolute;
+            right: 25px;
+            font-weight: bold;
+        }
+        
+        .body-counter {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(44, 62, 80, 0.95);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 15px;
+            z-index: 3;
+            backdrop-filter: blur(8px);
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .depth-indicator {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background: rgba(231, 76, 60, 0.95);
+            color: white;
+            padding: 15px 22px;
+            border-radius: 10px;
+            font-size: 17px;
+            z-index: 3;
+            backdrop-filter: blur(8px);
+            font-weight: 600;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .faucet-container {
+            display: flex;
+            justify-content: center;
+            gap: 120px;
+            margin-top: 30px;
+        }
+        
+        .faucet-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .faucet {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(145deg, #7f8c8d, #95a5a6);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            position: relative;
+            font-size: 24px;
+        }
+        
+        .faucet:hover {
+            transform: scale(1.15);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+        }
+        
+        .faucet-handle {
+            position: absolute;
+            width: 12px;
+            height: 30px;
+            border-radius: 6px;
+        }
+        
+        .top-faucet .faucet-handle {
+            bottom: -35px;
+            background: linear-gradient(to bottom, var(--success), #27ae60);
+        }
+        
+        .bottom-faucet .faucet-handle {
+            top: -35px;
+            background: linear-gradient(to top, var(--warning), #d35400);
+        }
+        
+        .faucet-label {
+            margin-top: 15px;
+            font-weight: bold;
+            color: var(--dark);
+            font-size: 17px;
+        }
+        
+        /* باقي الأنماط تبقى كما هي مع تعديلات بسيطة */
+        .bodies-section {
+            background: rgba(255, 255, 255, 0.92);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            border: 1px solid rgba(0,0,0,0.1);
+            margin-top: 25px;
+            text-align: center;
+        }
+        
+        .bodies-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .body {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(145deg, #7f8c8d, #95a5a6);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: move;
+            user-select: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+            transition: all 0.3s;
+            position: relative;
+            font-size: 18px;
+        }
+        
+        .body:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+        
+        .body-in-water {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: rgba(127, 140, 141, 0.9);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            z-index: 2;
+            transition: all 0.5s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            cursor: move;
+            font-size: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .body-in-water:hover {
+            transform: scale(1.08);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.35);
+        }
+        
+        .body-fixed {
+            cursor: not-allowed !important;
+            background: linear-gradient(145deg, #34495e, #2c3e50) !important;
+            border: 3px solid var(--accent) !important;
+        }
+        
+        .body-fixed:hover {
+            transform: none !important;
+        }
+        
+        .pressure-indicator {
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(135deg, var(--secondary), var(--dark));
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            font-weight: bold;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            margin-bottom: 25px;
+            color: white;
+            overflow: hidden;
+        }
+        
+        .pressure-indicator::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary), var(--accent), var(--success));
+        }
+        
+        .formula-box {
+            background: linear-gradient(135deg, var(--primary), #2980b9);
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            font-size: 28px;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            font-weight: 600;
+        }
+        
+        .formula-box::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            animation: shine 3s infinite linear;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .liquid-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .gravity-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .option-btn {
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: bold;
+            color: white;
+            transition: all 0.3s;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .option-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.5s;
+        }
+        
+        .option-btn:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .option-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        
+        .option-btn.active {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+        }
+        
+        .water-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        
+        .oil-btn {
+            background: linear-gradient(135deg, #f1c40f, #f39c12);
+        }
+        
+        .gasoline-btn {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+        }
+        
+        .honey-btn {
+            background: linear-gradient(135deg, #d35400, #a04000);
+        }
+        
+        .earth-btn {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+        
+        .moon-btn {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+        }
+        
+        .mars-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .current-liquid-info {
+            font-size: 18px;
+            font-weight: bold;
+            color: rgb(7, 7, 7);
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            padding: 22px;
+            border-radius: 14px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            margin-bottom: 25px;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+            line-height: 1.8;
+        }
+        
+        .current-liquid-info .depth-symbol {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 24px;
+            font-style: italic;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(135deg, var(--primary), #2980b9);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            min-width: 180px;
+        }
+        
+        button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #2980b9, #2573a7);
+        }
+        
+        button:active {
+            transform: translateY(-1px);
+        }
+        
+        /* باقي الأنماط تبقى كما هي */
+        .explanation, .video-section, .pdf-section, .applications-section {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            margin-top: 30px;
+        }
+        
+        .section-title {
+            color: var(--secondary);
+            margin-bottom: 20px;
+            font-size: 26px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 40%;
+            right: 40%;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        
+        /* تحسينات الاستجابة للأجهزة المحمولة */
+        @media (max-width: 1200px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .control-buttons-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .lab-container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+            
+            .container {
+                width: 320px;
+                height: 480px;
+            }
+            
+            .scale {
+                height: 480px;
+                left: -35px;
+                width: 30px;
+            }
+            
+            .control-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .control-group {
+                min-width: 100%;
+            }
+            
+            .scientific-notation {
+                font-size: 22px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .coefficient {
+                font-size: 26px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                width: 280px;
+                height: 420px;
+            }
+            
+            .scale {
+                height: 420px;
+                left: -30px;
+                width: 25px;
+            }
+            
+            .depth-indicator {
+                font-size: 14px;
+                padding: 10px 15px;
+            }
+            
+            .scientific-notation {
+                font-size: 18px;
+            }
+            
+            .formula-box {
+                font-size: 22px;
+                padding: 20px;
+            }
+        }
+        
+        .control-buttons-section {
+            margin-top: 25px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        .control-buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .control-button {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-align: center;
+            font-size: 15px;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .control-button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .control-button:hover::before {
+            left: 100%;
+        }
+        
+        .control-button:hover {
+            background: linear-gradient(135deg, #2980b9, #2573a7);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(52, 152, 219, 0.4);
+        }
+        
+        .control-button.active {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+        }
+        
+        .control-button.atmospheric-active {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+        }
+        
+        .control-button:disabled {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: 0 4px 12px rgba(149, 165, 166, 0.3) !important;
+        }
+        
+        .control-button:disabled::before {
+            display: none;
+        }
+        
+        /* تحسينات لعرض الصور */
+        .image-display-area {
+            min-height: 400px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-top: 20px;
+            flex-direction: column;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .image-display-area:hover {
+            border-color: #3498db;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+        }
+        
+        .displayed-image {
+            max-width: 100%;
+            max-height: 350px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            border: 3px solid white;
+            transition: transform 0.3s ease;
+        }
+        
+        .displayed-image:hover {
+            transform: scale(1.02);
+        }
+        
+        .image-placeholder {
+            text-align: center;
+            color: #6c757d;
+            padding: 40px;
+        }
+        
+        .image-placeholder i {
+            font-size: 60px;
+            margin-bottom: 15px;
+            color: #adb5bd;
+        }
+        
+        .image-description {
+            margin-top: 15px;
+            padding: 20px;
+            background: #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #495057;
+            text-align: right;
+            width: 100%;
+            border-right: 4px solid #3498db;
+        }
+        
+        .image-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .image-info {
+            font-size: 16px;
+            color: #7f8c8d;
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 8px 15px;
+            background: white;
+            border-radius: 6px;
+            display: inline-block;
+        }
+        
+        .image-info i {
+            margin-left: 8px;
+        }
+        
+        /* تحسين أزرار التثبيت */
+        .control-button i {
+            font-size: 18px;
+        }
+        
+        /* مؤشرات حالة التثبيت */
+        .fix-status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+            background: #95a5a6;
+        }
+        
+        .control-button.active .fix-status {
+            background: #2ecc71;
+        }
+        
+        .control-button:disabled .fix-status {
+            background: #e74c3c;
+        }
+        
+        /* تحسين تنسيق PDF */
+        .pdf-container {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        .pdf-header {
+            background: linear-gradient(135deg, var(--primary), #2980b9);
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .pdf-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .pdf-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .pdf-control-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pdf-control-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+        
+        .pdf-content {
+            height: 500px;
+            overflow: hidden;
+        }
+        
+        .pdf-content embed {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        /* تحسين تنسيق الفيديوهات */
+        .applications-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-top: 25px;
+        }
+        
+        .video-application {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            border: 1px solid #e9ecef;
+        }
+        
+        .video-application:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .video-application video {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .video-title {
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--secondary);
+            text-align: center;
+            background: #f8f9fa;
+        }
+        
+        @media (max-width: 992px) {
+            .applications-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .applications-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+  <div class="floating-elements">
+    <div class="floating-element" style="width: 120px; height: 120px; top: 10%; left: 10%; animation-duration: 25s;"></div>
+    <div class="floating-element" style="width: 180px; height: 180px; top: 70%; left: 80%; animation-duration: 30s;"></div>
+    <div class="floating-element" style="width: 100px; height: 100px; top: 40%; left: 70%; animation-duration: 20s;"></div>
+    <div class="floating-element" style="width: 150px; height: 150px; top: 20%; left: 80%; animation-duration: 35s;"></div>
+</div>
+
+<div class="lab-container">
+    <h1><i class="fas fa-flask"></i>    معمل فيزياء تجربه الضغط في باطن سائل  </h1>
+    
+    <div class="main-content">
+        <div class="experiment-section">
+            <div class="container-setup">
+                <div class="container-wrapper">
+                    <div class="scale" id="containerScale"></div>
+                    <div class="container" id="container">
+                        <div class="container-lid" id="containerLid"></div>
+                        <div class="liquid" id="liquid" style="height: 40%;">
+                            <div class="liquid-surface" id="liquidSurface"></div>
+                            <div class="bubbles" id="bubbles"></div>
+                        </div>
+                        <div class="depth-indicator" id="depthIndicator">عمق الجسم: 0.000 متر</div>
+                        <div class="body-counter" id="bodyCounter">الجسم: غير مضاف</div>
+                        <div id="bodiesInWater"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faucet-container">
+                <div class="faucet-column">
+                    <div class="faucet top-faucet" id="topFaucet">
+                        <i class="fas fa-faucet"></i>
+                        <div class="faucet-handle"></div>
+                    </div>
+                    <div class="faucet-label">إضافة السائل</div>
+                </div>
+                
+                <div class="faucet-column">
+                    <div class="faucet bottom-faucet" id="bottomFaucet">
+                        <i class="fas fa-faucet"></i>
+                        <div class="faucet-handle"></div>
+                    </div>
+                    <div class="faucet-label">تفريغ السائل</div>
+                </div>
+            </div>
+            
+            <div class="bodies-section">
+                <h3 class="section-title">الجسم المتاح</h3>
+                <div class="bodies-container" id="bodiesContainer"></div>
+            </div>
+            
+            <div class="controls">
+                <button id="resetExperiment"><i class="fas fa-redo"></i> إعادة التجربة</button>
+                <button id="atmosphericPressureBtn"><i class="fas fa-cloud"></i> الضغط الجوي</button>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <div class="pressure-indicator">
+                <div class="scientific-notation">
+                    <span class="unit">الضغط:</span>
+                    <span class="coefficient" id="pressureCoefficient">0</span>
+                    <span class="times">×</span>
+                    <span class="ten">10</span>
+                    <sup class="exponent" id="pressureExponent">0</sup>
+                    <span class="unit">باسكال</span>
+                </div>
+                <div id="atmosphericInfo" style="font-size: 14px; margin-top: 5px; display: none;">
+                    (يشمل الضغط الجوي: 1.013 × 10<sup>5</sup> باسكال)
+                </div>
+            </div>
+            
+            <div class="formula-box" id="pressureFormula">
+                P = ρ × g × h
+            </div>
+            
+            <div class="current-liquid-info">
+                السائل الحالي: <span id="currentLiquidName">ماء</span><br>
+                الكثافة: <span id="currentLiquidDensity">1000</span> <span id="densityUnit">كجم/م³</span><br>
+                الجاذبية: <span id="currentGravityValue">9.8</span> م/ث²<br>
+                العمق الحالي: <span id="currentDepthValue">0.000</span> متر<br>
+                <span id="atmosphericStatus" style="color: #f1c40f; display: none;">✓ الضغط الجوي مضاف</span>
+            </div>
+            
+            <div class="calculation-section" id="calculationSection">
+                <div class="calculation-container">
+                    <h4>حساب الكثافة المجهولة (ρ)</h4>
+                    <div class="equation">
+                        ρ = P ÷ (g × h)
+                    </div>
+                    <div id="densityCalculation" style="margin-top: 15px; padding: 10px; background: #e8f4fc; border-radius: 8px; display: none;">
+                        <div id="calculationResult"></div>
+                    </div>
+                    <div class="calculation-steps" id="calculationSteps" style="display: none;">
+                        <h5>خطوات الحساب:</h5>
+                        <div id="stepsContent"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="unknown-density" id="unknownDensity">
+                <span class="density-symbol">ρ = ?</span>
+            </div>
+            
+            <div class="control-buttons-section">
+                <h4 class="section-title">أزرار التثبيت</h4>
+                <div class="control-buttons-grid">
+                    <button class="control-button" id="fixDensityBtn">
+                        <i class="fas fa-globe"></i> تثبيت الكثافة (كواكب)
+                    </button>
+                    <button class="control-button" id="fixGravityBtn">
+                        <i class="fas fa-tint"></i> تثبيت العجلة (سوائل)
+                    </button>
+                    <button class="control-button" id="fixHeightBtn">
+                        <i class="fas fa-ruler-vertical"></i> تثبيت الارتفاع
+                    </button>
+                    <button class="control-button" id="fixAtmosphericBtn">
+                        <i class="fas fa-cloud"></i> تثبيت الضغط الجوي
+                    </button>
+                </div>
+            </div>
+            
+            <div id="liquidOptionsContainer">
+                <div class="liquid-options">
+                    <h4 class="section-title">اختيار السائل (للعجلة)</h4>
+                    <button class="option-btn water-btn active" data-liquid="water"><i class="fas fa-tint"></i> ماء</button>
+                    <button class="option-btn oil-btn" data-liquid="oil"><i class="fas fa-oil-can"></i> زيت</button>
+                    <button class="option-btn gasoline-btn" data-liquid="gasoline"><i class="fas fa-gas-pump"></i> بنزين</button>
+                    <button class="option-btn honey-btn" data-liquid="honey"><i class="fas fa-honey-pot"></i> عسل</button>
+                </div>
+            </div>
+            
+            <div id="planetOptionsContainer">
+                <div class="gravity-options">
+                    <h4 class="section-title">اختيار الكوكب (للكثافة)</h4>
+                    <button class="option-btn earth-btn active" data-planet="earth"><i class="fas fa-globe-americas"></i> الأرض</button>
+                    <button class="option-btn moon-btn" data-planet="moon"><i class="fas fa-moon"></i> القمر</button>
+                    <button class="option-btn mars-btn" data-planet="mars"><i class="fas fa-globe"></i> المريخ</button>
+                </div>
+            </div>
+            
+            <div class="unknown-gravity" id="unknownGravity" style="display: none;">
+                <div class="calculation-container">
+                    <h4>العجلة المجهولة</h4>
+                    <div class="equation">
+                        g = ?
+                    </div>
+                    <div style="margin-top: 15px; padding: 10px; background: #e8f4fc; border-radius: 8px; text-align: center;">
+                        <p>العجلة مجهولة. يمكن حسابها من الرسم البياني:</p>
+                        <p class="equation">g = الميل ÷ ρ</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="images-section" id="imagesSection">
+        <h3 class="section-title">رسم بياني </h3>
+        <div class="image-display-area" id="imageDisplayArea" style="min-height: 250px; display: flex; justify-content: center; align-items: center;">
+            
+            <div id="imagePlaceholder" style="display: none !important;"></div>
+            <div id="imageDescription" style="display: none !important;"></div>
+            
+            <img class="displayed-image" id="displayedImage" style="display: none; max-width: 100%; height: auto;" alt="الصورة المعروضة">
+        </div>
+    </div>
+    
+    <div class="pdf-section">
+        <h3 class="section-title">ملف التجربة (PDF)</h3>
+        <div class="pdf-container">
+            <div class="pdf-header">
+                <div class="pdf-title">تجربة الضغط في باطن السائل</div>
+                <div class="pdf-controls">
+                    <button class="pdf-control-btn" title="تكبير"><i class="fas fa-search-plus"></i></button>
+                    <button class="pdf-control-btn" title="تصغير"><i class="fas fa-search-minus"></i></button>
+                    <button class="pdf-control-btn" title="تحميل"><i class="fas fa-download"></i></button>
+                </div>
+            </div>
+            <div class="pdf-content">
+                <embed src="assets/الضغط في باطن سائل.pdf" type="application/pdf" width="100%" height="100%">
+            </div>
+        </div>
+    </div>
+
+    <div class="applications-section">
+        <h3 class="section-title">التطبيقات العملية</h3>
+        <div class="applications-container">
+            <div class="video-application">
+                <video controls>
+                    <source src="assets/video/dumb.mp4" type="video/mp4">
+                    متصفحك لا يدعم تشغيل الفيديو.
+                </video>
+                <div class="video-title">تطبيق السدود المائيه</div>
+            </div>
+            <div class="video-application">
+                <video controls>
+                    <source src="assets/video/bottle.mp4" type="video/mp4">
+                    متصفحك لا يدعم تشغيل الفيديو.
+                </video>
+                <div class="video-title">انكماش زجاجه الماء في عمق البحر</div>
+            </div>
+            <div class="video-application">
+                <video controls>
+                    <source src="assets/video/lungs.mp4" type="video/mp4">
+                    متصفحك لا يدعم تشغيل الفيديو.
+                </video>
+                <div class="video-title">تاثير الضغط علي رئه الانسان</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('container');
+        const liquid = document.getElementById('liquid');
+        const containerLid = document.getElementById('containerLid');
+        const liquidSurface = document.getElementById('liquidSurface');
+        const bubbles = document.getElementById('bubbles');
+        const pressureCoefficient = document.getElementById('pressureCoefficient');
+        const pressureExponent = document.getElementById('pressureExponent');
+        const bodiesContainer = document.getElementById('bodiesContainer');
+        const resetBtn = document.getElementById('resetExperiment');
+        const atmosphericPressureBtn = document.getElementById('atmosphericPressureBtn');
+        const topFaucet = document.getElementById('topFaucet');
+        const bottomFaucet = document.getElementById('bottomFaucet');
+        const liquidButtons = document.querySelectorAll('.option-btn[data-liquid]');
+        const planetButtons = document.querySelectorAll('.option-btn[data-planet]');
+        const currentLiquidName = document.getElementById('currentLiquidName');
+        const currentLiquidDensity = document.getElementById('currentLiquidDensity');
+        const densityUnit = document.getElementById('densityUnit');
+        const currentGravityValue = document.getElementById('currentGravityValue');
+        const currentDepthValue = document.getElementById('currentDepthValue');
+        const depthIndicator = document.getElementById('depthIndicator');
+        const containerScale = document.getElementById('containerScale');
+        const bodiesInWater = document.getElementById('bodiesInWater');
+        const bodyCounter = document.getElementById('bodyCounter');
+        const atmosphericInfo = document.getElementById('atmosphericInfo');
+        const atmosphericStatus = document.getElementById('atmosphericStatus');
+        const pressureFormula = document.getElementById('pressureFormula');
+        const calculationSection = document.getElementById('calculationSection');
+        const unknownDensity = document.getElementById('unknownDensity');
+        const liquidOptionsContainer = document.getElementById('liquidOptionsContainer');
+        const planetOptionsContainer = document.getElementById('planetOptionsContainer');
+        const unknownGravity = document.getElementById('unknownGravity');
+        const imagesSection = document.getElementById('imagesSection');
+        const displayedImage = document.getElementById('displayedImage');
+        const imagePlaceholder = document.getElementById('imagePlaceholder');
+        const imageDescription = document.getElementById('imageDescription');
+        
+        // أزرار التثبيت الجديدة
+        const fixDensityBtn = document.getElementById('fixDensityBtn');
+        const fixGravityBtn = document.getElementById('fixGravityBtn');
+        const fixHeightBtn = document.getElementById('fixHeightBtn');
+        const fixAtmosphericBtn = document.getElementById('fixAtmosphericBtn');
+        
+        // --- تعريف البيانات بمسارات الصور الصحيحة ---
+        const liquidTypes = {
+            water: {
+                name: "ماء",
+                density: 1000,
+                colorStart: "#2980b9",
+                colorEnd: "#3498db",
+                image: "assets/Graphy+water.jpg",
+                description: "الماء هو السائل الأكثر شيوعًا. كثافته 1000 كجم/م³، ويستخدم كمرجع للكثافة النسبية للسوائل الأخرى. العجلة الأرضية: 9.8 م/ث²"
+            },
+            oil: {
+                name: "زيت",
+                density: 900,
+                colorStart: "#f1c40f",
+                colorEnd: "#f39c12",
+                image: "assets/Graphty+oil.jpg",
+                description: "الزيت أقل كثافة من الماء (900 كجم/م³)، مما يجعله يطفو على سطح الماء. يستخدم في العديد من التطبيقات الصناعية. العجلة الأرضية: 9.8 م/ث²"
+            },
+            gasoline: {
+                name: "بنزين",
+                density: 750,
+                colorStart: "#e67e22",
+                colorEnd: "#d35400",
+                image: "assets/Graphty+petrol.jpg",
+               
+            },
+            honey: {
+                name: "عسل",
+                density: 1420,
+                colorStart: "#d35400",
+                colorEnd: "#a04000",
+                image: "assets/Graphty+hony.jpg",
+
+            }
+        };
+
+        const planetTypes = {
+            earth: {
+                name: "الأرض",
+                value: 9.8,
+                color: "#27ae60",
+                image: "assets/denisty+earth.jpg",
+             
+            },
+            moon: {
+                name: "القمر",
+                value: 1.6,
+                color: "#95a5a6",
+                image: "assets/denisty+moon.jpg",
+              
+            },
+            mars: {
+                name: "المريخ",
+                value: 3.7,
+                color: "#e74c3c",
+                image: "assets/denisty+marsh.jpg",
+            }
+        };
+        
+        // المتغيرات الأساسية
+        let currentLiquid = "water";
+        let currentPlanet = "earth";
+        let liquidDensity = liquidTypes[currentLiquid].density;
+        let gravity = planetTypes[currentPlanet].value;
+        let bodiesInContainer = 0;
+        let topFaucetOpen = false;
+        let bottomFaucetOpen = false;
+        let faucetIntervals = {};
+        let currentDepth = 0;
+        let isDraggingBody = false;
+        let draggedBody = null;
+        let currentBody = null;
+        let bubbleInterval = null;
+        
+        // المتغيرات الجديدة
+        let includeAtmosphericPressure = false;
+        const ATMOSPHERIC_PRESSURE = 101325;
+        
+        // متغيرات التثبيت
+        let fixedDensity = null;
+        let fixedGravity = null;
+        let fixedHeight = null;
+        let fixedAtmospheric = false;
+        
+        // متغير لتتبع الزر المثبت حالياً
+        let currentlyFixedButton = null;
+        
+        // دالة لتحويل الرقم إلى صيغة علمية
+        function toScientificNotation(number) {
+            if (number === 0) return { coefficient: 0, exponent: 0 };
+            
+            let exponent = Math.floor(Math.log10(Math.abs(number)));
+            let coefficient = number / Math.pow(10, exponent);
+            
+            coefficient = Math.round(coefficient * 100) / 100;
+            
+            if (coefficient >= 10) {
+                coefficient /= 10;
+                exponent += 1;
+            }
+            
+            return { coefficient, exponent };
+        }
+        
+        // دالة لعرض الضغط بصيغة علمية
+        function displayPressureInScientificNotation(pressure) {
+            const { coefficient, exponent } = toScientificNotation(pressure);
+            pressureCoefficient.textContent = coefficient.toFixed(2);
+            pressureExponent.textContent = exponent;
+        }
+        
+        // إنشاء مسطرة القياس
+        function createScale(scaleId) {
+            const scale = document.getElementById(scaleId);
+            scale.innerHTML = '';
+            
+            for (let i = 0; i <= 10; i++) {
+                const mark = document.createElement('div');
+                mark.className = 'scale-mark';
+                mark.style.height = '60px';
+                
+                const line = document.createElement('div');
+                line.className = 'major-scale-line';
+                
+                const number = document.createElement('div');
+                number.className = 'scale-number';
+                number.textContent = i + ' م';
+                mark.appendChild(number);
+                
+                mark.appendChild(line);
+                scale.appendChild(mark);
+                
+                if (i < 10) {
+                    for (let j = 0.2; j < 1; j += 0.2) {
+                        const subMark = document.createElement('div');
+                        subMark.className = 'scale-mark';
+                        subMark.style.height = '60px';
+                        subMark.style.position = 'relative';
+                        subMark.style.top = `-${j * 60}px`;
+                        
+                        const subLine = document.createElement('div');
+                        subLine.className = 'minor-scale-line';
+                        
+                        subMark.appendChild(subLine);
+                        scale.appendChild(subMark);
+                    }
+                }
+            }
+        }
+        
+        // إنشاء فقاعات هواء عند فتح الحوض
+        function createBubbles() {
+            bubbles.innerHTML = '';
+            
+            if (bubbleInterval) {
+                clearInterval(bubbleInterval);
+            }
+            
+            bubbleInterval = setInterval(() => {
+                if (!container.classList.contains('open-top')) {
+                    clearInterval(bubbleInterval);
+                    return;
+                }
+                
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                
+                const size = Math.random() * 15 + 5;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                
+                const left = Math.random() * 100;
+                bubble.style.left = `${left}%`;
+                
+                const delay = Math.random() * 3;
+                bubble.style.animationDelay = `${delay}s`;
+                
+                const duration = Math.random() * 2 + 3;
+                bubble.style.animationDuration = `${duration}s`;
+                
+                bubbles.appendChild(bubble);
+                
+                setTimeout(() => {
+                    if (bubble.parentNode) {
+                        bubble.remove();
+                    }
+                }, (duration + delay) * 1000);
+                
+            }, 300);
+        }
+        
+        // عرض إشعار للمستخدم
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, var(--primary), #2980b9);
+                color: white;
+                padding: 18px 30px;
+                border-radius: 12px;
+                z-index: 1000;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+                font-weight: bold;
+                font-size: 16px;
+                animation: slideIn 0.4s ease-out;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                border: 1px solid rgba(255,255,255,0.2);
+                min-width: 300px;
+                max-width: 500px;
+                text-align: center;
+            `;
+            notification.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.4s ease-in';
+                setTimeout(() => notification.remove(), 400);
+            }, 3500);
+            
+            if (!document.querySelector('#notificationStyles')) {
+                const style = document.createElement('style');
+                style.id = 'notificationStyles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+                        to { transform: translateX(-50%) translateY(0); opacity: 1; }
+                    }
+                    @keyframes slideOut {
+                        from { transform: translateX(-50%) translateY(0); opacity: 1; }
+                        to { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+        
+        // --- تعديل هام: دالة لعرض الصور بناءً على التثبيت والاختيار ---
+        function updateImageDisplay() {
+            // إظهار قسم الصور دائمًا
+            imagesSection.style.display = 'block';
+            
+            // إذا كان زر تثبيت الكثافة مفعلاً وتم اختيار كوكب
+            if (fixedDensity !== null && currentlyFixedButton === fixDensityBtn) {
+                imagePlaceholder.style.display = 'none';
+                displayedImage.style.display = 'block';
+                imageDescription.style.display = 'block';
+                
+                const planetData = planetTypes[currentPlanet];
+                
+                // استخدام المسار المباشر للصورة (بدون إضافات نصية)
+                displayedImage.src = planetData.image;
+                displayedImage.alt = planetData.name;
+                
+                // إلغاء معالج الخطأ لتجنب العودة للصورة القديمة
+                displayedImage.onerror = null;
+                
+                imageDescription.innerHTML = `
+                    <div class="image-title">
+                        <i class="fas fa-globe"></i> كوكب ${planetData.name}
+                    </div>
+                    <div class="image-info">
+                        <i class="fas fa-tachometer-alt"></i> الجاذبية: ${planetData.value} م/ث²
+                    </div>
+                    <p>${planetData.description}</p>
+                   
+                `;
+                
+                
+                
+            } 
+            // إذا كان زر تثبيت العجلة مفعلاً وتم اختيار سائل
+            else if (fixedGravity !== null && currentlyFixedButton === fixGravityBtn) {
+                imagePlaceholder.style.display = 'none';
+                displayedImage.style.display = 'block';
+                imageDescription.style.display = 'block';
+                
+                const liquidData = liquidTypes[currentLiquid];
+                
+                // استخدام المسار المباشر للصورة (بدون إضافات نصية)
+                displayedImage.src = liquidData.image;
+                displayedImage.alt = liquidData.name;
+                
+                // إلغاء معالج الخطأ
+                displayedImage.onerror = null;
+                
+                imageDescription.innerHTML = `
+                    <div class="image-title">
+                        <i class="fas fa-tint"></i> ${liquidData.name}
+                    </div>
+                    <div class="image-info">
+                        <i class="fas fa-weight-hanging"></i> الكثافة: ${liquidData.density} كجم/م³
+                    </div>
+                    <p>${liquidData.description}</p>
+                    
+                `;
+                
+                showNotification(`تم عرض صورة ${liquidData.name}`);
+                
+            } 
+            // إذا لم يتم تثبيت أي متغير
+            
+        }
+        
+        // دالة مساعدة لتحويل لون CSS إلى كود سداسي
+        function getColorHex(cssColor) {
+            if (cssColor.startsWith('#')) {
+                return cssColor.substring(1); // إزالة #
+            }
+            return '2c3e50';
+        }
+        
+        // تحديث عرض العمق
+        function updateDepthDisplay() {
+            if (fixedHeight !== null) {
+                depthIndicator.textContent = `عمق الجسم: Z متر`;
+                currentDepthValue.innerHTML = '<span class="depth-symbol">Z</span>';
+            } else {
+                depthIndicator.textContent = `عمق الجسم: ${currentDepth.toFixed(3)} متر`;
+                currentDepthValue.textContent = currentDepth.toFixed(3);
+            }
+        }
+        
+        // تحديث عداد الأجسام
+        function updateBodyCounter() {
+            if (bodiesInContainer === 0) {
+                bodyCounter.textContent = `الجسم: غير مضاف`;
+            } else {
+                bodyCounter.textContent = `الجسم مضاف`;
+            }
+        }
+        
+        // تحديث واجهة السائل والكوكب الحالي
+        function updateLiquidInfo() {
+            currentLiquidName.textContent = liquidTypes[currentLiquid].name;
+            currentLiquidDensity.textContent = liquidTypes[currentLiquid].density;
+            densityUnit.textContent = "كجم/م³";
+            
+            currentGravityValue.textContent = planetTypes[currentPlanet].value.toFixed(1);
+            
+            updateDepthDisplay();
+        }
+        
+        // حساب الضغط
+        function calculatePressure() {
+            const density = fixedDensity !== null ? 1000 : liquidTypes[currentLiquid].density;
+            const gravityValue = fixedGravity !== null ? 9.8 : planetTypes[currentPlanet].value;
+            
+            let pressure = density * gravityValue * currentDepth;
+            
+            if (includeAtmosphericPressure) {
+                pressure += ATMOSPHERIC_PRESSURE;
+            }
+            
+            displayPressureInScientificNotation(pressure);
+            return pressure;
+        }
+        
+        // حساب عمق الجسم تحت سطح السائل بالمتر
+        function calculateDepth(bodyElement) {
+            if (!bodyElement) return 0;
+            
+            const containerHeight = container.offsetHeight;
+            const liquidHeightPx = (parseInt(liquid.style.height) / 100) * containerHeight;
+            const bodyBottom = parseInt(bodyElement.style.bottom) || 0;
+            let depthPx = liquidHeightPx - bodyBottom;
+            
+            if (depthPx < 0) depthPx = 0;
+            
+            const scaleFactor = 10 / 600;
+            let depthM = depthPx * scaleFactor;
+            depthM = Math.round(depthM * 1000) / 1000;
+            
+            return depthM;
+        }
+        
+        // تعطيل زر تثبيت إذا كان هناك زر آخر مثبت
+        function disableOtherFixButtons(activeButton) {
+            const allFixButtons = [fixDensityBtn, fixGravityBtn, fixHeightBtn, fixAtmosphericBtn];
+            
+            allFixButtons.forEach(button => {
+                if (button !== activeButton) {
+                    button.disabled = true;
+                }
+            });
+        }
+        
+        // تفعيل جميع أزرار التثبيت
+        function enableAllFixButtons() {
+            const allFixButtons = [fixDensityBtn, fixGravityBtn, fixHeightBtn, fixAtmosphericBtn];
+            allFixButtons.forEach(button => {
+                button.disabled = false;
+            });
+        }
+        
+        // تبديل تثبيت الكثافة (الكواكب)
+        function toggleFixDensity() {
+            if (currentlyFixedButton && currentlyFixedButton !== fixDensityBtn) {
+                showNotification(`يجب إلغاء تثبيت ${getButtonName(currentlyFixedButton)} أولاً`);
+                return;
+            }
+            
+            if (fixedDensity === null) {
+                fixedDensity = true;
+                fixDensityBtn.classList.add('active');
+                currentlyFixedButton = fixDensityBtn;
+                
+                disableOtherFixButtons(fixDensityBtn);
+                
+                planetOptionsContainer.style.display = 'block';
+                liquidOptionsContainer.style.display = 'none';
+                unknownDensity.style.display = 'block';
+                calculationSection.style.display = 'block';
+                
+                updateImageDisplay();
+                
+                showNotification("تم تثبيت الكثافة - اختر كوكبًا لرؤية صورته");
+            } else {
+                fixedDensity = null;
+                fixDensityBtn.classList.remove('active');
+                currentlyFixedButton = null;
+                
+                enableAllFixButtons();
+                
+                planetOptionsContainer.style.display = 'none';
+                liquidOptionsContainer.style.display = 'block';
+                unknownDensity.style.display = 'none';
+                calculationSection.style.display = 'none';
+                
+                updateImageDisplay();
+                
+                showNotification("تم إلغاء تثبيت الكثافة");
+            }
+            
+            updateLiquidInfo();
+            
+            if (bodiesInContainer > 0) {
+                calculatePressure();
+            }
+        }
+        
+        // تبديل تثبيت العجلة (السوائل)
+        function toggleFixGravity() {
+            if (currentlyFixedButton && currentlyFixedButton !== fixGravityBtn) {
+                showNotification(`يجب إلغاء تثبيت ${getButtonName(currentlyFixedButton)} أولاً`);
+                return;
+            }
+            
+            if (fixedGravity === null) {
+                fixedGravity = true;
+                fixGravityBtn.classList.add('active');
+                currentlyFixedButton = fixGravityBtn;
+                
+                disableOtherFixButtons(fixGravityBtn);
+                
+                liquidOptionsContainer.style.display = 'block';
+                planetOptionsContainer.style.display = 'none';
+                unknownGravity.style.display = 'block';
+                
+                updateImageDisplay();
+                
+                showNotification("تم تثبيت العجلة - اختر سائلاً لرؤية صورته");
+            } else {
+                fixedGravity = null;
+                fixGravityBtn.classList.remove('active');
+                currentlyFixedButton = null;
+                
+                enableAllFixButtons();
+                
+                liquidOptionsContainer.style.display = 'block';
+                planetOptionsContainer.style.display = 'block';
+                unknownGravity.style.display = 'none';
+                
+                updateImageDisplay();
+                
+                showNotification("تم إلغاء تثبيت العجلة");
+            }
+            
+            updateLiquidInfo();
+            
+            if (bodiesInContainer > 0) {
+                calculatePressure();
+            }
+        }
+        
+        // تبديل تثبيت الارتفاع
+        function toggleFixHeight() {
+            if (currentlyFixedButton && currentlyFixedButton !== fixHeightBtn) {
+                showNotification(`يجب إلغاء تثبيت ${getButtonName(currentlyFixedButton)} أولاً`);
+                return;
+            }
+            
+            if (fixedHeight === null) {
+                fixedHeight = true;
+                fixHeightBtn.classList.add('active');
+                currentlyFixedButton = fixHeightBtn;
+                
+                disableOtherFixButtons(fixHeightBtn);
+                
+                if (topFaucetOpen) toggleTopFaucet();
+                if (bottomFaucetOpen) toggleBottomFaucet();
+                
+                if (bodiesInContainer > 0 && currentBody) {
+                    const containerWidth = container.offsetWidth;
+                    const containerHeight = container.offsetHeight;
+                    const liquidHeight = (parseInt(liquid.style.height) / 100) * containerHeight;
+                    
+                    const centerLeft = (containerWidth - 80) / 2;
+                    const centerBottom = liquidHeight / 2;
+                    
+                    currentBody.style.left = `${centerLeft}px`;
+                    currentBody.style.bottom = `${centerBottom}px`;
+                    
+                    currentBody.classList.add('body-fixed');
+                    currentBody.style.cursor = 'not-allowed';
+                    currentBody.style.pointerEvents = 'none';
+                }
+                
+                showNotification("تم تثبيت الارتفاع - أصبح مجهولاً (Z)");
+            } else {
+                fixedHeight = null;
+                fixHeightBtn.classList.remove('active');
+                currentlyFixedButton = null;
+                
+                enableAllFixButtons();
+                
+                if (bodiesInContainer > 0 && currentBody) {
+                    currentBody.classList.remove('body-fixed');
+                    currentBody.style.cursor = 'move';
+                    currentBody.style.pointerEvents = 'auto';
+                }
+                
+                showNotification("تم إلغاء تثبيت الارتفاع");
+            }
+            
+            updateLiquidInfo();
+            
+            if (bodiesInContainer > 0) {
+                calculatePressure();
+            }
+        }
+        
+        // تبديل تثبيت الضغط الجوي
+        function toggleFixAtmospheric() {
+            if (currentlyFixedButton && currentlyFixedButton !== fixAtmosphericBtn) {
+                showNotification(`يجب إلغاء تثبيت ${getButtonName(currentlyFixedButton)} أولاً`);
+                return;
+            }
+            
+            fixedAtmospheric = !fixedAtmospheric;
+            
+            if (fixedAtmospheric) {
+                fixAtmosphericBtn.classList.add('active');
+                currentlyFixedButton = fixAtmosphericBtn;
+                
+                disableOtherFixButtons(fixAtmosphericBtn);
+                
+                if (!includeAtmosphericPressure) {
+                    toggleAtmosphericPressure();
+                }
+                
+                showNotification("تم تثبيت إضافة الضغط الجوي");
+            } else {
+                fixAtmosphericBtn.classList.remove('active');
+                currentlyFixedButton = null;
+                
+                enableAllFixButtons();
+                
+                showNotification("تم إلغاء تثبيت الضغط الجوي");
+            }
+        }
+        
+        // الحصول على اسم الزر بالعربية
+        function getButtonName(button) {
+            if (button === fixDensityBtn) return "الكثافة";
+            if (button === fixGravityBtn) return "العجلة";
+            if (button === fixHeightBtn) return "الارتفاع";
+            if (button === fixAtmosphericBtn) return "الضغط الجوي";
+            return "";
+        }
+        
+        // تبديل الضغط الجوي مع فتح/إغلاق الحوض
+        function toggleAtmosphericPressure() {
+            includeAtmosphericPressure = !includeAtmosphericPressure;
+            
+            if (includeAtmosphericPressure) {
+                atmosphericPressureBtn.classList.add('atmospheric-active');
+                atmosphericInfo.style.display = 'block';
+                atmosphericStatus.style.display = 'inline';
+                pressureFormula.textContent = 'P = ρ × g × h + P₀';
+                
+                container.classList.add('open-top');
+                createBubbles();
+                
+                showNotification("تم تفعيل الضغط الجوي وفتح الحوض");
+            } else {
+                atmosphericPressureBtn.classList.remove('atmospheric-active');
+                atmosphericInfo.style.display = 'none';
+                atmosphericStatus.style.display = 'none';
+                pressureFormula.textContent = 'P = ρ × g × h';
+                
+                container.classList.remove('open-top');
+                
+                if (bubbleInterval) {
+                    clearInterval(bubbleInterval);
+                    bubbleInterval = null;
+                }
+                
+                bubbles.innerHTML = '';
+                
+                showNotification("تم إلغاء الضغط الجوي وإغلاق الحوض");
+            }
+            
+            if (bodiesInContainer > 0) {
+                calculatePressure();
+            }
+        }
+        
+        // تغيير نوع السائل (للعجلة)
+        function changeLiquidType(liquidType) {
+            if (fixedGravity !== null) {
+                currentLiquid = liquidType;
+                const colorStart = liquidTypes[liquidType].colorStart;
+                const colorEnd = liquidTypes[liquidType].colorEnd;
+                liquid.style.background = `linear-gradient(to top, ${colorStart}, ${colorEnd})`;
+                
+                updateLiquidInfo();
+                updateImageDisplay();
+                
+                showNotification(`تم تغيير السائل إلى ${liquidTypes[liquidType].name}`);
+                return;
+            }
+            
+            currentLiquid = liquidType;
+            liquidDensity = liquidTypes[liquidType].density;
+            
+            const colorStart = liquidTypes[liquidType].colorStart;
+            const colorEnd = liquidTypes[liquidType].colorEnd;
+            liquid.style.background = `linear-gradient(to top, ${colorStart}, ${colorEnd})`;
+            
+            updateLiquidInfo();
+            
+            liquidButtons.forEach(btn => {
+                if (btn.dataset.liquid === liquidType) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            if (bodiesInContainer > 0) {
+                calculatePressure();
+            }
+        }
+        
+        // تغيير الكوكب (للكثافة)
+        function changePlanetType(planetType) {
+            if (fixedDensity !== null) {
+                currentPlanet = planetType;
+                
+                updateLiquidInfo();
+                updateImageDisplay();
+                
+                showNotification(`تم تغيير الكوكب إلى ${planetTypes[planetType].name}`);
+                return;
+            }
+            
+            currentPlanet = planetType;
+            gravity = planetTypes[planetType].value;
+            
+            planetButtons.forEach(btn => {
+                if (btn.dataset.planet === planetType) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            updateLiquidInfo();
+            
+            if (bodiesInContainer > 0) {
+                calculatePressure();
+            }
+        }
+        
+        // إضافة مستمعي الأحداث لأزرار السوائل
+        liquidButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.dataset.liquid) {
+                    changeLiquidType(this.dataset.liquid);
+                }
+            });
+        });
+        
+        // إضافة مستمعي الأحداث لأزرار الكواكب
+        planetButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.dataset.planet) {
+                    changePlanetType(this.dataset.planet);
+                }
+            });
+        });
+        
+        // إضافة مستمعي الأحداث للأزرار
+        atmosphericPressureBtn.addEventListener('click', toggleAtmosphericPressure);
+        
+        fixDensityBtn.addEventListener('click', toggleFixDensity);
+        fixGravityBtn.addEventListener('click', toggleFixGravity);
+        fixHeightBtn.addEventListener('click', toggleFixHeight);
+        fixAtmosphericBtn.addEventListener('click', toggleFixAtmospheric);
+        
+        // إنشاء الجسم الوحيد
+        function createBody() {
+            const body = document.createElement('div');
+            body.className = 'body';
+            body.draggable = true;
+            body.innerHTML = '<i class="fas fa-cube"></i>';
+            
+            body.addEventListener('dragstart', function(e) {
+                if (bodiesInContainer > 0) {
+                    e.preventDefault();
+                    return;
+                }
+                e.dataTransfer.setData('text/plain', 'body');
+                setTimeout(() => body.style.opacity = '0.6', 0);
+            });
+            
+            body.addEventListener('dragend', function() {
+                body.style.opacity = '1';
+                body.style.transform = 'translateY(0)';
+            });
+            
+            bodiesContainer.appendChild(body);
+        }
+        
+        // جعل الوعاء منطقة لإفلات الأجسام
+        container.addEventListener('dragover', function(e) {
+            e.preventDefault();
+        });
+        
+        container.addEventListener('drop', function(e) {
+            e.preventDefault();
+            
+            if (bodiesInContainer > 0) {
+                return;
+            }
+            
+            addBodyToContainer();
+        });
+        
+        // إضافة جسم إلى الوعاء
+        function addBodyToContainer() {
+            if (bodiesInContainer > 0) {
+                return;
+            }
+            
+            const bodyInWater = document.createElement('div');
+            bodyInWater.className = 'body-in-water';
+            bodyInWater.innerHTML = '<i class="fas fa-cube"></i>';
+            
+            const containerWidth = container.offsetWidth;
+            const containerHeight = container.offsetHeight;
+            const liquidHeight = (parseInt(liquid.style.height) / 100) * containerHeight;
+            
+            const randomLeft = Math.random() * (containerWidth - 80);
+            const randomBottom = 10 + Math.random() * (liquidHeight - 90);
+            
+            bodyInWater.style.left = `${randomLeft}px`;
+            bodyInWater.style.bottom = `${randomBottom}px`;
+            
+            bodiesInWater.appendChild(bodyInWater);
+            bodiesInContainer = 1;
+            currentBody = bodyInWater;
+            updateBodyCounter();
+            
+            if (!fixedHeight) {
+                let currentHeight = parseInt(liquid.style.height);
+                const increaseAmount = 1;
+                liquid.style.height = (currentHeight + increaseAmount) + '%';
+            }
+            
+            if (fixedHeight !== null) {
+                const centerLeft = (containerWidth - 80) / 2;
+                const centerBottom = liquidHeight / 2;
+                
+                bodyInWater.style.left = `${centerLeft}px`;
+                bodyInWater.style.bottom = `${centerBottom}px`;
+                bodyInWater.classList.add('body-fixed');
+                bodyInWater.style.cursor = 'not-allowed';
+                bodyInWater.style.pointerEvents = 'none';
+            } else {
+                makeBodyDraggable(bodyInWater);
+            }
+            
+            currentDepth = calculateDepth(bodyInWater);
+            updateDepthDisplay();
+            calculatePressure();
+        }
+        
+        // جعل الجسم قابلاً للتحريك داخل السائل
+        function makeBodyDraggable(bodyElement) {
+            let isDragging = false;
+            let offsetX, offsetY;
+            
+            bodyElement.addEventListener('mousedown', startDrag);
+            bodyElement.addEventListener('touchstart', startDrag);
+            
+            function startDrag(e) {
+                if (fixedHeight !== null) {
+                    e.preventDefault();
+                    return;
+                }
+                
+                isDragging = true;
+                isDraggingBody = true;
+                draggedBody = bodyElement;
+                
+                const rect = bodyElement.getBoundingClientRect();
+                
+                if (e.type === 'mousedown') {
+                    offsetX = e.clientX - rect.left;
+                    offsetY = e.clientY - rect.top;
+                } else if (e.type === 'touchstart') {
+                    offsetX = e.touches[0].clientX - rect.left;
+                    offsetY = e.touches[0].clientY - rect.top;
+                }
+                
+                document.addEventListener('mousemove', onDrag);
+                document.addEventListener('touchmove', onDrag);
+                document.addEventListener('mouseup', stopDrag);
+                document.addEventListener('touchend', stopDrag);
+                
+                e.preventDefault();
+            }
+            
+            function onDrag(e) {
+                if (!isDragging) return;
+                
+                let clientX, clientY;
+                
+                if (e.type === 'mousemove') {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                } else if (e.type === 'touchmove') {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                }
+                
+                const containerRect = container.getBoundingClientRect();
+                let newLeft = clientX - containerRect.left - offsetX;
+                let newBottom = containerRect.bottom - clientY - offsetY;
+                
+                const maxLeft = container.offsetWidth - 80;
+                const maxBottom = container.offsetHeight - 80;
+                const minBottom = 10;
+                
+                newLeft = Math.max(0, Math.min(newLeft, maxLeft));
+                newBottom = Math.max(minBottom, Math.min(newBottom, maxBottom));
+                
+                bodyElement.style.left = `${newLeft}px`;
+                bodyElement.style.bottom = `${newBottom}px`;
+                
+                currentDepth = calculateDepth(bodyElement);
+                updateDepthDisplay();
+                calculatePressure();
+                
+                e.preventDefault();
+            }
+            
+            function stopDrag() {
+                isDragging = false;
+                isDraggingBody = false;
+                draggedBody = null;
+                
+                document.removeEventListener('mousemove', onDrag);
+                document.removeEventListener('touchmove', onDrag);
+                document.removeEventListener('mouseup', stopDrag);
+                document.removeEventListener('touchend', stopDrag);
+            }
+        }
+        
+        // فتح/غلق الحنفيات
+        function toggleTopFaucet() {
+            if (fixedHeight !== null) {
+                showNotification("الارتفاع مثبت! لا يمكن تغيير مستوى السائل");
+                return;
+            }
+            
+            topFaucetOpen = !topFaucetOpen;
+            
+            if (topFaucetOpen) {
+                topFaucet.classList.add('open');
+                startAddingLiquid();
+            } else {
+                topFaucet.classList.remove('open');
+                stopAddingLiquid();
+            }
+        }
+        
+        function toggleBottomFaucet() {
+            if (fixedHeight !== null) {
+                showNotification("الارتفاع مثبت! لا يمكن تغيير مستوى السائل");
+                return;
+            }
+            
+            bottomFaucetOpen = !bottomFaucetOpen;
+            
+            if (bottomFaucetOpen) {
+                bottomFaucet.classList.add('open');
+                startRemovingLiquid();
+            } else {
+                bottomFaucet.classList.remove('open');
+                stopRemovingLiquid();
+            }
+        }
+        
+        // إضافة السائل إلى الوعاء
+        function startAddingLiquid() {
+            faucetIntervals['add'] = setInterval(() => {
+                let currentHeight = parseInt(liquid.style.height);
+                if (currentHeight < 95) {
+                    liquid.style.height = (currentHeight + 0.5) + '%';
+                    
+                    if (bodiesInContainer > 0) {
+                        const bodyInWater = bodiesInWater.querySelector('.body-in-water');
+                        currentDepth = calculateDepth(bodyInWater);
+                        updateDepthDisplay();
+                        calculatePressure();
+                    }
+                }
+            }, 300);
+        }
+        
+        // إزالة السائل من الوعاء
+        function startRemovingLiquid() {
+            faucetIntervals['remove'] = setInterval(() => {
+                let currentHeight = parseInt(liquid.style.height);
+                if (currentHeight > 5) {
+                    liquid.style.height = (currentHeight - 0.5) + '%';
+                    
+                    if (bodiesInContainer > 0) {
+                        const bodyInWater = bodiesInWater.querySelector('.body-in-water');
+                        currentDepth = calculateDepth(bodyInWater);
+                        updateDepthDisplay();
+                        calculatePressure();
+                    }
+                }
+            }, 300);
+        }
+        
+        // إيقاف إضافة السائل
+        function stopAddingLiquid() {
+            clearInterval(faucetIntervals['add']);
+        }
+        
+        // إيقاف إزالة السائل
+        function stopRemovingLiquid() {
+            clearInterval(faucetIntervals['remove']);
+        }
+        
+        // إضافة مستمعي الأحداث للحنفيات
+        topFaucet.addEventListener('click', toggleTopFaucet);
+        bottomFaucet.addEventListener('click', toggleBottomFaucet);
+        
+        // إعادة التجربة
+        resetBtn.addEventListener('click', function() {
+            liquid.style.height = '40%';
+            
+            topFaucetOpen = false;
+            bottomFaucetOpen = false;
+            topFaucet.classList.remove('open');
+            bottomFaucet.classList.remove('open');
+            
+            for (let key in faucetIntervals) {
+                clearInterval(faucetIntervals[key]);
+            }
+            faucetIntervals = {};
+            
+            container.classList.remove('open-top');
+            if (bubbleInterval) {
+                clearInterval(bubbleInterval);
+                bubbleInterval = null;
+            }
+            bubbles.innerHTML = '';
+            
+            bodiesInWater.innerHTML = '';
+            bodiesInContainer = 0;
+            currentBody = null;
+            updateBodyCounter();
+            
+            currentDepth = 0;
+            updateDepthDisplay();
+            
+            if (!fixedDensity) changePlanetType('earth');
+            if (!fixedGravity) changeLiquidType('water');
+            
+            if (!fixedAtmospheric && includeAtmosphericPressure) {
+                toggleAtmosphericPressure();
+            }
+            
+            fixedDensity = null;
+            fixedGravity = null;
+            fixedHeight = null;
+            fixedAtmospheric = false;
+            currentlyFixedButton = null;
+            
+            fixDensityBtn.classList.remove('active');
+            fixGravityBtn.classList.remove('active');
+            fixHeightBtn.classList.remove('active');
+            fixAtmosphericBtn.classList.remove('active');
+            
+            enableAllFixButtons();
+            
+            planetOptionsContainer.style.display = 'block';
+            liquidOptionsContainer.style.display = 'block';
+            unknownDensity.style.display = 'none';
+            unknownGravity.style.display = 'none';
+            
+            calculationSection.style.display = 'none';
+            
+            updateImageDisplay();
+            
+            calculatePressure();
+            
+            showNotification("تم إعادة تعيين التجربة بنجاح");
+        });
+        
+        // تهيئة التطبيق
+        createScale('containerScale');
+        createBody();
+        updateLiquidInfo();
+        updateDepthDisplay();
+        updateBodyCounter();
+        calculatePressure();
+        updateImageDisplay();
+    });
+</script>
+</body>
+</html>

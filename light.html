@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تجربة توماس يونج | المختبر الكمّي المتقدم</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --bg: #030305;
+            --surface: rgba(15, 15, 20, 0.6);
+            --border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: #8892b0;
+            --accent: #00ffcc;
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body::after {
+            content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.04; pointer-events: none; z-index: 9999;
+        }
+
+        .ambient-glow {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 80vw; height: 80vh; background: radial-gradient(circle, var(--accent) 0%, transparent 60%);
+            opacity: 0.08; pointer-events: none; z-index: 0; transition: background 0.5s ease; filter: blur(120px);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif; background-color: var(--bg);
+            color: var(--text-main); min-height: 100vh; display: flex;
+            flex-direction: column; align-items: center; padding: 30px; overflow-x: hidden;
+        }
+
+        header {
+            text-align: center; margin-bottom: 30px; width: 100%; max-width: 1400px;
+            display: flex; justify-content: space-between; align-items: flex-end;
+            border-bottom: 1px solid var(--border); padding-bottom: 15px; position: relative; z-index: 10;
+        }
+
+        .title-group h1 {
+            font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 5px;
+            background: linear-gradient(90deg, #fff, var(--text-muted));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .title-group p { color: var(--text-muted); font-weight: 300; font-size: 1rem; }
+
+        .header-actions { display: flex; gap: 15px; align-items: center; }
+
+        .btn-export {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);
+            color: #fff; font-family: 'Cairo', sans-serif; font-size: 0.9rem; font-weight: 700;
+            padding: 10px 20px; border-radius: 8px; cursor: pointer; backdrop-filter: blur(10px);
+            transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-export:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px rgba(0, 255, 204, 0.4); }
+
+        .formula-badge {
+            font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; color: var(--accent);
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px);
+            padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);
+            direction: ltr; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .container { width: 100%; max-width: 1400px; display: flex; flex-direction: column; gap: 20px; z-index: 10; position: relative; }
+
+        .apparatus-panel-wrapper { perspective: 1200px; width: 100%; }
+        .apparatus-panel {
+            background: var(--surface); backdrop-filter: blur(20px); border-radius: 20px;
+            border: 1px solid var(--border); padding: 20px; box-shadow: var(--glass-shadow);
+            display: flex; flex-direction: column; transform-style: preserve-3d; transition: transform 0.1s ease-out;
+        }
+
+        .apparatus-labels {
+            display: flex; justify-content: space-between; padding: 0 40px 10px 40px;
+            color: var(--text-muted); font-size: 0.85rem; font-weight: 700;
+            letter-spacing: 1px; text-transform: uppercase; transform: translateZ(20px);
+        }
+
+        .canvas-wrapper-main {
+            width: 100%; height: 350px; background: #000; border-radius: 12px;
+            overflow: hidden; position: relative; box-shadow: inset 0 0 60px rgba(0,0,0,1);
+            transform: translateZ(10px); cursor: grab;
+        }
+        .canvas-wrapper-main:active { cursor: grabbing; }
+        canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+
+        .bottom-section { display: grid; grid-template-columns: 350px 1fr 1fr; gap: 20px; }
+        .panel {
+            background: var(--surface); backdrop-filter: blur(20px); border: 1px solid var(--border);
+            border-radius: 20px; padding: 25px; box-shadow: var(--glass-shadow); display: flex; flex-direction: column;
+        }
+
+        .panel-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; color: #fff; display: flex; align-items: center; gap: 10px; }
+        .panel-title::before { content: ''; display: block; width: 8px; height: 20px; background: var(--accent); border-radius: 4px; transition: background 0.3s; }
+
+        .controls-container { overflow-y: auto; padding-right: 5px; }
+        .controls-container::-webkit-scrollbar { width: 4px; }
+        .controls-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+        .control-row { margin-bottom: 15px; }
+        .control-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+        .control-label { font-size: 0.85rem; font-weight: 500; }
+        .control-val { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: var(--accent); }
+
+        input[type="range"] { -webkit-appearance: none; width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; outline: none; margin-top: 5px; }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+            background: #fff; border: 2px solid var(--accent); cursor: pointer; box-shadow: 0 0 10px var(--accent); transition: 0.2s;
+        }
+        input[type="range"]:disabled::-webkit-slider-thumb { background: #555; border-color: #333; box-shadow: none; cursor: not-allowed; }
+
+        select {
+            width: 100%; padding: 6px 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--border);
+            border-radius: 6px; color: #fff; font-family: 'Cairo', sans-serif; font-size: 0.9rem; outline: none; cursor: pointer;
+        }
+
+        .toggle-group { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
+        .switch-wrapper { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.3); padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; }
+        .switch-wrapper span { font-size: 0.9rem; font-weight: 700; }
+        
+        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #334155; transition: .4s; border-radius: 22px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent); }
+        input.quantum:checked + .slider { background-color: #a855f7; }
+        input:checked + .slider:before { transform: translateX(18px); }
+
+        .analysis-wrapper {
+            flex: 1; background: #000; border-radius: 12px; border: 1px solid var(--border);
+            position: relative; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); cursor: crosshair;
+        }
+
+        .ruler-tooltip {
+            position: absolute; background: rgba(0,0,0,0.9); color: #fff; padding: 4px 8px;
+            border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
+            pointer-events: none; border: 1px solid var(--accent); display: none; z-index: 100; transform: translate(-50%, -120%);
+        }
+
+        @media (max-width: 1100px) {
+            .bottom-section { grid-template-columns: 1fr; }
+            header { flex-direction: column; align-items: center; gap: 15px; text-align: center; }
+            .header-actions { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow" id="ambientGlow"></div>
+
+    <header>
+        <div class="title-group">
+            <h1>المختبر البصري | تجربة التداخل</h1>
+            <p>محاكاة فيزيائية سينمائية (الضوء الأبيض، الانكسار، والكم)</p>
+        </div>
+        <div class="header-actions">
+            <!-- <div class="formula-badge">I = I₀ [sin(Nδ/2)/sin(δ/2)]² [sin(β)/β]²</div> -->
+            <button class="btn-export" onclick="exportReport()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                تصدير التقرير
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div class="apparatus-panel-wrapper">
+            <div class="apparatus-panel" id="tiltPanel">
+                <div class="apparatus-labels">
+                    <span>مصدر الضوء</span>
+                    <span>محزز الحيود (N-Slits)</span>
+                    <span style="color: var(--accent); font-size: 0.75rem;">(اسحب الحائل لتغيير مسافة R)</span>
+                    <span style="text-align: left;">الحائل</span>
+                </div>
+                <div class="canvas-wrapper-main" id="appCanvasContainer">
+                    <canvas id="appCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-section">
+            
+            <div class="panel">
+                <div class="panel-title">المتغيرات الفيزيائية</div>
+                <div class="controls-container">
+                    <div class="control-row">
+                        <div class="control-header">
+                            <span class="control-label">الطول الموجي (λ)</span>
+                            <span class="control-val" id="val-lambda">600 nm</span>
+                        </div>
+                        <input type="range" id="lambda" min="400" max="750" value="600" step="1">
+                    </div>
+                    <div class="control-row">
+                        <div class="control-header">
+                            <span class="control-label">المسافة بين الشقوق (d)</span>
+                            <span class="control-val" id="val-d">0.15 mm</span>
+                        </div>
+                        <input type="range" id="d" min="0.05" max="0.4" value="0.15" step="0.01">
+                    </div>
+                    <div class="control-row">
+                        <div class="control-header">
+                            <span class="control-label">عرض الشق (w)</span>
+                            <span class="control-val" id="val-w">0.02 mm</span>
+                        </div>
+                        <input type="range" id="w" min="0.005" max="0.08" value="0.02" step="0.005">
+                    </div>
+                    <div class="control-row">
+                        <div class="control-header">
+                            <span class="control-label">عدد الشقوق (N)</span>
+                            <span class="control-val" id="val-N">2</span>
+                        </div>
+                        <input type="range" id="N" min="1" max="5" value="2" step="1">
+                    </div>
+                    <div class="control-row" style="display: none;"> <input type="range" id="R" min="1.0" max="4.0" value="2.0" step="0.1">
+                    </div>
+                    <div class="control-row">
+                        <div class="control-header">
+                            <span class="control-label">معامل الانكسار (n)</span>
+                            <span class="control-val" id="val-n">1.0</span>
+                        </div>
+                        <select id="medium-n">
+                            <option value="1.0">هواء / فراغ (1.0)</option>
+                            <option value="1.33">ماء (1.33)</option>
+                            <option value="1.52">زجاج تاج (1.52)</option>
+                        </select>
+                    </div>
+
+                    <div class="toggle-group">
+                        <label class="switch-wrapper">
+                            <span>طيف الضوء الأبيض (White Light)</span>
+                            <div class="switch">
+                                <input type="checkbox" id="white-light-mode">
+                                <span class="slider"></span>
+                            </div>
+                        </label>
+                        <label class="switch-wrapper">
+                            <span>الوضع الكمّي (فوتونات)</span>
+                            <div class="switch">
+                                <input type="checkbox" class="quantum" id="quantum-mode">
+                                <span class="slider"></span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">توزيع شدة الإضاءة التحليلي</div>
+                <div class="analysis-wrapper">
+                    <canvas id="graphCanvas"></canvas>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title" id="screen-title">المشاهدة على الحائل <span style="font-size: 0.75rem; color: #8892b0; font-weight: normal;">(اسحب للقياس)</span></div>
+                <div class="analysis-wrapper" id="screenContainer">
+                    <canvas id="screenCanvas"></canvas>
+                    <div class="ruler-tooltip" id="rulerTooltip">0.00 mm</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+<script>
+    // --- Context Setup ---
+    function setupCanvas(canvasId) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext('2d', { alpha: false, willReadFrequently: true });
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        return { canvas, ctx, w: rect.width, h: rect.height, dpr };
+    }
+
+    let app, graph, screen;
+    function resizeAll() {
+        app = setupCanvas('appCanvas'); graph = setupCanvas('graphCanvas'); screen = setupCanvas('screenCanvas');
+        if(state.isQuantum) clearQuantum();
+    }
+    window.addEventListener('resize', resizeAll);
+    setTimeout(resizeAll, 50);
+
+    // --- State & UI ---
+    const ui = {
+        L: document.getElementById('lambda'), d: document.getElementById('d'), w: document.getElementById('w'),
+        N: document.getElementById('N'), R: document.getElementById('R'), n: document.getElementById('medium-n'),
+        q: document.getElementById('quantum-mode'), wl: document.getElementById('white-light-mode'),
+        vL: document.getElementById('val-lambda'), vd: document.getElementById('val-d'), vw: document.getElementById('val-w'),
+        vN: document.getElementById('val-N'), vn: document.getElementById('val-n')
+    };
+
+    let state = { lambda: 600, d: 0.15, w: 0.02, N: 2, R: 2.0, n: 1.0, isQuantum: false, isWhiteLight: false };
+    let time = 0; let quantumStateHash = "";
+
+    // --- Audio setup for Quantum Clicks ---
+    let audioCtx = null;
+    ui.q.addEventListener('change', () => {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        if(ui.q.checked) { ui.wl.checked = false; } // Mutually exclusive
+    });
+    ui.wl.addEventListener('change', () => { if(ui.wl.checked) ui.q.checked = false; });
+
+    function playQuantumClick() {
+        if(!audioCtx || audioCtx.state !== 'running') return;
+        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+        osc.type = 'square'; osc.frequency.setValueAtTime(6000 + Math.random() * 4000, audioCtx.currentTime); 
+        gain.gain.setValueAtTime(0.01, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.01);
+        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.01);
+    }
+
+    // --- Dust Particles ---
+    let particles = [];
+    for(let i=0; i<80; i++) particles.push({ x: Math.random() * 1400, y: Math.random() * 400, vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5, size: Math.random()*1.5+0.5 });
+
+    // --- Draggable Apparatus (Screen R) ---
+    let isDraggingScreen = false;
+    const appContainer = document.getElementById('appCanvasContainer');
+    
+    function handleAppDrag(clientX) {
+        if(!isDraggingScreen || !app) return;
+        const rect = appContainer.getBoundingClientRect();
+        const mouseX = Math.max(rect.width * 0.45, Math.min(clientX - rect.left, rect.width * 0.95));
+        const newR = 1.0 + ((mouseX - (rect.width * 0.45)) / (rect.width * 0.5)) * 3.0;
+        ui.R.value = newR;
+    }
+
+    appContainer.addEventListener('mousedown', (e) => { isDraggingScreen = true; handleAppDrag(e.clientX); appContainer.style.cursor = 'grabbing'; });
+    appContainer.addEventListener('touchstart', (e) => { isDraggingScreen = true; handleAppDrag(e.touches[0].clientX); });
+    window.addEventListener('mousemove', (e) => handleAppDrag(e.clientX));
+    window.addEventListener('touchmove', (e) => { if(isDraggingScreen) handleAppDrag(e.touches[0].clientX); });
+    window.addEventListener('mouseup', () => { isDraggingScreen = false; appContainer.style.cursor = 'grab'; });
+    window.addEventListener('touchend', () => { isDraggingScreen = false; });
+
+    // --- Touch/Mouse Ruler Tool ---
+    let ruler = { active: false, startX: 0, currentX: 0 };
+    const screenContainer = document.getElementById('screenContainer');
+    const rulerTooltip = document.getElementById('rulerTooltip');
+
+    function startRuler(clientX) {
+        const rect = screenContainer.getBoundingClientRect();
+        ruler.active = true; ruler.startX = clientX - rect.left; ruler.currentX = ruler.startX;
+        rulerTooltip.style.display = 'block';
+    }
+    function moveRuler(clientX, clientY) {
+        if(!ruler.active) return;
+        const rect = screenContainer.getBoundingClientRect();
+        ruler.currentX = Math.max(0, Math.min(clientX - rect.left, rect.width));
+        const distMM = Math.abs(ruler.startX - ruler.currentX) / 15;
+        rulerTooltip.innerText = distMM.toFixed(2) + ' mm';
+        rulerTooltip.style.left = ruler.currentX + 'px';
+        rulerTooltip.style.top = (clientY - rect.top) + 'px';
+    }
+
+    screenContainer.addEventListener('mousedown', (e) => startRuler(e.clientX));
+    screenContainer.addEventListener('touchstart', (e) => { e.preventDefault(); startRuler(e.touches[0].clientX); });
+    window.addEventListener('mousemove', (e) => moveRuler(e.clientX, e.clientY));
+    window.addEventListener('touchmove', (e) => { if(ruler.active) moveRuler(e.touches[0].clientX, e.touches[0].clientY); }, {passive: false});
+    window.addEventListener('mouseup', () => { ruler.active = false; rulerTooltip.style.display = 'none'; });
+    window.addEventListener('touchend', () => { ruler.active = false; rulerTooltip.style.display = 'none'; });
+
+    // --- 3D Parallax Tilt ---
+    const tiltPanel = document.getElementById('tiltPanel');
+    tiltPanel.addEventListener('mousemove', (e) => {
+        if(isDraggingScreen) return;
+        const rect = tiltPanel.getBoundingClientRect();
+        tiltPanel.style.transform = `rotateX(${((e.clientY - rect.top - rect.height/2)/rect.height)*-4}deg) rotateY(${((e.clientX - rect.left - rect.width/2)/rect.width)*4}deg)`;
+        tiltPanel.style.transition = 'none';
+    });
+    tiltPanel.addEventListener('mouseleave', () => { tiltPanel.style.transform = `rotateX(0deg) rotateY(0deg)`; tiltPanel.style.transition = 'transform 0.5s ease-out'; });
+
+    // --- Helpers ---
+    function getWaveColor(lambda) {
+        let r=0, g=0, b=0;
+        if(lambda >= 380 && lambda < 440) { r = -(lambda-440)/60; b = 1; }
+        else if(lambda >= 440 && lambda < 490) { g = (lambda-440)/50; b = 1; }
+        else if(lambda >= 490 && lambda < 510) { g = 1; b = -(lambda-510)/20; }
+        else if(lambda >= 510 && lambda < 580) { r = (lambda-510)/70; g = 1; }
+        else if(lambda >= 580 && lambda < 645) { r = 1; g = -(lambda-645)/65; }
+        else if(lambda >= 645 && lambda <= 780) { r = 1; }
+        let a = lambda > 700 ? 0.3 + 0.7 * (780-lambda)/80 : (lambda < 420 ? 0.3 + 0.7 * (lambda-380)/40 : 1);
+        return { r: Math.round(r*255*a), g: Math.round(g*255*a), b: Math.round(b*255*a), css: `rgb(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)})` };
+    }
+
+    const lerp = (start, end, amt) => (1 - amt) * start + amt * end;
+    const snap = (val, target, epsilon = 0.001) => Math.abs(val - target) < epsilon ? target : val;
+
+    function clearQuantum() { if(screen && screen.ctx) { screen.ctx.fillStyle = '#000'; screen.ctx.fillRect(0, 0, screen.w, screen.h); } }
+
+    // --- Main Loop ---
+    function animate() {
+        if(!app || !graph || !screen) return requestAnimationFrame(animate);
+
+        state.lambda = snap(lerp(state.lambda, parseFloat(ui.L.value), 0.15), parseFloat(ui.L.value));
+        state.d = snap(lerp(state.d, parseFloat(ui.d.value), 0.15), parseFloat(ui.d.value));
+        state.w = snap(lerp(state.w, parseFloat(ui.w.value), 0.15), parseFloat(ui.w.value));
+        state.N = parseInt(ui.N.value); // FIX applied for correct hole count
+        state.n = snap(lerp(state.n, parseFloat(ui.n.value), 0.15), parseFloat(ui.n.value));
+        state.R = snap(lerp(state.R, parseFloat(ui.R.value), 0.2), parseFloat(ui.R.value));
+        
+        state.isQuantum = ui.q.checked;
+        state.isWhiteLight = ui.wl.checked;
+
+        ui.L.disabled = state.isWhiteLight;
+        ui.vL.innerText = state.isWhiteLight ? "الطيف الكامل (White)" : Math.round(state.lambda) + ' nm';
+        ui.vd.innerText = state.d.toFixed(2) + ' mm';
+        ui.vw.innerText = state.w.toFixed(3) + ' mm';
+        ui.vN.innerText = state.N;
+        ui.vn.innerText = state.n.toFixed(2);
+
+        const currentHash = `${state.lambda.toFixed(0)}_${state.d.toFixed(3)}_${state.w.toFixed(3)}_${state.N}_${state.n.toFixed(2)}_${state.R.toFixed(2)}_${state.isQuantum}_${state.isWhiteLight}`;
+        if(currentHash !== quantumStateHash) { clearQuantum(); quantumStateHash = currentHash; }
+
+        let activeColor = state.isWhiteLight ? {r:255,g:255,b:255, css:'#fff'} : getWaveColor(state.lambda);
+        if(state.isQuantum) activeColor = {r:168, g:85, b:247, css:'#a855f7'};
+        
+        document.documentElement.style.setProperty('--accent', activeColor.css);
+        document.getElementById('ambientGlow').style.background = `radial-gradient(circle, ${activeColor.css} 0%, transparent 60%)`;
+
+        renderApparatus(activeColor);
+        renderAnalysis(activeColor);
+
+        time += 0.2; requestAnimationFrame(animate);
+    }
+
+    // --- Apparatus Render ---
+    function renderApparatus(color) {
+        const { ctx, w, h, dpr } = app;
+        const laserX = w * 0.05, laserW = w * 0.08, wallX = w * 0.35;
+        const screenX = wallX + ((state.R - 1.0)/3.0) * (w * 0.95 - wallX);
+        
+        const effectiveLambda = state.isWhiteLight ? 550 / state.n : state.lambda / state.n; 
+        const waveSpacing = effectiveLambda / 12; 
+        const slitDist = state.d * 400; 
+        
+        const slitsY = []; const startY = h/2 - ((state.N - 1) * slitDist) / 2;
+        for(let i=0; i<state.N; i++) slitsY.push(startY + i * slitDist);
+
+        const pixelW = Math.floor(w * dpr); const pixelH = Math.floor(h * dpr);
+        const imgData = ctx.createImageData(pixelW, pixelH); const data = imgData.data;
+
+        const k = (2 * Math.PI) / (waveSpacing * dpr);
+        const wallX_px = wallX * dpr; const screenX_px = screenX * dpr; const centerY_px = (h/2) * dpr;
+        
+        let idx = 0;
+        for (let y = 0; y < pixelH; y++) {
+            const distFromCenter = Math.abs(y - centerY_px);
+            const dy_sq = []; for(let i=0; i<state.N; i++) dy_sq.push(Math.pow(y - (slitsY[i] * dpr), 2));
+
+            for (let x = 0; x < pixelW; x++) {
+                let r = 0, g = 0, b = 0;
+                if (x > (laserX + laserW)*dpr && x < wallX_px) {
+                    const planeWave = Math.sin((2 * Math.PI) / ( (effectiveLambda/12) * dpr) * x * 0.5 - time);
+                    if (planeWave > 0.8) {
+                        const intensity = Math.pow(planeWave, 4); const edgeFade = Math.max(0, 1 - (distFromCenter / (h * dpr * 0.4)));
+                        r = color.r * intensity * edgeFade; g = color.g * intensity * edgeFade; b = color.b * intensity * edgeFade;
+                    }
+                } else if (x >= wallX_px && x < screenX_px) {
+                    const dx = x - wallX_px; let amplitude = 0;
+                    for(let i=0; i<state.N; i++) amplitude += Math.sin(k * Math.sqrt(dx * dx + dy_sq[i]) - time);
+                    
+                    // FIX: Improved wave intensity mapping for varying N-slits
+                    let normalizedAmplitude = amplitude / state.N; 
+                    let intensity = Math.pow((normalizedAmplitude + 1) / 2, 2); 
+                    intensity = intensity * Math.min(1, (200 * dpr) / dx) * Math.exp(-Math.pow((y - centerY_px)/(pixelH/1.2), 2));
+                    
+                    r = color.r * intensity; g = color.g * intensity; b = color.b * intensity;
+                }
+                data[idx++] = r; data[idx++] = g; data[idx++] = b; data[idx++] = 255;
+            }
+        }
+        ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.putImageData(imgData, 0, 0); ctx.restore();
+
+        // Hardware Draw
+        if(state.n > 1.001) { 
+            const mediumAlpha = (state.n - 1.0) * 0.2; 
+            ctx.fillStyle = `rgba(0, 150, 255, ${mediumAlpha})`; 
+            ctx.fillRect(wallX, 0, screenX - wallX, h); 
+        }
+        
+        const wallGrad = ctx.createLinearGradient(wallX - 6, 0, wallX + 6, 0);
+        wallGrad.addColorStop(0, '#1e293b'); wallGrad.addColorStop(0.5, '#64748b'); wallGrad.addColorStop(1, '#0f172a');
+        ctx.fillStyle = wallGrad; ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 15; ctx.fillRect(wallX - 4, 0, 8, h);
+        
+        ctx.globalCompositeOperation = 'destination-out';
+        for(let i=0; i<state.N; i++) ctx.fillRect(wallX - 5, slitsY[i] - (state.w * 150), 10, state.w * 300 + 2); 
+        ctx.globalCompositeOperation = 'source-over';
+
+        ctx.fillStyle = '#fff'; ctx.shadowColor = color.css;
+        for(let i=0; i<state.N; i++) { ctx.beginPath(); ctx.arc(wallX, slitsY[i], 2, 0, Math.PI*2); ctx.fill(); }
+        ctx.shadowBlur = 0;
+
+        const laserGrad = ctx.createLinearGradient(laserX, h/2 - 25, laserX, h/2 + 25);
+        laserGrad.addColorStop(0, '#020617'); laserGrad.addColorStop(0.5, '#334155'); laserGrad.addColorStop(1, '#020617');
+        ctx.fillStyle = laserGrad; ctx.beginPath(); ctx.roundRect(laserX, h/2 - 25, laserW, 50, 6); ctx.fill();
+
+        ctx.fillStyle = '#facc15'; ctx.fillRect(laserX + laserW, h/2 - 12, 10, 24);
+
+        const screenGrad = ctx.createLinearGradient(screenX, 0, screenX + 10, 0);
+        screenGrad.addColorStop(0, '#94a3b8'); screenGrad.addColorStop(1, '#1e293b');
+        ctx.fillStyle = screenGrad; ctx.fillRect(screenX, 0, 10, h);
+        
+        // Drag Indicator on Screen
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.fillRect(screenX - 2, h/2 - 20, 2, 40);
+        
+        renderDust(ctx, color, w, h, laserX + laserW, wallX);
+    }
+
+    function renderDust(ctx, color, w, h, startX, endX) {
+        ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, 0.8)`; ctx.globalCompositeOperation = 'screen';
+        particles.forEach(p => {
+            p.x += p.vx; p.y += p.vy;
+            if(p.x > w || p.x < 0) p.vx *= -1; if(p.y > h || p.y < 0) p.vy *= -1;
+            if(p.x > startX && p.x < endX && p.y > h/2 - 40 && p.y < h/2 + 40) { ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill(); }
+        });
+        ctx.globalCompositeOperation = 'source-over';
+    }
+
+    // --- Analysis Render ---
+    function renderAnalysis(baseColor) {
+        const cxG = graph.ctx, cxS = screen.ctx;
+        const wG = graph.w, hG = graph.h, wS = screen.w, hS = screen.h;
+        const center = wG / 2;
+
+        cxG.clearRect(0, 0, wG, hG);
+        if(!state.isQuantum) { cxS.fillStyle = '#050505'; cxS.fillRect(0, 0, wS, hS); cxS.globalCompositeOperation = 'screen'; }
+
+        // Setup spectrum (White light or single)
+        const wavelengths = state.isWhiteLight ? [650, 580, 530, 470, 430] : [state.lambda];
+        const colors = state.isWhiteLight ? [{r:255,g:0,b:0}, {r:255,g:255,b:0}, {r:0,g:255,b:0}, {r:0,g:150,b:255}, {r:100,g:0,b:255}] : [baseColor];
+        
+        let maxGraphIntensities = new Float32Array(wG);
+
+        for(let wlIdx = 0; wlIdx < wavelengths.length; wlIdx++) {
+            const currentLambda = wavelengths[wlIdx];
+            const cColor = colors[wlIdx];
+            const effectiveLambda_m = (currentLambda / state.n) * 1e-9;
+            const k = (2 * Math.PI) / effectiveLambda_m;
+            
+            cxG.beginPath(); cxG.moveTo(0, hG);
+            
+            for(let x = 0; x < wG; x++) {
+                const screenY_m = ((x - center) / 15) * 0.001; 
+                const theta = Math.atan2(screenY_m, state.R);
+                
+                const delta = k * (state.d * 0.001) * Math.sin(theta);
+                const beta = (k * (state.w * 0.001) * Math.sin(theta)) / 2;
+
+                let interference = 1.0;
+                if (state.N > 1) interference = Math.abs(delta) < 1e-6 ? 1.0 : Math.pow(Math.sin(state.N * delta / 2) / (state.N * Math.sin(delta / 2)), 2);
+                let diffraction = 1.0;
+                if (Math.abs(beta) > 1e-6) diffraction = Math.pow(Math.sin(beta) / beta, 2);
+
+                let intensity = interference * diffraction;
+                if(intensity > maxGraphIntensities[x]) maxGraphIntensities[x] = intensity;
+
+                cxG.lineTo(x, hG - 15 - (intensity * (hG - 30)));
+
+                if(!state.isQuantum) {
+                    const bloom = Math.pow(intensity, state.isWhiteLight ? 1.2 : 1.5);
+                    const weight = state.isWhiteLight ? 0.6 : 1.0; 
+                    cxS.fillStyle = `rgb(${cColor.r * bloom * weight},${cColor.g * bloom * weight},${cColor.b * bloom * weight})`;
+                    cxS.fillRect(x, 0, 1, hS);
+                }
+            }
+            if(!state.isWhiteLight) {
+                cxG.lineTo(wG, hG); cxG.closePath();
+                const grad = cxG.createLinearGradient(0, 0, 0, hG);
+                grad.addColorStop(0, `rgba(${baseColor.r},${baseColor.g},${baseColor.b}, 0.5)`); grad.addColorStop(1, 'transparent');
+                cxG.fillStyle = grad; cxG.fill();
+                cxG.strokeStyle = '#fff'; cxG.lineWidth = 2; cxG.shadowBlur = 10; cxG.shadowColor = baseColor.css;
+                cxG.stroke(); cxG.shadowBlur = 0;
+            }
+        }
+
+        // Draw combined white light graph envelope
+        if(state.isWhiteLight) {
+            cxG.beginPath(); cxG.moveTo(0, hG);
+            for(let x = 0; x < wG; x++) cxG.lineTo(x, hG - 15 - (maxGraphIntensities[x] * (hG - 30)));
+            cxG.lineTo(wG, hG); cxG.closePath();
+            const grad = cxG.createLinearGradient(0, 0, 0, hG);
+            grad.addColorStop(0, `rgba(255,255,255, 0.4)`); grad.addColorStop(1, 'transparent');
+            cxG.fillStyle = grad; cxG.fill();
+            cxG.strokeStyle = '#fff'; cxG.lineWidth = 2; cxG.stroke();
+        }
+
+        // Quantum Logic
+        if(state.isQuantum) {
+            cxS.globalCompositeOperation = 'screen'; cxS.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            let photonFired = false;
+            for(let p = 0; p < 200; p++) {
+                const randX = Math.floor(Math.random() * wG); const randY = Math.random() * hS;
+                if(Math.random() < maxGraphIntensities[randX]) {
+                    cxS.beginPath(); cxS.arc(randX, randY, Math.random() > 0.9 ? 1.5 : 0.8, 0, Math.PI*2); cxS.fill();
+                    if(Math.random() < 0.02) photonFired = true;
+                }
+            }
+            if(photonFired) playQuantumClick();
+        }
+        cxS.globalCompositeOperation = 'source-over';
+
+        if(ruler.active) {
+            cxS.fillStyle = 'rgba(255, 255, 255, 0.1)'; cxS.fillRect(Math.min(ruler.startX, ruler.currentX), 0, Math.abs(ruler.startX - ruler.currentX), hS);
+            cxS.strokeStyle = '#00ffcc'; cxS.lineWidth = 1; cxS.beginPath();
+            cxS.moveTo(ruler.startX, 0); cxS.lineTo(ruler.startX, hS); cxS.moveTo(ruler.currentX, 0); cxS.lineTo(ruler.currentX, hS); cxS.stroke();
+        }
+
+        [cxG, cxS].forEach(c => {
+            c.strokeStyle = 'rgba(255,255,255,0.2)'; c.setLineDash([4, 4]);
+            c.beginPath(); c.moveTo(center, 0); c.lineTo(center, c.canvas === cxG.canvas ? hG : hS); c.stroke(); c.setLineDash([]);
+        });
+    }
+
+    setTimeout(() => { requestAnimationFrame(animate); }, 100);
+
+    // --- Export Lab Report ---
+    function exportReport() {
+        const expCanvas = document.createElement('canvas');
+        expCanvas.width = screen.w; expCanvas.height = screen.h + 100;
+        const ctx = expCanvas.getContext('2d');
+        
+        // Background
+        ctx.fillStyle = '#030305'; ctx.fillRect(0, 0, expCanvas.width, expCanvas.height);
+        
+        // Draw Screen image
+        ctx.drawImage(screen.canvas, 0, 0, screen.canvas.width, screen.canvas.height, 0, 0, screen.w, screen.h);
+        
+        // Add Polaroid Data Footer
+        ctx.fillStyle = '#1e293b'; ctx.fillRect(0, screen.h, expCanvas.width, 100);
+        ctx.fillStyle = '#fff'; ctx.font = '16px Cairo, sans-serif'; ctx.textAlign = 'right';
+        ctx.fillText('تقرير مختبر توماس يونج (نظام الأهداب)', expCanvas.width - 20, screen.h + 30);
+        
+        ctx.font = '14px JetBrains Mono, monospace'; ctx.fillStyle = '#00ffcc';
+        const txt1 = `Wavelength (λ): ${state.isWhiteLight ? 'White Spectrum' : Math.round(state.lambda)+' nm'} | Slit Dist (d): ${state.d.toFixed(2)} mm`;
+        const txt2 = `Slit Width (w): ${state.w.toFixed(3)} mm | Screen Dist (R): ${state.R.toFixed(2)} m`;
+        const txt3 = `Slits (N): ${state.N} | Refr. Index (n): ${state.n.toFixed(2)}`;
+        
+        ctx.textAlign = 'left';
+        ctx.fillText(txt1, 20, screen.h + 40);
+        ctx.fillText(txt2, 20, screen.h + 65);
+        ctx.fillText(txt3, 20, screen.h + 90);
+        
+        // Download
+        const link = document.createElement('a');
+        link.download = `Youngs_Experiment_${Date.now()}.png`;
+        link.href = expCanvas.toDataURL('image/png');
+        link.click();
+    }
+</script>
+</body>
+</html>

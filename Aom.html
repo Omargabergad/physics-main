@@ -1,0 +1,2052 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تجربة قانون أوم - دائرة متكاملة</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* جميع الأنماط السابقة تبقى كما هي */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --background-color: #f8f9fa;
+            --card-color: #ffffff;
+            --text-color: #333333;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .interactive-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-particle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(52, 152, 219, 0.2) 0%, rgba(52, 152, 219, 0) 70%);
+            animation: float 15s infinite linear;
+        }
+        
+        .bg-circuit {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            background-image: 
+                radial-gradient(circle at 25% 25%, var(--secondary-color) 2px, transparent 2px),
+                radial-gradient(circle at 75% 75%, var(--accent-color) 2px, transparent 2px);
+            background-size: 50px 50px;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+            }
+            25% {
+                transform: translateY(-20px) translateX(10px);
+            }
+            50% {
+                transform: translateY(-40px) translateX(20px);
+            }
+            75% {
+                transform: translateY(-20px) translateX(10px);
+            }
+            100% {
+                transform: translateY(0) translateX(0);
+            }
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            grid-column: 1 / -1;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            color: var(--secondary-color);
+            font-size: 1.2rem;
+        }
+        
+        .circuit-section {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: none;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .circuit-section.active {
+            display: block;
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-color);
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .circuit-panel {
+            position: relative;
+            height: 500px;
+        }
+        
+        .status-indicator {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            background-color: var(--success-color);
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            z-index: 10;
+        }
+        
+        .status-indicator.off {
+            background-color: var(--accent-color);
+        }
+        
+        .circuit-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: #f0f2f5;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #d1d9e6;
+        }
+        
+        .circuit-svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls-panel {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: fit-content;
+            position: relative;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .experiment-switcher {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .experiment-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .experiment-btn:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .experiment-btn.active {
+            background-color: var(--success-color);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .slider-container {
+            margin-bottom: 15px;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: var(--primary-color);
+        }
+        
+        .value-display {
+            text-align: center;
+            font-weight: bold;
+            color: var(--accent-color);
+            font-size: 1.1rem;
+            margin-top: 5px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+        }
+        
+        button:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .toggle-switch {
+            background-color: var(--success-color);
+        }
+        
+        .toggle-switch.off {
+            background-color: var(--accent-color);
+        }
+        
+        .theory-panel {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            grid-column: 1 / -1;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: static;
+        }
+        
+        .theory-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .theory-card {
+            background: linear-gradient(135deg, rgba(245, 247, 250, 0.8) 0%, rgba(228, 232, 240, 0.8) 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid var(--secondary-color);
+        }
+        
+        .theory-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .formula {
+            font-size: 1.5rem;
+            text-align: center;
+            margin: 15px 0;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        
+        .calculation {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .kirchhoff-calculation {
+            background-color: #e8f4fd;
+            border-left: 4px solid #3498db;
+        }
+        
+        .meter-readings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .meter-reading {
+            background: linear-gradient(135deg, #e8f4fd 0%, #d1e7f7 100%);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #b8d9f0;
+        }
+        
+        .meter-reading h4 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+        
+        .meter-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        .wire {
+            fill: none;
+            stroke: #7f8c8d;
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+        
+        .wire-active {
+            fill: none;
+            stroke: var(--secondary-color);
+            stroke-width: 8;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 5px var(--secondary-color));
+            stroke-dasharray: 10;
+            animation: flow 1s linear infinite;
+        }
+        
+        .wire-cut {
+            fill: none;
+            stroke: #7f8c8d;
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-dasharray: 5, 10;
+        }
+        
+        @keyframes flow {
+            to {
+                stroke-dashoffset: 20;
+            }
+        }
+        
+        .electron {
+            fill: var(--secondary-color);
+            r: 4;
+            filter: drop-shadow(0 0 3px var(--secondary-color));
+            transition: r 0.3s;
+        }
+        
+        .resistor {
+            stroke: var(--accent-color);
+            stroke-width: 4;
+            fill: none;
+        }
+        
+        .variable-resistor {
+            stroke: #8e44ad;
+            stroke-width: 4;
+            fill: none;
+        }
+        
+        .battery {
+            stroke: var(--warning-color);
+            stroke-width: 4;
+            fill: none;
+        }
+        
+        .switch-base {
+            stroke: var(--success-color);
+            stroke-width: 4;
+            fill: none;
+            cursor: pointer;
+        }
+        
+        .switch-arm {
+            stroke: var(--success-color);
+            stroke-width: 4;
+            stroke-linecap: round;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .switch-arm.open {
+            transform: rotate(-45deg);
+        }
+        
+        .switch-arm.closed {
+            transform: rotate(45deg);
+        }
+        
+        .ammeter, .voltmeter {
+            stroke: #9b59b6;
+            stroke-width: 3;
+            fill: white;
+        }
+        
+        .meter-label {
+            font-size: 14px;
+            font-weight: bold;
+            fill: #9b59b6;
+            text-anchor: middle;
+        }
+        
+        .meter-value-svg {
+            font-size: 18px;
+            font-weight: bold;
+            fill: #2c3e50;
+            text-anchor: middle;
+        }
+        
+        .component-label {
+            font-size: 16px;
+            font-weight: bold;
+            fill: var(--primary-color);
+            text-anchor: middle;
+        }
+        
+        .component-value {
+            font-size: 14px;
+            font-weight: bold;
+            fill: var(--primary-color);
+            text-anchor: middle;
+        }
+        
+        .junction {
+            fill: #2c3e50;
+            r: 6;
+        }
+        
+        .current-direction {
+            fill: none;
+            stroke: #e74c3c;
+            stroke-width: 2;
+            marker-end: url(#arrowhead);
+        }
+        
+        .video-section {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            grid-column: 1 / -1;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: static;
+        }
+        .video-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(to right, var(--success), var(--warning));
+            border-radius: 18px 18px 0 0;
+        }
+        .video-placeholder {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .video-placeholder::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(52, 152, 219, 0.3), transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(231, 76, 60, 0.3), transparent 50%);
+        }
+        
+        .video-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            z-index: 1;
+        }
+        
+        .video-text {
+            font-size: 24px;
+            font-weight: bold;
+            z-index: 1;
+            text-align: center;
+        }
+        
+        .video-subtext {
+            font-size: 16px;
+            margin-top: 10px;
+            opacity: 0.8;
+            z-index: 1;
+            text-align: center;
+        }
+        
+        .video-placeholder h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+        
+        .video-placeholder p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        .applications-section {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 18px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+        
+        .applications-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(to right, var(--accent), var(--warning));
+            border-radius: 18px 18px 0 0;
+        }
+        
+        .applications-container {
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .video-application {
+            flex: 1;
+            background: #2c3e50;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+        }
+        
+        @media (max-width: 1100px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls-panel {
+                position: static;
+            }
+            
+            .video-container {
+                width: 95%;
+            }
+        }
+        
+        .video-section {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 18px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+        
+        .video-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(to right, var(--success), var(--warning));
+            border-radius: 18px 18px 0 0;
+        }
+        
+        .video-placeholder {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .video-placeholder::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(52, 152, 219, 0.3), transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(231, 76, 60, 0.3), transparent 50%);
+        }
+        
+        .video-icon {
+            font-size: 90px;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            z-index: 1;
+        }
+        
+        .video-text {
+            font-size: 36px;
+            font-weight: bold;
+            z-index: 1;
+            text-align: center;
+        }
+        
+        .video-subtext {
+            font-size: 16px;
+            margin-top: 10px;
+            opacity: 0.8;
+            z-index: 1;
+            text-align: center;
+        }
+        
+        /* قسم التطبيقات العملية - الفيديوهات الثلاثة جنبًا إلى جنب */
+        .applications-section {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 18px;
+            padding: 50px;
+            margin-top: 50px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+        
+        .applications-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(to right, var(--accent), var(--warning));
+            border-radius: 30px 30px 0 0;
+        }
+        
+        .applications-container {
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .video-application {
+            flex: 1;
+            background: #2c3e50;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+        }
+        
+       .video-application video {
+    width: 100%;
+    max-width: 100%;
+    height: 200px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    background: #000;
+    object-fit: cover;
+}
+        
+       .video-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    margin-top: 10px;
+}
+        /* قسم الفيديو الكبير أسفل الفيديوهات الثلاثة */
+       .large-video-section {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 18px;
+    padding: 30px;
+    margin-top: 30px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+}
+        
+        .large-video-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(to right, var(--primary-color), var(--success-color));
+    border-radius: 18px 18px 0 0;
+}
+        
+        .large-video-container {
+    width: 100%;
+    height: 500px;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+    margin-top: 20px;
+}
+        
+        .large-video-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 30% 30%, rgba(52, 152, 219, 0.3), transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(231, 76, 60, 0.3), transparent 50%);
+    z-index: 0;
+}
+
+        
+       .large-video-text {
+    font-size: 28px;
+    font-weight: bold;
+    z-index: 1;
+    text-align: center;
+}
+
+        .large-video-subtext {
+    font-size: 18px;
+    margin-top: 10px;
+    opacity: 0.8;
+    z-index: 1;
+    text-align: center;
+}
+        .large-video-text {
+            font-size: 28px;
+            font-weight: bold;
+            z-index: 1;
+            text-align: center;
+        }
+        
+        .large-video-subtext {
+            font-size: 18px;
+            margin-top: 10px;
+            opacity: 0.8;
+            z-index: 1;
+            text-align: center;
+        }
+        
+        /* قسم الفيديو الجديد في المنتصف */
+        
+        
+    </style>
+</head>
+<body>
+    <div class="interactive-bg">
+        <div class="bg-circuit"></div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <h1>تجربة قانون أوم - دائرة متكاملة</h1>
+            <p class="subtitle">محاكاة تفاعلية للدائرة الكهربائية مع ثلاث مقاومات والتحكم في خصائص السلك</p>
+        </header>
+        
+        <div class="circuit-area">
+            <div id="experiment1" class="circuit-section active">
+                <h2 class="section-title">الدائرة الأساسية (ثلاث مقاومات)</h2>
+                <div class="circuit-panel">
+                    <div class="status-indicator" id="circuit1-status">الدائرة مغلقة</div>
+                    <div class="circuit-container">
+                        <svg class="circuit-svg" id="circuit1" viewBox="0 0 1000 500"></svg>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="experiment2" class="circuit-section">
+                <h2 class="section-title">دائرة البطاريات على التوازي (قوانين كيرشوف)</h2>
+                <div class="circuit-panel">
+                    <div class="status-indicator" id="circuit2-status">الدائرة مغلقة</div>
+                    <div class="circuit-container">
+                        <svg class="circuit-svg" id="circuit2" viewBox="0 0 1000 500"></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls-panel">
+            <h2 class="section-title">لوحة التحكم</h2>
+            
+            <div class="experiment-switcher">
+                <button id="experiment1-btn" class="experiment-btn active">الدائرة الأساسية (ثلاث مقاومات)</button>
+                <button id="experiment2-btn" class="experiment-btn">دائرة البطاريات على التوازي (قوانين كيرشوف)</button>
+            </div>
+            
+            <div id="controls-experiment1" class="control-group">
+                <div class="control-label">
+                    <span>خصائص السلك</span>
+                </div>
+                <div class="slider-container">
+                    <label>طول السلك (متر)</label>
+                    <input type="range" id="wire-length" min="0.5" max="2" step="0.1" value="1.2">
+                    <div class="value-display" id="wire-length-value">1.2 م</div>
+                </div>
+                <div class="slider-container">
+                    <label>قطر السلك (مم)</label>
+                    <input type="range" id="wire-diameter" min="0.5" max="3" step="0.1" value="1.5">
+                    <div class="value-display" id="wire-diameter-value">1.5 مم</div>
+                </div>
+                
+                <div class="control-label">
+                    <span>جهد البطارية (V)</span>
+                </div>
+                <div class="slider-container">
+                    <input type="range" id="battery-voltage" min="5" max="24" value="12">
+                    <div class="value-display" id="battery-voltage-value">12 V</div>
+                </div>
+                
+                <div class="control-label">
+                    <span>المقاومات (Ω)</span>
+                </div>
+                <div class="slider-container">
+                    <label>المقاومة R1 (ثابتة)</label>
+                    <div class="value-display" id="resistor1-value">20 Ω</div>
+                </div>
+                <div class="slider-container">
+                    <label>المقاومة R2 (ثابتة)</label>
+                    <div class="value-display" id="resistor2-value">30 Ω</div>
+                </div>
+                <div class="slider-container">
+                    <label>المقاومة R3 (متغيرة)</label>
+                    <input type="range" id="resistor3" min="5" max="100" value="50">
+                    <div class="value-display" id="resistor3-value">50 Ω</div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="toggle-circuit1" class="toggle-switch">فتح الدائرة 1</button>
+                </div>
+                
+                <div class="meter-readings">
+                    <div class="meter-reading">
+                        <h4>التيار الكلي (أميتر)</h4>
+                        <div class="meter-value" id="total-current-display">0.12 A</div>
+                    </div>
+                    <div class="meter-reading">
+                        <h4>فرق الجهد الكلي (فولتميتر)</h4>
+                        <div class="meter-value" id="total-voltage-display">12.0 V</div>
+                    </div>
+                </div>
+                
+                <div class="calculation">
+                    <h3>حسابات قانون أوم</h3>
+                    <p id="wire-resistance-calculation">مقاومة السلك: 0.034 Ω</p>
+                    <p id="resistance-calculation">المقاومة الكلية: 100.034 Ω</p>
+                    <p id="current-calculation">شدة التيار: 0.12 A</p>
+                    <p id="voltage-drop">فرق الجهد عبر R1: 2.4 V</p>
+                    <p id="ohms-law">V = I × R → 12V = 0.12A × 100.034Ω</p>
+                </div>
+            </div>
+            
+            <div id="controls-experiment2" class="control-group" style="display: none;">
+                <div class="control-label">
+                    <span>بطاريات على التوازي</span>
+                </div>
+                <div class="slider-container">
+                    <label>جهد البطارية 1 (V)</label>
+                    <input type="range" id="battery1-voltage" min="5" max="15" value="9">
+                    <div class="value-display" id="battery1-voltage-value">9 V</div>
+                </div>
+                <div class="slider-container">
+                    <label>جهد البطارية 2 (V)</label>
+                    <input type="range" id="battery2-voltage" min="5" max="15" value="12">
+                    <div class="value-display" id="battery2-voltage-value">12 V</div>
+                </div>
+                
+                <div class="control-label">
+                    <span>المقاومات (Ω)</span>
+                </div>
+                <div class="slider-container">
+                    <label>المقاومة R1 (تحت B1)</label>
+                    <input type="range" id="resistor-b1" min="5" max="100" value="20">
+                    <div class="value-display" id="resistor-b1-value">20 Ω</div>
+                </div>
+                <div class="slider-container">
+                    <label>المقاومة R (رئيسية)</label>
+                    <input type="range" id="parallel-resistor" min="5" max="100" value="20">
+                    <div class="value-display" id="parallel-resistor-value">20 Ω</div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="toggle-circuit2" class="toggle-switch">فتح الدائرة 2</button>
+                </div>
+                
+                <div class="meter-readings">
+                    <div class="meter-reading">
+                        <h4>التيار الكلي</h4>
+                        <div class="meter-value" id="total-current-parallel-display">0.45 A</div>
+                    </div>
+                    <div class="meter-reading">
+                        <h4>الجهد المكافئ</h4>
+                        <div class="meter-value" id="equivalent-voltage-display">9.0 V</div>
+                    </div>
+                </div>
+                
+                <div class="calculation kirchhoff-calculation">
+                    <h3>حسابات قوانين كيرشوف</h3>
+                    <p id="kirchhoff-current-law">قانون التيار: I₁ + I₂ = I₃</p>
+                    <p id="kirchhoff-voltage-law">قانون الجهد: V₁ = V₂ = V</p>
+                    <p id="equivalent-voltage">الجهد المكافئ: 9.0 V</p>
+                    <p id="total-current-parallel">التيار الكلي: 0.45 A</p>
+                    <p id="currents-breakdown">I₁ = 0.25A, I₂ = 0.20A</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="theory-panel">
+            <h2 class="section-title">شرح قوانين الدوائر الكهربائية</h2>
+            <div class="theory-content">
+                <div class="theory-card">
+                    <h3>قانون أوم</h3>
+                    <p>يصف قانون أوم العلاقة بين الجهد الكهربائي (V)، وشدة التيار (I)، والمقاومة الكهربائية (R) في الدائرة الكهربائية.</p>
+                    <div class="formula">V = I × R</div>
+                    <p>حيث:<br>
+                    V: فرق الجهد بوحدة الفولت (V)<br>
+                    I: شدة التيار بوحدة الأمبير (A)<br>
+                    R: المقاومة الكهربائية بوحدة الأوم (Ω)</p>
+                </div>
+                
+                <div class="theory-card">
+                    <h3>المقاومة الكهربائية للسلك</h3>
+                    <p>تعتمد مقاومة السلك على:</p>
+                    <ul>
+                        <li>طول السلك (م): تزداد المقاومة بزيادة الطول</li>
+                        <li>مساحة مقطع السلك: تقل المقاومة بزيادة السمك</li>
+                        <li>نوع المادة: تختلف مقاومة المواد باختلاف طبيعتها</li>
+                    </ul>
+                    <div class="formula">R = ρ × L / A</div>
+                    <p>حيث:<br>
+                    ρ: مقاومة نوع المادة (للنحاس 1.68×10⁻⁸ Ω·m)<br>
+                    L: طول السلك (متر)<br>
+                    A: مساحة مقطع السلك (متر²) = π × (قطر/2)²</p>
+                </div>
+                
+                <div class="theory-card">
+                    <h3>المقاومات في الدوائر الكهربائية</h3>
+                    <p>المقاومات هي مكونات إلكترونية تقاوم تدفق التيار الكهربائي. توجد أنواع مختلفة:</p>
+                    <ul>
+                        <li>مقاومات ثابتة: تحافظ على قيمة مقاومة ثابتة</li>
+                        <li>مقاومات متغيرة: يمكن تغيير قيمة مقاومتها</li>
+                        <li>مقاومات حرارية: تتغير مقاومتها مع درجة الحرارة</li>
+                    </ul>
+                    <p>في هذه التجربة، نستخدم مقاومات ثابتة ومتغيرة لدراسة تأثير تغيير المقاومة على شدة التيار.</p>
+                </div>
+                
+                <div class="theory-card">
+                    <h3>أجهزة القياس الكهربائية</h3>
+                    <p>تستخدم أجهزة القياس لقياس الخصائص الكهربائية في الدائرة:</p>
+                    <ul>
+                        <li>الأميتر: يقيس شدة التيار الكهربائي (يوصل على التوالي)</li>
+                        <li>الفولتميتر: يقيس فرق الجهد (يوصل على التوازي)</li>
+                        <li>الأوميتر: يقيس المقاومة الكهربائية</li>
+                    </ul>
+                    <p>في هذه التجربة، نستخدم الأميتر لقياس التيار الكلي والفولتميتر لقياس فرق الجهد عبر المقاومة R1.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- فيديو الشرح الرئيسي في الأعلى -->
+        <div class="video-section">
+            <h2 class="section-title">فيديو شرح التجربة</h2>
+            <p>شاهد هذا الفيديو التوضيحي لفهم كيفية عمل تجربة قانون أوم وتطبيقاته العملية في الدوائر الكهربائية.</p>
+            
+            <div class="video-container">
+                <div class="video-placeholder">
+                    <i class="fas fa-play-circle video-icon"></i>
+                    <h3 class="video-text">فيديو شرح تجربة قانون أوم</h3>
+                    <p class="video-subtext">هذا القسم معد لعرض فيديو تعليمي. يمكنك إضافة رابط فيديو من YouTube أو أي منصة أخرى.</p>
+                    <p class="video-subtext">لإضافة فيديو حقيقي، استبدل هذا العنصر بعنصر &lt;iframe&gt; يحتوي على رابط الفيديو.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- الفيديوهات الثلاثة جنبًا إلى جنب -->
+        <div class="applications-section">
+            <h3 class="section-title">التطبيقات العملية</h3>
+            <div class="applications-container">
+                <div class="video-application">
+                    <video controls>
+                        <source src="assets/video/simulation in Oam.mp4" type="video/mp4">
+                        متصفحك لا يدعم تشغيل الفيديو.
+                    </video>
+                    <div class="video-title">  تجربه اوم   </div>
+                </div>
+                <div class="video-application">
+                    <video controls>
+                        <source src="assets/video/resistence.mp4" type="video/mp4">
+                        متصفحك لا يدعم تشغيل الفيديو.
+                    </video>
+                    <div class="video-title">    شرح المقومات  </div>
+                </div>
+                <div class="video-application">
+                    <video controls>
+                        <source src="assets/video/electric math.mp4" type="video/mp4">
+                        متصفحك لا يدعم تشغيل الفيديو.
+                    </video>
+                    <div class="video-title">    </div>
+                </div>
+            </div>
+        </div>
+        
+       
+        </div>
+        
+        
+    </div>
+
+   <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // إنشاء خلفية تفاعلية ديناميكية
+            createInteractiveBackground();
+            
+            // العناصر الرئيسية للدائرتين
+            const svg1 = document.getElementById('circuit1');
+            const svg2 = document.getElementById('circuit2');
+            const circuit1Status = document.getElementById('circuit1-status');
+            const circuit2Status = document.getElementById('circuit2-status');
+            const toggleCircuit1Button = document.getElementById('toggle-circuit1');
+            const toggleCircuit2Button = document.getElementById('toggle-circuit2');
+            
+            // عناصر التحكم للدائرة الأولى
+            const batteryVoltageSlider = document.getElementById('battery-voltage');
+            const wireLengthSlider = document.getElementById('wire-length');
+            const wireDiameterSlider = document.getElementById('wire-diameter');
+            const resistor3Slider = document.getElementById('resistor3');
+            
+            // عناصر التحكم للدائرة الثانية
+            const battery1VoltageSlider = document.getElementById('battery1-voltage');
+            const battery2VoltageSlider = document.getElementById('battery2-voltage');
+            const parallelResistorSlider = document.getElementById('parallel-resistor');
+            const resistorB1Slider = document.getElementById('resistor-b1');
+            
+            // عرض القيم
+            const batteryVoltageValue = document.getElementById('battery-voltage-value');
+            const wireLengthValue = document.getElementById('wire-length-value');
+            const wireDiameterValue = document.getElementById('wire-diameter-value');
+            const resistor1Value = document.getElementById('resistor1-value');
+            const resistor2Value = document.getElementById('resistor2-value');
+            const resistor3Value = document.getElementById('resistor3-value');
+            const battery1VoltageValue = document.getElementById('battery1-voltage-value');
+            const battery2VoltageValue = document.getElementById('battery2-voltage-value');
+            const parallelResistorValue = document.getElementById('parallel-resistor-value');
+            const resistorB1Value = document.getElementById('resistor-b1-value');
+            
+            // عناصر الحسابات
+            const wireResistanceCalculation = document.getElementById('wire-resistance-calculation');
+            const resistanceCalculation = document.getElementById('resistance-calculation');
+            const currentCalculation = document.getElementById('current-calculation');
+            const voltageDrop = document.getElementById('voltage-drop');
+            const ohmsLaw = document.getElementById('ohms-law');
+            const kirchhoffCurrentLaw = document.getElementById('kirchhoff-current-law');
+            const kirchhoffVoltageLaw = document.getElementById('kirchhoff-voltage-law');
+            const equivalentVoltage = document.getElementById('equivalent-voltage');
+            const totalCurrentParallel = document.getElementById('total-current-parallel');
+            const currentsBreakdown = document.getElementById('currents-breakdown');
+            
+            // قراءات العدادات
+            const totalCurrentDisplay = document.getElementById('total-current-display');
+            const totalVoltageDisplay = document.getElementById('total-voltage-display');
+            const totalCurrentParallelDisplay = document.getElementById('total-current-parallel-display');
+            const equivalentVoltageDisplay = document.getElementById('equivalent-voltage-display');
+            
+            // أزرار التبديل بين التجربتين
+            const experiment1Btn = document.getElementById('experiment1-btn');
+            const experiment2Btn = document.getElementById('experiment2-btn');
+            const experiment1Section = document.getElementById('experiment1');
+            const experiment2Section = document.getElementById('experiment2');
+            const controlsExperiment1 = document.getElementById('controls-experiment1');
+            const controlsExperiment2 = document.getElementById('controls-experiment2');
+            
+            // حالات الدائرتين
+            let circuit1Closed = true;
+            let circuit2Closed = true;
+            let electrons1 = [];
+            let electrons2 = [];
+            let animationId1 = null;
+            let animationId2 = null;
+            
+            // قيم المقاومات الأساسية (ثابتة)
+            const baseResistor1 = 20;
+            const baseResistor2 = 30;
+            
+            // مقاومة المواد النوعية (أوم.متر)
+            const materialResistivity = {
+                copper: 1.68e-8,    // نحاس
+                iron: 9.7e-8,       // حديد
+                wood: 1e12          // خشب (عازل)
+            };
+            
+            // المادة الافتراضية (نحاس)
+            let currentMaterial = 'copper';
+            
+            // دالة إنشاء الخلفية التفاعلية
+            function createInteractiveBackground() {
+                const interactiveBg = document.querySelector('.interactive-bg');
+                if (!interactiveBg) return;
+
+                const colors = [
+                    'rgba(52, 152, 219, 0.3)',  // أزرق
+                    'rgba(46, 204, 113, 0.2)',  // أخضر
+                    'rgba(155, 89, 182, 0.2)',  // بنفسجي
+                    'rgba(241, 196, 15, 0.2)'   // أصفر
+                ];
+                
+                // إنشاء جسيمات عشوائية
+                for (let i = 0; i < 15; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('bg-particle');
+                    
+                    // حجم عشوائي
+                    const size = Math.random() * 100 + 50;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    
+                    // لون عشوائي
+                    const colorIndex = Math.floor(Math.random() * colors.length);
+                    particle.style.background = `radial-gradient(circle, ${colors[colorIndex]} 0%, rgba(255,255,255,0) 70%)`;
+                    
+                    // موضع عشوائي
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.top = `${Math.random() * 100}%`;
+                    
+                    // توقيت عشوائي للحركة
+                    particle.style.animationDuration = `${Math.random() * 20 + 10}s`;
+                    particle.style.animationDelay = `${Math.random() * 5}s`;
+                    
+                    interactiveBg.appendChild(particle);
+                }
+            }
+            
+            // التبديل بين التجربتين
+            experiment1Btn.addEventListener('click', function() {
+                switchExperiment('experiment1');
+            });
+            
+            experiment2Btn.addEventListener('click', function() {
+                switchExperiment('experiment2');
+            });
+            
+            function switchExperiment(experiment) {
+                // إعادة تعيين الأزرار النشطة
+                experiment1Btn.classList.remove('active');
+                experiment2Btn.classList.remove('active');
+                
+                // إخفاء جميع الأقسام
+                experiment1Section.classList.remove('active');
+                experiment2Section.classList.remove('active');
+                controlsExperiment1.style.display = 'none';
+                controlsExperiment2.style.display = 'none';
+                
+                // إظهار القسم المحدد
+                if (experiment === 'experiment1') {
+                    experiment1Btn.classList.add('active');
+                    experiment1Section.classList.add('active');
+                    controlsExperiment1.style.display = 'block';
+                } else {
+                    experiment2Btn.classList.add('active');
+                    experiment2Section.classList.add('active');
+                    controlsExperiment2.style.display = 'block';
+                }
+            }
+            
+            // تحديث القيم المعروضة
+            function updateSliderValues() {
+                batteryVoltageValue.textContent = batteryVoltageSlider.value + ' V';
+                wireLengthValue.textContent = wireLengthSlider.value + ' م';
+                wireDiameterValue.textContent = wireDiameterSlider.value + ' مم';
+                resistor3Value.textContent = resistor3Slider.value + ' Ω';
+                battery1VoltageValue.textContent = battery1VoltageSlider.value + ' V';
+                battery2VoltageValue.textContent = battery2VoltageSlider.value + ' V';
+                parallelResistorValue.textContent = parallelResistorSlider.value + ' Ω';
+                resistorB1Value.textContent = resistorB1Slider.value + ' Ω';
+            }
+            
+            // استمع لتغيرات المنزلقات
+            batteryVoltageSlider.addEventListener('input', function() {
+                updateSliderValues();
+                updateCircuit1();
+            });
+            
+            wireLengthSlider.addEventListener('input', function() {
+                updateSliderValues();
+                updateCircuit1();
+            });
+            
+            wireDiameterSlider.addEventListener('input', function() {
+                updateSliderValues();
+                updateCircuit1();
+            });
+            
+            resistor3Slider.addEventListener('input', function() {
+                updateSliderValues();
+                updateCircuit1();
+            });
+            
+            battery1VoltageSlider.addEventListener('input', function() {
+                updateSliderValues();
+                updateCircuit2();
+            });
+            
+            battery2VoltageSlider.addEventListener('input', function() {
+                updateSliderValues();
+                updateCircuit2();
+            });
+            
+            parallelResistorSlider.addEventListener('input', function() {
+                updateSliderValues();
+                updateCircuit2();
+            });
+            
+            resistorB1Slider.addEventListener('input', function() {
+                updateSliderValues();
+                updateCircuit2();
+            });
+            
+            // تبديل حالة الدوائر
+            toggleCircuit1Button.addEventListener('click', function() {
+                circuit1Closed = !circuit1Closed;
+                updateCircuit1Status();
+                updateCircuit1();
+            });
+            
+            toggleCircuit2Button.addEventListener('click', function() {
+                circuit2Closed = !circuit2Closed;
+                updateCircuit2Status();
+                updateCircuit2();
+            });
+            
+            // تحديث حالة الدائرة الأولى
+            function updateCircuit1Status() {
+                if (circuit1Closed) {
+                    circuit1Status.textContent = "الدائرة مغلقة";
+                    circuit1Status.classList.remove("off");
+                    toggleCircuit1Button.textContent = "فتح الدائرة 1";
+                    toggleCircuit1Button.classList.remove("off");
+                } else {
+                    circuit1Status.textContent = "الدائرة مفتوحة";
+                    circuit1Status.classList.add("off");
+                    toggleCircuit1Button.textContent = "إغلاق الدائرة 1";
+                    toggleCircuit1Button.classList.add("off");
+                }
+            }
+            
+            // تحديث حالة الدائرة الثانية
+            function updateCircuit2Status() {
+                if (circuit2Closed) {
+                    circuit2Status.textContent = "الدائرة مغلقة";
+                    circuit2Status.classList.remove("off");
+                    toggleCircuit2Button.textContent = "فتح الدائرة 2";
+                    toggleCircuit2Button.classList.remove("off");
+                } else {
+                    circuit2Status.textContent = "الدائرة مفتوحة";
+                    circuit2Status.classList.add("off");
+                    toggleCircuit2Button.textContent = "إغلاق الدائرة 2";
+                    toggleCircuit2Button.classList.add("off");
+                }
+            }
+            
+            // حساب مقاومة السلك
+            function calculateWireResistance() {
+                const length = parseFloat(wireLengthSlider.value);
+                const diameter = parseFloat(wireDiameterSlider.value) / 1000;
+                const crossSectionalArea = Math.PI * Math.pow(diameter / 2, 2);
+                
+                const resistivity = materialResistivity[currentMaterial];
+                const wireResistance = resistivity * length / crossSectionalArea;
+                return wireResistance;
+            }
+            
+            // تحديث قيم المقاومات
+            function updateResistorValues() {
+                const wireResistance = calculateWireResistance();
+                const lengthFactor = parseFloat(wireLengthSlider.value) / 1.2;
+                const diameterFactor = Math.pow(1.5 / parseFloat(wireDiameterSlider.value), 2);
+                
+                const newResistor1 = baseResistor1 * lengthFactor * diameterFactor;
+                const newResistor2 = baseResistor2 * lengthFactor * diameterFactor;
+                
+                resistor1Value.textContent = newResistor1.toFixed(1) + ' Ω';
+                resistor2Value.textContent = newResistor2.toFixed(1) + ' Ω';
+                
+                return {
+                    resistor1: newResistor1,
+                    resistor2: newResistor2
+                };
+            }
+            
+            // حساب المقاومة الكلية
+            function calculateTotalResistance() {
+                const wireResistance = calculateWireResistance();
+                const resistors = updateResistorValues();
+                const variableResistor = parseInt(resistor3Slider.value);
+                
+                return resistors.resistor1 + resistors.resistor2 + variableResistor + wireResistance;
+            }
+            
+            // حساب شدة التيار
+            function calculateCurrent() {
+                if (!circuit1Closed) return 0;
+                
+                const totalResistance = calculateTotalResistance();
+                const voltage = parseInt(batteryVoltageSlider.value);
+                
+                return voltage / totalResistance;
+            }
+            
+            // رسم الدائرة الأولى
+            function drawCircuit1() {
+                svg1.innerHTML = '';
+                const width = 1000;
+                const height = 500;
+                addSVGEffects(svg1);
+                
+                const lengthFactor = parseFloat(wireLengthSlider.value) / 1.2;
+                const dynamicWidth = width * 0.85;
+                const dynamicHeight = height * 0.7;
+                
+                const marginX = (width - dynamicWidth) / 2;
+                const marginY = (height - dynamicHeight) / 2;
+                const circuitWidth = dynamicWidth;
+                const circuitHeight = dynamicHeight;
+                
+                svg1.setAttribute('viewBox', `0 0 ${width} ${height}`);
+                const wireThickness = parseFloat(wireDiameterSlider.value) * 3;
+                
+                if (circuit1Closed) {
+                    drawWire(svg1, marginX, marginY, marginX + circuitWidth, marginY, true, wireThickness);
+                    drawWire(svg1, marginX + circuitWidth, marginY, marginX + circuitWidth, marginY + circuitHeight, true, wireThickness);
+                    drawWire(svg1, marginX + circuitWidth, marginY + circuitHeight, marginX, marginY + circuitHeight, true, wireThickness);
+                    drawWire(svg1, marginX, marginY + circuitHeight, marginX, marginY, true, wireThickness);
+                } else {
+                    const gap = 50; 
+                    drawWire(svg1, marginX, marginY, marginX + circuitWidth/2 - gap/2, marginY, false, wireThickness);
+                    drawWire(svg1, marginX + circuitWidth/2 + gap/2, marginY, marginX + circuitWidth, marginY, false, wireThickness);
+                    drawWire(svg1, marginX + circuitWidth, marginY, marginX + circuitWidth, marginY + circuitHeight, false, wireThickness);
+                    drawWire(svg1, marginX + circuitWidth, marginY + circuitHeight, marginX, marginY + circuitHeight, false, wireThickness);
+                    drawWire(svg1, marginX, marginY + circuitHeight, marginX, marginY, false, wireThickness);
+                }
+                
+                const topCenter = { x: marginX + circuitWidth / 2, y: marginY };
+                const rightCenter = { x: marginX + circuitWidth, y: marginY + circuitHeight / 2 };
+                const bottomCenter = { x: marginX + circuitWidth / 2, y: marginY + circuitHeight };
+                const leftCenter = { x: marginX, y: marginY + circuitHeight / 2 };
+                
+                drawBattery(svg1, topCenter.x, topCenter.y, 80, 40, parseInt(batteryVoltageSlider.value));
+                
+                const resistors = updateResistorValues();
+                drawResistor(svg1, leftCenter.x, leftCenter.y, 60, 30, "R1", resistors.resistor1);
+                drawResistor(svg1, bottomCenter.x, bottomCenter.y - 45, 60, 30, "R2", resistors.resistor2);
+                drawVariableResistor(svg1, rightCenter.x, rightCenter.y, 60, 30, "R3", parseInt(resistor3Slider.value));
+                drawSwitch(svg1, bottomCenter.x, bottomCenter.y + 50, 35, circuit1Closed);
+                
+                const current = calculateCurrent();
+                const totalVoltage = parseInt(batteryVoltageSlider.value);
+                const ammeterValue = circuit1Closed ? current.toFixed(3) + " A" : "0.000 A";
+                const voltmeterValue = circuit1Closed ? totalVoltage.toFixed(1) + " V" : "0.0 V";
+                
+                drawAmmeter(svg1, marginX + 50, marginY + circuitHeight/4, 60, 35, "A", ammeterValue);
+                drawVoltmeter(svg1, marginX + circuitWidth + 40, marginY + circuitHeight/2, 60, 35, "V", voltmeterValue);
+                
+                if (circuit1Closed) {
+                    createElectrons(svg1, electrons1, marginX, marginY, circuitWidth, circuitHeight, wireThickness);
+                } else {
+                    electrons1.length = 0;
+                }
+                updateCircuit1Calculations();
+            }
+            
+            // رسم الدائرة الثانية (معدلة حسب الطلب)
+            function drawCircuit2() {
+                svg2.innerHTML = '';
+                const width = 1000;
+                const height = 500;
+                addSVGEffects(svg2);
+                
+                const marginX = 100;
+                const marginY = 100;
+                const circuitWidth = width - 2 * marginX;
+                const circuitHeight = height - 2 * marginY;
+                const wireThicknessExp2 = 15;
+                
+                const currents = calculateCircuit2Currents();
+                const v1 = parseInt(battery1VoltageSlider.value);
+                const v2 = parseInt(battery2VoltageSlider.value);
+                const equivalentV = Math.min(v1, v2);
+                
+                if (circuit2Closed) {
+                    drawWire(svg2, marginX, marginY, marginX + circuitWidth, marginY, true, wireThicknessExp2);
+                    drawWire(svg2, marginX + circuitWidth, marginY, marginX + circuitWidth, marginY + circuitHeight, true, wireThicknessExp2);
+                    drawWire(svg2, marginX + circuitWidth, marginY + circuitHeight, marginX, marginY + circuitHeight, true, wireThicknessExp2);
+                    drawWire(svg2, marginX, marginY + circuitHeight, marginX, marginY, true, wireThicknessExp2);
+                    
+                    drawWire(svg2, marginX + 200, marginY, marginX + 200, marginY + 100, true, wireThicknessExp2);
+                    drawWire(svg2, marginX + 800, marginY, marginX + 800, marginY + 100, true, wireThicknessExp2);
+                    drawWire(svg2, marginX + 200, marginY + 180, marginX + 200, marginY + circuitHeight, true, wireThicknessExp2);
+                    drawWire(svg2, marginX + 800, marginY + 180, marginX + 800, marginY + circuitHeight, true, wireThicknessExp2);
+                } else {
+                    const gap = 50;
+                    drawWire(svg2, marginX, marginY, marginX + circuitWidth/2 - gap/2, marginY, false, wireThicknessExp2);
+                    drawWire(svg2, marginX + circuitWidth/2 + gap/2, marginY, marginX + circuitWidth, marginY, false, wireThicknessExp2);
+                    drawWire(svg2, marginX + circuitWidth, marginY, marginX + circuitWidth, marginY + circuitHeight, false, wireThicknessExp2);
+                    drawWire(svg2, marginX + circuitWidth, marginY + circuitHeight, marginX, marginY + circuitHeight, false, wireThicknessExp2);
+                    drawWire(svg2, marginX, marginY + circuitHeight, marginX, marginY, false, wireThicknessExp2);
+                    drawWire(svg2, marginX + 200, marginY, marginX + 200, marginY + 100, false, wireThicknessExp2);
+                    drawWire(svg2, marginX + 800, marginY, marginX + 800, marginY + 100, false, wireThicknessExp2);
+                    drawWire(svg2, marginX + 200, marginY + 180, marginX + 200, marginY + circuitHeight, false, wireThicknessExp2);
+                    drawWire(svg2, marginX + 800, marginY + 180, marginX + 800, marginY + circuitHeight, false, wireThicknessExp2);
+                }
+                
+                const batteryWidth = 80;
+                const batteryHeight = 40;
+                const battery1X = marginX + 200;
+                const battery2X = marginX + 800;
+                const batteryY = marginY + 140;
+                
+                drawBattery(svg2, battery1X, batteryY, batteryWidth, batteryHeight, parseInt(battery1VoltageSlider.value), "B1");
+                drawBattery(svg2, battery2X, batteryY, batteryWidth, batteryHeight, parseInt(battery2VoltageSlider.value), "B2");
+                
+                // ✅ تعديل 1: إبعاد المقاومة R1 عن البطارية (نزود الـ Y لـ 120 بدل 90)
+                const rB1 = parseInt(resistorB1Slider.value);
+                drawResistor(svg2, battery1X, batteryY + 120, 60, 30, "R1", rB1);
+                
+                drawJunction(svg2, marginX + 200, marginY);
+                drawJunction(svg2, marginX + 800, marginY);
+                drawJunction(svg2, marginX + 200, marginY + circuitHeight);
+                drawJunction(svg2, marginX + 800, marginY + circuitHeight);
+                
+                // ✅ تعديل 2: حل مشكلة التداخل على اليمين
+                // وضع المقاومة R تحت البطارية B2 (زي ما عملنا مع R1) عشان تبعد عن الفولتميتر
+                const r = parseInt(parallelResistorSlider.value);
+                drawResistor(svg2, marginX + circuitWidth, batteryY + 120, 70, 35, "R", r);
+                
+                drawSwitch(svg2, marginX + circuitWidth/2, marginY + circuitHeight + 60, 40, circuit2Closed);
+                
+                if (circuit2Closed) {
+                    drawCurrentArrow(svg2, marginX + 150, marginY + 30, marginX + 180, marginY + 30);
+                    drawCurrentArrow(svg2, marginX + 200, marginY + 60, marginX + 200, marginY + 100);
+                    drawCurrentArrow(svg2, marginX + 800, marginY + 60, marginX + 800, marginY + 100);
+                    drawCurrentArrow(svg2, marginX + circuitWidth - 100, marginY + circuitHeight/2 - 50, marginX + circuitWidth - 100, marginY + circuitHeight/2 + 50);
+                }
+                
+                const ammeterValue = circuit2Closed ? currents.total.toFixed(2) + " A" : "0.00 A";
+                const voltmeterValue = circuit2Closed ? equivalentV.toFixed(1) + " V" : "0.0 V";
+                
+                drawAmmeter(svg2, marginX + 100, marginY, 70, 40, "A", ammeterValue);
+                
+                // ✅ تعديل 3: إخراج الفولتميتر لليمين أكتر (بمحاذاة المقاومة الجديدة)
+                drawVoltmeter(svg2, marginX + circuitWidth + 100, batteryY + 120, 70, 40, "V", voltmeterValue);
+                
+                if (circuit2Closed) {
+                    createElectrons(svg2, electrons2, marginX, marginY, circuitWidth, circuitHeight, wireThicknessExp2);
+                } else {
+                    electrons2.length = 0;
+                }
+                
+                updateCircuit2Calculations();
+            }
+            
+            // دوال الرسم المساعدة
+            function drawWire(svg, x1, y1, x2, y2, isActive, thickness = 6) {
+                const wire = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                wire.setAttribute("x1", x1);
+                wire.setAttribute("y1", y1);
+                wire.setAttribute("x2", x2);
+                wire.setAttribute("y2", y2);
+                wire.setAttribute("class", isActive ? "wire-active" : "wire");
+                wire.setAttribute("stroke-width", thickness);
+                svg.appendChild(wire);
+            }
+            
+            function drawBattery(svg, x, y, width, height, voltage, label = "البطارية") {
+                const batteryBody = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                batteryBody.setAttribute("x", x - width/2);
+                batteryBody.setAttribute("y", y - height/2);
+                batteryBody.setAttribute("width", width);
+                batteryBody.setAttribute("height", height);
+                batteryBody.setAttribute("class", "battery");
+                batteryBody.setAttribute("fill", "white");
+                batteryBody.setAttribute("rx", "8");
+                svg.appendChild(batteryBody);
+                
+                for (let i = 1; i <= 2; i++) {
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", x - width/2 + 15);
+                    line.setAttribute("y1", y - height/2 + i * height/3);
+                    line.setAttribute("x2", x + width/2 - 15);
+                    line.setAttribute("y2", y - height/2 + i * height/3);
+                    line.setAttribute("class", "battery");
+                    line.setAttribute("stroke-width", 4);
+                    svg.appendChild(line);
+                }
+                
+                const positiveTerminal = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                positiveTerminal.setAttribute("x", x - 10);
+                positiveTerminal.setAttribute("y", y - height/2 - 15);
+                positiveTerminal.setAttribute("width", 20);
+                positiveTerminal.setAttribute("height", 15);
+                positiveTerminal.setAttribute("class", "battery");
+                positiveTerminal.setAttribute("fill", "#f8f9fa");
+                positiveTerminal.setAttribute("rx", "4");
+                svg.appendChild(positiveTerminal);
+                
+                const plusSign = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                plusSign.setAttribute("x", x - 20);
+                plusSign.setAttribute("y", y - 5);
+                plusSign.setAttribute("class", "component-label");
+                plusSign.setAttribute("font-size", "20");
+                plusSign.textContent = "+";
+                svg.appendChild(plusSign);
+                
+                const minusSign = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                minusSign.setAttribute("x", x + 15);
+                minusSign.setAttribute("y", y - 5);
+                minusSign.setAttribute("class", "component-label");
+                minusSign.setAttribute("font-size", "20");
+                minusSign.textContent = "-";
+                svg.appendChild(minusSign);
+                
+                const batteryLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                batteryLabel.setAttribute("x", x);
+                batteryLabel.setAttribute("y", y + height/2 + 25);
+                batteryLabel.setAttribute("class", "component-label");
+                batteryLabel.setAttribute("font-size", "14");
+                batteryLabel.textContent = label + " " + voltage + "V";
+                svg.appendChild(batteryLabel);
+            }
+            
+            function drawResistor(svg, x, y, width, height, label, value) {
+                const resistorBody = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                resistorBody.setAttribute("x", x - width/2);
+                resistorBody.setAttribute("y", y - height/2);
+                resistorBody.setAttribute("width", width);
+                resistorBody.setAttribute("height", height);
+                resistorBody.setAttribute("class", "resistor");
+                resistorBody.setAttribute("fill", "#f5f5f5");
+                resistorBody.setAttribute("rx", "10");
+                svg.appendChild(resistorBody);
+                
+                const zigzag = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                let pathData = `M ${x - width/2 + 8} ${y} `;
+                for (let i = 1; i <= 6; i++) {
+                    const xPos = x - width/2 + i * width/7;
+                    const yPos = (i % 2 === 0) ? y - height/3 : y + height/3;
+                    pathData += `L ${xPos} ${yPos} `;
+                }
+                pathData += `L ${x + width/2 - 8} ${y}`;
+                zigzag.setAttribute("d", pathData);
+                zigzag.setAttribute("class", "resistor");
+                zigzag.setAttribute("stroke-width", 5);
+                zigzag.setAttribute("fill", "none");
+                svg.appendChild(zigzag);
+                
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", x);
+                text.setAttribute("y", y + height/2 + 25);
+                text.setAttribute("class", "component-label");
+                text.setAttribute("font-size", "14");
+                text.textContent = label;
+                svg.appendChild(text);
+                
+                const valueText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                valueText.setAttribute("x", x);
+                valueText.setAttribute("y", y - height/2 - 20);
+                valueText.setAttribute("class", "component-value");
+                valueText.setAttribute("font-size", "12");
+                valueText.textContent = value.toFixed(1) + "Ω";
+                svg.appendChild(valueText);
+            }
+            
+            function drawVariableResistor(svg, x, y, width, height, label, value) {
+                const resistorBody = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                resistorBody.setAttribute("x", x - width/2);
+                resistorBody.setAttribute("y", y - height/2);
+                resistorBody.setAttribute("width", width);
+                resistorBody.setAttribute("height", height);
+                resistorBody.setAttribute("class", "variable-resistor");
+                resistorBody.setAttribute("fill", "#f5f5f5");
+                resistorBody.setAttribute("rx", "10");
+                svg.appendChild(resistorBody);
+                
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", x - width/2 + 8);
+                line.setAttribute("y1", y);
+                line.setAttribute("x2", x + width/2 - 8);
+                line.setAttribute("y2", y);
+                line.setAttribute("class", "variable-resistor");
+                line.setAttribute("stroke-width", 5);
+                svg.appendChild(line);
+                
+                const arrow = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                const arrowPath = `M ${x} ${y - height/2 + 8} L ${x - 8} ${y - height/2 + 15} L ${x + 8} ${y - height/2 + 15} Z`;
+                arrow.setAttribute("d", arrowPath);
+                arrow.setAttribute("class", "variable-resistor");
+                arrow.setAttribute("fill", "#8e44ad");
+                svg.appendChild(arrow);
+                
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", x);
+                text.setAttribute("y", y + height/2 + 25);
+                text.setAttribute("class", "component-label");
+                text.setAttribute("font-size", "14");
+                text.textContent = label;
+                svg.appendChild(text);
+                
+                const valueText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                valueText.setAttribute("x", x);
+                valueText.setAttribute("y", y - height/2 - 20);
+                valueText.setAttribute("class", "component-value");
+                valueText.setAttribute("font-size", "12");
+                valueText.textContent = value + "Ω";
+                svg.appendChild(valueText);
+            }
+            
+            function drawSwitch(svg, x, y, size, isClosed) {
+                const switchGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                const switchBase = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                switchBase.setAttribute("cx", x);
+                switchBase.setAttribute("cy", y);
+                switchBase.setAttribute("r", size);
+                switchBase.setAttribute("class", "switch-base");
+                switchBase.setAttribute("fill", "#f8f9fa");
+                switchGroup.appendChild(switchBase);
+                
+                const switchArm = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                switchArm.setAttribute("x1", x);
+                switchArm.setAttribute("y1", y);
+                if (isClosed) {
+                    switchArm.setAttribute("x2", x + size * Math.cos(Math.PI/4));
+                    switchArm.setAttribute("y2", y + size * Math.sin(Math.PI/4));
+                    switchArm.setAttribute("class", "switch-arm closed");
+                } else {
+                    switchArm.setAttribute("x2", x + size * Math.cos(-Math.PI/4));
+                    switchArm.setAttribute("y2", y + size * Math.sin(-Math.PI/4));
+                    switchArm.setAttribute("class", "switch-arm open");
+                }
+                switchGroup.appendChild(switchArm);
+                
+                const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                label.setAttribute("x", x);
+                label.setAttribute("y", y + size + 25);
+                label.setAttribute("class", "component-label");
+                label.setAttribute("font-size", "14");
+                label.textContent = "المفتاح";
+                switchGroup.appendChild(label);
+                
+                svg.appendChild(switchGroup);
+                return switchGroup;
+            }
+            
+            function drawAmmeter(svg, x, y, width, height, label, value) {
+                const ammeterBody = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                ammeterBody.setAttribute("x", x - width/2);
+                ammeterBody.setAttribute("y", y - height/2);
+                ammeterBody.setAttribute("width", width);
+                ammeterBody.setAttribute("height", height);
+                ammeterBody.setAttribute("class", "ammeter");
+                ammeterBody.setAttribute("fill", "#f0f0f0");
+                ammeterBody.setAttribute("rx", "6");
+                svg.appendChild(ammeterBody);
+                
+                const ammeterScreen = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                ammeterScreen.setAttribute("x", x - width/2 + 6);
+                ammeterScreen.setAttribute("y", y - height/2 + 6);
+                ammeterScreen.setAttribute("width", width - 12);
+                ammeterScreen.setAttribute("height", height - 12);
+                ammeterScreen.setAttribute("fill", "#e1f5fe");
+                ammeterScreen.setAttribute("stroke", "#9b59b6");
+                ammeterScreen.setAttribute("stroke-width", 1);
+                ammeterScreen.setAttribute("rx", "4");
+                svg.appendChild(ammeterScreen);
+                
+                const ammeterValueSVG = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                ammeterValueSVG.setAttribute("x", x);
+                ammeterValueSVG.setAttribute("y", y + 6);
+                ammeterValueSVG.setAttribute("class", "meter-value-svg");
+                ammeterValueSVG.setAttribute("font-size", "14");
+                ammeterValueSVG.textContent = value;
+                svg.appendChild(ammeterValueSVG);
+                
+                const meterLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                meterLabel.setAttribute("x", x);
+                meterLabel.setAttribute("y", y + height/2 + 25);
+                meterLabel.setAttribute("class", "meter-label");
+                meterLabel.setAttribute("font-size", "12");
+                meterLabel.textContent = label;
+                svg.appendChild(meterLabel);
+            }
+            
+            function drawVoltmeter(svg, x, y, width, height, label, value) {
+                const voltmeterBody = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                voltmeterBody.setAttribute("x", x - width/2);
+                voltmeterBody.setAttribute("y", y - height/2);
+                voltmeterBody.setAttribute("width", width);
+                voltmeterBody.setAttribute("height", height);
+                voltmeterBody.setAttribute("class", "voltmeter");
+                voltmeterBody.setAttribute("fill", "#f0f0f0");
+                voltmeterBody.setAttribute("rx", "6");
+                svg.appendChild(voltmeterBody);
+                
+                const voltmeterScreen = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                voltmeterScreen.setAttribute("x", x - width/2 + 6);
+                voltmeterScreen.setAttribute("y", y - height/2 + 6);
+                voltmeterScreen.setAttribute("width", width - 12);
+                voltmeterScreen.setAttribute("height", height - 12);
+                voltmeterScreen.setAttribute("fill", "#e1f5fe");
+                voltmeterScreen.setAttribute("stroke", "#9b59b6");
+                voltmeterScreen.setAttribute("stroke-width", 1);
+                voltmeterScreen.setAttribute("rx", "4");
+                svg.appendChild(voltmeterScreen);
+                
+                const voltmeterValueSVG = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                voltmeterValueSVG.setAttribute("x", x);
+                voltmeterValueSVG.setAttribute("y", y + 6);
+                voltmeterValueSVG.setAttribute("class", "meter-value-svg");
+                voltmeterValueSVG.setAttribute("font-size", "14");
+                voltmeterValueSVG.textContent = value;
+                svg.appendChild(voltmeterValueSVG);
+                
+                const meterLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                meterLabel.setAttribute("x", x);
+                meterLabel.setAttribute("y", y + height/2 + 25);
+                meterLabel.setAttribute("class", "meter-label");
+                meterLabel.setAttribute("font-size", "12");
+                meterLabel.textContent = label;
+                svg.appendChild(meterLabel);
+            }
+            
+            function drawJunction(svg, x, y) {
+                const junction = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                junction.setAttribute("cx", x);
+                junction.setAttribute("cy", y);
+                junction.setAttribute("r", 6);
+                junction.setAttribute("class", "junction");
+                svg.appendChild(junction);
+            }
+            
+            function drawCurrentArrow(svg, x1, y1, x2, y2) {
+                const arrow = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                arrow.setAttribute("x1", x1);
+                arrow.setAttribute("y1", y1);
+                arrow.setAttribute("x2", x2);
+                arrow.setAttribute("y2", y2);
+                arrow.setAttribute("class", "current-direction");
+                svg.appendChild(arrow);
+            }
+            
+            function addSVGEffects(svg) {
+                const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+                const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+                marker.setAttribute("id", "arrowhead");
+                marker.setAttribute("markerWidth", "10");
+                marker.setAttribute("markerHeight", "7");
+                marker.setAttribute("refX", "9");
+                marker.setAttribute("refY", "3.5");
+                marker.setAttribute("orient", "auto");
+                const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                polygon.setAttribute("points", "0 0, 10 3.5, 0 7");
+                polygon.setAttribute("fill", "#e74c3c");
+                marker.appendChild(polygon);
+                defs.appendChild(marker);
+                svg.appendChild(defs);
+            }
+            
+            function createElectrons(svg, electronsArray, marginX, marginY, width, height, thickness = 6) {
+                electronsArray.forEach(electron => {
+                    if (electron && electron.element && electron.element.parentNode) {
+                        electron.element.parentNode.removeChild(electron.element);
+                    }
+                });
+                electronsArray.length = 0;
+                
+                const numElectrons = 10;
+                for (let i = 0; i < numElectrons; i++) {
+                    const electron = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                    electron.setAttribute("class", "electron");
+                    electron.setAttribute("r", 4);
+                    electronsArray.push({
+                        element: electron,
+                        position: (i / numElectrons) * (2 * (width + height))
+                    });
+                    svg.appendChild(electron);
+                }
+            }
+            
+            function animateElectrons1() {
+                if (animationId1) cancelAnimationFrame(animationId1);
+                if (!circuit1Closed) return;
+                
+                const width = 1000;
+                const height = 500;
+                const lengthFactor = parseFloat(wireLengthSlider.value) / 1.2;
+                const dynamicWidth = width * 0.85;
+                const dynamicHeight = height * 0.7;
+                
+                const marginX = (width - dynamicWidth) / 2;
+                const marginY = (height - dynamicHeight) / 2;
+                const circuitWidth = dynamicWidth;
+                const circuitHeight = dynamicHeight;
+                const pathLength = 2 * (circuitWidth + circuitHeight);
+                
+                function update() {
+                    if (!circuit1Closed) { cancelAnimationFrame(animationId1); return; }
+                    
+                    electrons1.forEach(electron => {
+                        const current = calculateCurrent();
+                        if (circuit1Closed && current > 0) {
+                            electron.position = (electron.position + current * 0.5) % pathLength;
+                        }
+                        
+                        let x, y;
+                        if (electron.position < circuitWidth) {
+                            x = marginX + electron.position;
+                            y = marginY;
+                        } else if (electron.position < circuitWidth + circuitHeight) {
+                            x = marginX + circuitWidth;
+                            y = marginY + (electron.position - circuitWidth);
+                        } else if (electron.position < 2 * circuitWidth + circuitHeight) {
+                            x = marginX + circuitWidth - (electron.position - circuitWidth - circuitHeight);
+                            y = marginY + circuitHeight;
+                        } else {
+                            x = marginX;
+                            y = marginY + circuitHeight - (electron.position - 2 * circuitWidth - circuitHeight);
+                        }
+                        
+                        if(electron.element) {
+                            electron.element.setAttribute("cx", x);
+                            electron.element.setAttribute("cy", y);
+                        }
+                    });
+                    animationId1 = requestAnimationFrame(update);
+                }
+                update();
+            }
+
+            function animateElectrons2() {
+                 if (animationId2) cancelAnimationFrame(animationId2);
+                 if (!circuit2Closed) return;
+
+                 const marginX = 100;
+                 const marginY = 100;
+                 const circuitWidth = 800;
+                 const circuitHeight = 300;
+                 const pathLength = 2 * (circuitWidth + circuitHeight);
+
+                 function update() {
+                    if (!circuit2Closed) { cancelAnimationFrame(animationId2); return; }
+                    
+                    electrons2.forEach(electron => {
+                        const currents = calculateCircuit2Currents();
+                        if (circuit2Closed && currents.total > 0) {
+                            electron.position = (electron.position + currents.total * 0.3) % pathLength;
+                        }
+
+                        let x, y;
+                        if (electron.position < circuitWidth) { x = marginX + electron.position; y = marginY; }
+                        else if (electron.position < circuitWidth + circuitHeight) { x = marginX + circuitWidth; y = marginY + (electron.position - circuitWidth); }
+                        else if (electron.position < 2 * circuitWidth + circuitHeight) { x = marginX + circuitWidth - (electron.position - circuitWidth - circuitHeight); y = marginY + circuitHeight; }
+                        else { x = marginX; y = marginY + circuitHeight - (electron.position - 2 * circuitWidth - circuitHeight); }
+                        
+                        if(electron.element) { electron.element.setAttribute("cx", x); electron.element.setAttribute("cy", y); }
+                    });
+                    animationId2 = requestAnimationFrame(update);
+                 }
+                 update();
+            }
+
+            function calculateCircuit2Currents() {
+                if (!circuit2Closed) return { total: 0, battery1: 0, battery2: 0 };
+                const v1 = parseInt(battery1VoltageSlider.value);
+                const v2 = parseInt(battery2VoltageSlider.value);
+                const r = parseInt(parallelResistorSlider.value);
+                const equivalentVoltage = Math.min(v1, v2);
+                const totalCurrent = equivalentVoltage / r;
+                const battery1Current = totalCurrent * (v1 / (v1 + v2));
+                const battery2Current = totalCurrent * (v2 / (v1 + v2));
+                return { total: totalCurrent, battery1: battery1Current, battery2: battery2Current };
+            }
+
+            function updateCircuit1Calculations() {
+                const wireResistance = calculateWireResistance();
+                const totalResistance = calculateTotalResistance();
+                const current = calculateCurrent();
+                const resistors = updateResistorValues();
+                const voltageDropR1 = current * resistors.resistor1;
+                const voltage = parseInt(batteryVoltageSlider.value);
+                
+                totalCurrentDisplay.textContent = current.toFixed(3) + " A";
+                totalVoltageDisplay.textContent = voltage.toFixed(1) + " V";
+                wireResistanceCalculation.textContent = `مقاومة السلك: ${wireResistance.toFixed(3)} Ω`;
+                resistanceCalculation.textContent = `المقاومة الكلية: ${totalResistance.toFixed(3)} Ω`;
+                currentCalculation.textContent = `شدة التيار: ${current.toFixed(3)} A`;
+                voltageDrop.textContent = `فرق الجهد عبر R1: ${voltageDropR1.toFixed(2)} V`;
+                
+                if (circuit1Closed) ohmsLaw.textContent = `V = I × R → ${voltage}V = ${current.toFixed(3)}A × ${totalResistance.toFixed(3)}Ω`;
+                else ohmsLaw.textContent = `V = I × R → ${voltage}V = 0A × ${totalResistance.toFixed(3)}Ω (الدائرة مفتوحة)`;
+            }
+
+            function updateCircuit2Calculations() {
+                const currents = calculateCircuit2Currents();
+                const v1 = parseInt(battery1VoltageSlider.value);
+                const v2 = parseInt(battery2VoltageSlider.value);
+                const equivalentV = circuit2Closed ? Math.min(v1, v2) : 0;
+                const totalCurrent = circuit2Closed ? currents.total : 0;
+                const battery1Current = circuit2Closed ? currents.battery1 : 0;
+                const battery2Current = circuit2Closed ? currents.battery2 : 0;
+                
+                totalCurrentParallelDisplay.textContent = totalCurrent.toFixed(2) + " A";
+                equivalentVoltageDisplay.textContent = equivalentV.toFixed(1) + " V";
+                
+                if (circuit2Closed) {
+                    kirchhoffCurrentLaw.textContent = `قانون التيار: I₁ + I₂ = I₃ → ${battery1Current.toFixed(2)}A + ${battery2Current.toFixed(2)}A = ${totalCurrent.toFixed(2)}A`;
+                    kirchhoffVoltageLaw.textContent = `قانون الجهد: V₁ = V₂ = V → ${equivalentV}V`;
+                    equivalentVoltage.textContent = `الجهد المكافئ: ${equivalentV.toFixed(1)} V`;
+                    totalCurrentParallel.textContent = `التيار الكلي: ${totalCurrent.toFixed(2)} A`;
+                    currentsBreakdown.textContent = `I₁ = ${battery1Current.toFixed(2)}A, I₂ = ${battery2Current.toFixed(2)}A`;
+                } else {
+                    kirchhoffCurrentLaw.textContent = `قانون التيار: I₁ + I₂ = I₃ → 0A + 0A = 0A (الدائرة مفتوحة)`;
+                    kirchhoffVoltageLaw.textContent = `قانون الجهد: V₁ = V₂ = V → 0V (الدائرة مفتوحة)`;
+                    equivalentVoltage.textContent = `الجهد المكافئ: 0.0 V`;
+                    totalCurrentParallel.textContent = `التيار الكلي: 0.00 A`;
+                    currentsBreakdown.textContent = `I₁ = 0.00A, I₂ = 0.00A`;
+                }
+            }
+            
+            function updateCircuit1() {
+                drawCircuit1();
+                animateElectrons1();
+            }
+            
+            function updateCircuit2() {
+                drawCircuit2();
+                animateElectrons2();
+            }
+            
+            // التهيئة الأولية
+            updateSliderValues();
+            updateCircuit1Status();
+            updateCircuit2Status();
+            updateCircuit1();
+            updateCircuit2();
+        });
+    </script>
+</body>
+</html>

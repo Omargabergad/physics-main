@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ معمل الانكسار - محاكاة فيزيائية احترافية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* نفس الأنماط السابقة بدون تغيير */
+        :root {
+            --primary: #00e6e6;
+            --secondary: #ff9800;
+            --accent: #9c27b0;
+            --success: #4CAF50;
+            --danger: #f44336;
+            --dark-bg: rgba(15, 15, 35, 0.98);
+            --medium-1: rgba(0, 100, 255, 0.1);
+            --medium-2: rgba(255, 100, 0, 0.1);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Cairo', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #05050f 100%);
+            color: white;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* لوحة التحكم الجانبية */
+        .sidebar {
+            width: 360px;
+            background: var(--dark-bg);
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            border-left: 1px solid rgba(0, 230, 230, 0.2);
+            box-shadow: 8px 0 25px rgba(0, 0, 0, 0.4);
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            color: var(--primary);
+            font-size: 1.9em;
+            margin-bottom: 8px;
+            text-shadow: 0 0 15px rgba(0, 230, 230, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header p {
+            color: #aaa;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .control-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: var(--transition);
+        }
+
+        .control-card:hover {
+            border-color: rgba(0, 230, 230, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title i {
+            font-size: 1.1em;
+        }
+
+        .index-display {
+            background: rgba(0, 230, 230, 0.15);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: white;
+            font-family: 'Courier New', monospace;
+        }
+
+        .chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .chip {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .chip:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .chip.active {
+            background: var(--primary);
+            color: #000;
+            font-weight: bold;
+            border-color: white;
+            box-shadow: 0 0 15px rgba(0, 230, 230, 0.5);
+        }
+
+        .chip.active i {
+            color: #000;
+        }
+
+        .slider-container {
+            margin-top: 15px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .slider-value {
+            background: rgba(0, 255, 0, 0.15);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-weight: bold;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 230, 230, 0.8);
+            border: 2px solid white;
+        }
+
+        .color-section {
+            margin-top: 15px;
+        }
+
+        .color-btns {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .color-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .color-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        .color-btn.active {
+            border-color: white;
+            transform: scale(1.15);
+            box-shadow: 0 0 25px currentColor;
+        }
+
+        .color-btn i {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+            font-size: 1.1em;
+        }
+
+        .action-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: #00cccc;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 230, 230, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+            margin-top: auto;
+            background: transparent;
+            color: var(--secondary);
+            text-decoration: none;
+            padding: 14px;
+            border: 2px solid var(--secondary);
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            background: var(--secondary);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+        }
+
+        /* منطقة المحاكاة الرئيسية */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .canvas-container {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(0, 230, 230, 0.2);
+        }
+
+        #canvas {
+            display: block;
+            background: #0a0a14;
+        }
+
+        /* لوحات المعلومات */
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 320px;
+        }
+
+        .info-panel h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-panel p {
+            color: #ddd;
+            font-size: 0.9em;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .law-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 320px;
+        }
+
+        .law-panel h3 {
+            color: var(--success);
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .law-formula {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .data-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 300px;
+        }
+
+        .data-panel h3 {
+            color: var(--accent);
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .data-label {
+            color: #aaa;
+        }
+
+        .data-value {
+            color: white;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .warning-banner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(244, 67, 54, 0.9);
+            color: white;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            text-align: center;
+            z-index: 50;
+            display: none;
+            border: 2px solid #ff5252;
+            box-shadow: 0 0 30px rgba(244, 67, 54, 0.5);
+        }
+
+        /* تخصيص للشاشات الصغيرة */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 320px;
+            }
+            
+            .canvas-container {
+                transform: scale(0.9);
+            }
+        }
+
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column;
+                height: auto;
+                overflow-y: auto;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                border-left: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+            
+            .canvas-container {
+                transform: scale(0.85);
+            }
+            
+            .info-panel, .law-panel, .data-panel {
+                position: static;
+                margin-top: 15px;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- لوحة التحكم الجانبية -->
+    <div class="sidebar">
+        <div class="header">
+            <h1><i class="fas fa-water"></i> معمل الانكسار الضوئي</h1>
+            <p>محاكاة تفاعلية لقانون الانكسار (قانون سنل) - دراسة انتقال الضوء بين الأوساط المختلفة</p>
+        </div>
+
+        <div class="control-card">
+            <div class="card-header">
+                <span class="card-title"><i class="fas fa-layer-group"></i> الوسط العلوي</span>
+                <div class="index-display" id="n1Display">n₁ = 1.00</div>
+            </div>
+            <div class="chips-container" id="m1-chips">
+                <div class="chip active" data-n="1.00" data-name="الهواء">
+                    <i class="fas fa-wind"></i> هواء (1.00)
+                </div>
+                <div class="chip" data-n="1.33" data-name="الماء">
+                    <i class="fas fa-tint"></i> ماء (1.33)
+                </div>
+                <div class="chip" data-n="1.52" data-name="الزجاج">
+                    <i class="fas fa-glass-whiskey"></i> زجاج (1.52)
+                </div>
+                <div class="chip" data-n="1.31" data-name="الثلج">
+                    <i class="fas fa-snowflake"></i> ثلج (1.31)
+                </div>
+                <div class="chip" data-n="1.36" data-name="الكحول">
+                    <i class="fas fa-flask"></i> كحول (1.36)
+                </div>
+            </div>
+        </div>
+
+        <div class="control-card">
+            <div class="card-header">
+                <span class="card-title"><i class="fas fa-layer-group"></i> الوسط السفلي</span>
+                <div class="index-display" id="n2Display">n₂ = 1.33</div>
+            </div>
+            <div class="chips-container" id="m2-chips">
+                <div class="chip active" data-n="1.33" data-name="الماء">
+                    <i class="fas fa-tint"></i> ماء (1.33)
+                </div>
+                <div class="chip" data-n="1.52" data-name="الزجاج">
+                    <i class="fas fa-glass-whiskey"></i> زجاج (1.52)
+                </div>
+                <div class="chip" data-n="2.42" data-name="الماس">
+                    <i class="fas fa-gem"></i> ماس (2.42)
+                </div>
+                <div class="chip" data-n="1.46" data-name="الكوارتز">
+                    <i class="fas fa-mountain"></i> كوارتز (1.46)
+                </div>
+                <div class="chip" data-n="1.62" data-name="الزفير">
+                    <i class="fas fa-gem"></i> زفير (1.62)
+                </div>
+            </div>
+        </div>
+
+        <div class="control-card">
+            <div class="card-header">
+                <span class="card-title"><i class="fas fa-angle-double-right"></i> زاوية السقوط</span>
+                <div class="slider-value" id="angleVal">30°</div>
+            </div>
+            <div class="slider-container">
+                <input type="range" id="angleInput" min="0" max="85" value="30" step="1">
+                <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 0.8em; color: #aaa;">
+                    <span>0°</span>
+                    <span>85°</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-card">
+            <div class="card-header">
+                <span class="card-title"><i class="fas fa-palette"></i> لون الشعاع الليزري</span>
+            </div>
+            <div class="color-btns">
+                <div class="color-btn active" style="background: #ff0000;" data-color="#ff0000">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="color-btn" style="background: #00ff00;" data-color="#00ff00">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="color-btn" style="background: #00bfff;" data-color="#00bfff">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="color-btn" style="background: #ffff00;" data-color="#ffff00">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="color-btn" style="background: #ff00ff;" data-color="#ff00ff">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="color-btn" style="background: #ffffff;" data-color="#ffffff">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="color-btn" style="background: #ff9900;" data-color="#ff9900">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="color-btn" style="background: #9c27b0;" data-color="#9c27b0">
+                    <i class="fas fa-check"></i>
+                </div>
+            </div>
+            
+            <div class="action-btns">
+                <button class="btn btn-secondary" id="resetBtn">
+                    <i class="fas fa-redo"></i> إعادة تعيين
+                </button>
+                <button class="btn btn-primary" id="toggleGrid">
+                    <i class="fas fa-th"></i> تبديل الشبكة
+                </button>
+            </div>
+        </div>
+
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-right"></i> العودة للقائمة الرئيسية
+        </a>
+    </div>
+
+    <!-- منطقة المحاكاة الرئيسية -->
+    <div class="main-content">
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
+            
+            <!-- بانر التحذير من الانعكاس الكلي الداخلي -->
+            <div class="warning-banner" id="tirWarning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>ظاهرة الانعكاس الكلي الداخلي</h3>
+                <p>زاوية السقوط أكبر من الزاوية الحرجة<br>جميع الأشعة تنعكس داخلياً</p>
+            </div>
+        </div>
+        
+        <!-- لوحة المعلومات التعليمية -->
+        <div class="info-panel">
+            <h3><i class="fas fa-lightbulb"></i> معلومة فيزيائية</h3>
+            <p>الانكسار: تغير اتجاه الشعاع الضوئي عند عبوره السطح الفاصل بين وسطين شفافين مختلفين في الكثافة الضوئية.</p>
+            <p>قانون سنل: n₁sin(θ₁) = n₂sin(θ₂)</p>
+        </div>
+        
+        <!-- لوحة الصيغة الرياضية -->
+        <div class="law-panel">
+            <h3><i class="fas fa-calculator"></i> قانون سنل للانكسار</h3>
+            <div class="law-formula">n₁ × sin(θ₁) = n₂ × sin(θ₂)</div>
+            <p>حيث n هو معامل الانكسار و θ هي الزاوية مقاسة من العمودي</p>
+        </div>
+        
+        <!-- لوحة البيانات الحسابية -->
+        <div class="data-panel">
+            <h3><i class="fas fa-chart-line"></i> البيانات الحسابية</h3>
+            <div class="data-row">
+                <span class="data-label">زاوية السقوط (θ₁):</span>
+                <span class="data-value" id="calcAngleInc">30°</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">زاوية الانكسار (θ₂):</span>
+                <span class="data-value" id="calcAngleRef">22.08°</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">الزاوية الحرجة:</span>
+                <span class="data-value" id="calcCriticalAngle">48.75°</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">نسبة الانكسار:</span>
+                <span class="data-value" id="calcRefRatio">1.33</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">حالة الانكسار:</span>
+                <span class="data-value" id="calcRefStatus">انكسار عادي</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // العناصر الأساسية
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const angleInput = document.getElementById('angleInput');
+        const angleVal = document.getElementById('angleVal');
+        
+        // إعدادات المحاكاة
+        let n1 = 1.00;
+        let n2 = 1.33;
+        let laserColor = "#ff0000";
+        let showGrid = true;
+        let medium1Name = "الهواء";
+        let medium2Name = "الماء";
+        
+        // متغيرات حسابية
+        let criticalAngle = 0;
+        let isTotalInternalReflection = false;
+        
+        // أبعاد الـcanvas
+        canvas.width = 1000;
+        canvas.height = 700;
+        const interfaceY = canvas.height / 2;
+        const centerX = canvas.width / 2;
+        
+        // العناصر المتحكمة
+        const m1Chips = document.querySelectorAll('#m1-chips .chip');
+        const m2Chips = document.querySelectorAll('#m2-chips .chip');
+        const colorBtns = document.querySelectorAll('.color-btn');
+        const resetBtn = document.getElementById('resetBtn');
+        const toggleGridBtn = document.getElementById('toggleGrid');
+        const n1Display = document.getElementById('n1Display');
+        const n2Display = document.getElementById('n2Display');
+        const tirWarning = document.getElementById('tirWarning');
+        
+        // عناصر البيانات الحسابية
+        const calcAngleInc = document.getElementById('calcAngleInc');
+        const calcAngleRef = document.getElementById('calcAngleRef');
+        const calcCriticalAngle = document.getElementById('calcCriticalAngle');
+        const calcRefRatio = document.getElementById('calcRefRatio');
+        const calcRefStatus = document.getElementById('calcRefStatus');
+        
+        // معلومات الوسائط
+        const mediaInfo = {
+            "1.00": { name: "الهواء", color: "rgba(135, 206, 250, 0.1)", icon: "fa-wind" },
+            "1.31": { name: "الثلج", color: "rgba(240, 248, 255, 0.15)", icon: "fa-snowflake" },
+            "1.33": { name: "الماء", color: "rgba(30, 144, 255, 0.15)", icon: "fa-tint" },
+            "1.36": { name: "الكحول", color: "rgba(255, 215, 0, 0.1)", icon: "fa-flask" },
+            "1.46": { name: "الكوارتز", color: "rgba(192, 192, 192, 0.15)", icon: "fa-mountain" },
+            "1.52": { name: "الزجاج", color: "rgba(169, 169, 169, 0.15)", icon: "fa-glass-whiskey" },
+            "1.62": { name: "الزفير", color: "rgba(0, 0, 139, 0.15)", icon: "fa-gem" },
+            "2.42": { name: "الماس", color: "rgba(185, 242, 255, 0.15)", icon: "fa-gem" }
+        };
+        
+        // إعداد الأحداث
+        function setupEventListeners() {
+            // حدث تغيير زاوية السقوط
+            angleInput.addEventListener('input', updateAngle);
+            
+            // أحداث شرائح الوسط الأول
+            m1Chips.forEach(chip => {
+                chip.addEventListener('click', () => {
+                    m1Chips.forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    n1 = parseFloat(chip.getAttribute('data-n'));
+                    medium1Name = chip.getAttribute('data-name');
+                    n1Display.textContent = `n₁ = ${n1.toFixed(2)}`;
+                    calculateCriticalAngle();
+                });
+            });
+            
+            // أحداث شرائح الوسط الثاني
+            m2Chips.forEach(chip => {
+                chip.addEventListener('click', () => {
+                    m2Chips.forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    n2 = parseFloat(chip.getAttribute('data-n'));
+                    medium2Name = chip.getAttribute('data-name');
+                    n2Display.textContent = `n₂ = ${n2.toFixed(2)}`;
+                    calculateCriticalAngle();
+                });
+            });
+            
+            // أحداث أزرار الألوان
+            colorBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    colorBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    laserColor = btn.getAttribute('data-color');
+                });
+            });
+            
+            // حدث إعادة التعيين
+            resetBtn.addEventListener('click', resetSimulation);
+            
+            // حدث تبديل الشبكة
+            toggleGridBtn.addEventListener('click', () => {
+                showGrid = !showGrid;
+                toggleGridBtn.innerHTML = showGrid ? 
+                    '<i class="fas fa-th"></i> إخفاء الشبكة' : 
+                    '<i class="fas fa-th"></i> إظهار الشبكة';
+            });
+        }
+        
+        // تحديث الزاوية
+        function updateAngle() {
+            angleVal.textContent = `${angleInput.value}°`;
+        }
+        
+        // حساب الزاوية الحرجة
+        function calculateCriticalAngle() {
+            if (n1 > n2) {
+                criticalAngle = Math.asin(n2 / n1) * (180 / Math.PI);
+                criticalAngle = Math.round(criticalAngle * 100) / 100;
+            } else {
+                criticalAngle = 90; // لا يوجد انعكاس كلي داخلي عندما n1 <= n2
+            }
+            calcCriticalAngle.textContent = `${criticalAngle}°`;
+        }
+        
+        // إعادة تعيين المحاكاة
+        function resetSimulation() {
+            angleInput.value = 30;
+            updateAngle();
+            
+            // إعادة تعيين الوسط الأول إلى الهواء
+            m1Chips.forEach(chip => {
+                chip.classList.remove('active');
+                if (chip.getAttribute('data-n') === "1.00") {
+                    chip.classList.add('active');
+                    n1 = 1.00;
+                    medium1Name = "الهواء";
+                    n1Display.textContent = "n₁ = 1.00";
+                }
+            });
+            
+            // إعادة تعيين الوسط الثاني إلى الماء
+            m2Chips.forEach(chip => {
+                chip.classList.remove('active');
+                if (chip.getAttribute('data-n') === "1.33") {
+                    chip.classList.add('active');
+                    n2 = 1.33;
+                    medium2Name = "الماء";
+                    n2Display.textContent = "n₂ = 1.33";
+                }
+            });
+            
+            // إعادة تعيين اللون إلى الأحمر
+            colorBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-color') === "#ff0000") {
+                    btn.classList.add('active');
+                    laserColor = "#ff0000";
+                }
+            });
+            
+            // إعادة تعيين الشبكة
+            showGrid = true;
+            toggleGridBtn.innerHTML = '<i class="fas fa-th"></i> إخفاء الشبكة';
+            
+            calculateCriticalAngle();
+        }
+        
+        // رسم الشبكة المرجعية
+        function drawGrid() {
+            if (!showGrid) return;
+            
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
+            ctx.lineWidth = 1;
+            
+            // خطوط أفقية
+            for (let y = 50; y < canvas.height; y += 50) {
+                ctx.beginPath();
+                ctx.moveTo(50, y);
+                ctx.lineTo(canvas.width - 50, y);
+                ctx.stroke();
+            }
+            
+            // خطوط رأسية
+            for (let x = 50; x < canvas.width; x += 50) {
+                ctx.beginPath();
+                ctx.moveTo(x, 50);
+                ctx.lineTo(x, canvas.height - 50);
+                ctx.stroke();
+            }
+        }
+        
+        // رسم الوسائط
+        function drawMedia() {
+            // الوسط العلوي
+            const medium1Color = mediaInfo[n1.toFixed(2)]?.color || "rgba(135, 206, 250, 0.1)";
+            ctx.fillStyle = medium1Color;
+            ctx.fillRect(0, 0, canvas.width, interfaceY);
+            
+            // الوسط السفلي
+            const medium2Color = mediaInfo[n2.toFixed(2)]?.color || "rgba(30, 144, 255, 0.15)";
+            ctx.fillStyle = medium2Color;
+            ctx.fillRect(0, interfaceY, canvas.width, canvas.height - interfaceY);
+            
+            // السطح الفاصل
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(50, interfaceY);
+            ctx.lineTo(canvas.width - 50, interfaceY);
+            ctx.stroke();
+            
+            // تسمية السطح الفاصل
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+            ctx.font = "bold 16px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("السطح الفاصل", canvas.width / 2, interfaceY - 15);
+            
+            // تسمية الوسائط
+            ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+            ctx.font = "bold 14px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(`الوسط العلوي: ${medium1Name}`, canvas.width / 2, 40);
+            ctx.fillText(`الوسط السفلي: ${medium2Name}`, canvas.width / 2, canvas.height - 30);
+        }
+        
+        // رسم الخط العمودي
+        function drawNormalLine() {
+            ctx.setLineDash([10, 8]);
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(centerX, 100);
+            ctx.lineTo(centerX, canvas.height - 100);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // تسمية الخط العمودي
+            ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+            ctx.font = "bold 15px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("الخط العمودي", centerX, 80);
+        }
+        
+        // رسم الشعاع الليزري
+        function drawLaserBeam() {
+            const angleDeg = parseInt(angleInput.value);
+            const angleRad = (angleDeg * Math.PI) / 180;
+            const beamLength = 400;
+            
+            // حساب نقطة انطلاق الشعاع
+            const sourceX = centerX - Math.sin(angleRad) * beamLength;
+            const sourceY = interfaceY - Math.cos(angleRad) * beamLength;
+            
+            // حساب زاوية الانكسار باستخدام قانون سنل
+            const sinTheta2 = (n1 * Math.sin(angleRad)) / n2;
+            let refractionAngleRad = 0;
+            isTotalInternalReflection = false;
+            
+            // التحقق من ظاهرة الانعكاس الكلي الداخلي
+            if (n1 > n2 && Math.sin(angleRad) > n2 / n1) {
+                isTotalInternalReflection = true;
+                refractionAngleRad = angleRad; // زاوية الانعكاس تساوي زاوية السقوط
+            } else {
+                refractionAngleRad = Math.asin(sinTheta2);
+            }
+            
+            // تحديث البيانات الحسابية
+            updateCalculations(angleDeg, refractionAngleRad);
+            
+            // رسم الشعاع الساقط
+            ctx.strokeStyle = laserColor;
+            ctx.lineWidth = 6;
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = laserColor;
+            ctx.beginPath();
+            ctx.moveTo(sourceX, sourceY);
+            ctx.lineTo(centerX, interfaceY);
+            ctx.stroke();
+            
+            // رسم الشعاع المنكسر أو المنعكس
+            if (isTotalInternalReflection) {
+                // رسم الشعاع المنعكس (الانعكاس الكلي الداخلي)
+                ctx.beginPath();
+                ctx.moveTo(centerX, interfaceY);
+                ctx.lineTo(
+                    centerX + Math.sin(angleRad) * beamLength,
+                    interfaceY - Math.cos(angleRad) * beamLength
+                );
+                ctx.stroke();
+                
+                // إظهار تحذير الانعكاس الكلي الداخلي
+                tirWarning.style.display = 'block';
+                calcRefStatus.textContent = "انعكاس كلي داخلي";
+            } else {
+                // رسم الشعاع المنكسر
+                ctx.beginPath();
+                ctx.moveTo(centerX, interfaceY);
+                ctx.lineTo(
+                    centerX + Math.sin(refractionAngleRad) * beamLength,
+                    interfaceY + Math.cos(refractionAngleRad) * beamLength
+                );
+                ctx.stroke();
+                
+                // إخفاء تحذير الانعكاس الكلي الداخلي
+                tirWarning.style.display = 'none';
+                calcRefStatus.textContent = "انكسار عادي";
+            }
+            
+            ctx.shadowBlur = 0;
+            
+            // رسم نقطة السقوط
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.arc(centerX, interfaceY, 10, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // رسم بندقية الليزر
+            drawLaserGun(sourceX, sourceY, angleRad);
+            
+            // رسم الزوايا (مع القيم العددية)
+            drawAngles(angleRad, refractionAngleRad);
+        }
+        
+        // تحديث الحسابات
+        function updateCalculations(angleDeg, refractionAngleRad) {
+            calcAngleInc.textContent = `${angleDeg}°`;
+            
+            if (isTotalInternalReflection) {
+                calcAngleRef.textContent = `${angleDeg}°`;
+            } else {
+                const refractionAngleDeg = Math.round(refractionAngleRad * (180 / Math.PI) * 100) / 100;
+                calcAngleRef.textContent = `${refractionAngleDeg}°`;
+            }
+            
+            calcRefRatio.textContent = (n2 / n1).toFixed(2);
+        }
+        
+        // رسم بندقية الليزر
+        function drawLaserGun(x, y, angleRad) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angleRad + Math.PI / 2);
+            
+            // جسم البندقية
+            ctx.fillStyle = '#222';
+            ctx.beginPath();
+            ctx.roundRect = ctx.roundRect || function(x, y, w, h, r) {
+                if (w < 2 * r) r = w / 2;
+                if (h < 2 * r) r = h / 2;
+                this.beginPath();
+                this.moveTo(x + r, y);
+                this.arcTo(x + w, y, x + w, y + h, r);
+                this.arcTo(x + w, y + h, x, y + h, r);
+                this.arcTo(x, y + h, x, y, r);
+                this.arcTo(x, y, x + w, y, r);
+                this.closePath();
+            };
+            
+            ctx.roundRect(-18, -60, 36, 70, 8);
+            ctx.fill();
+            
+            // أنبوب الليزر
+            ctx.fillStyle = '#444';
+            ctx.fillRect(-22, 0, 44, 15);
+            
+            // عدسة الليزر
+            const gradient = ctx.createRadialGradient(0, 20, 0, 0, 20, 12);
+            gradient.addColorStop(0, laserColor);
+            gradient.addColorStop(1, "transparent");
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(0, 20, 12, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.restore();
+        }
+        
+        // رسم الزوايا مع القيم العددية
+        function drawAngles(incidentAngleRad, refractionAngleRad) {
+            const radius = 80;
+            
+            // زاوية السقوط
+            ctx.strokeStyle = "#FFD700";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(centerX, interfaceY, radius, -incidentAngleRad, 0);
+            ctx.stroke();
+            
+            // كتابة رمز الزاوية وقيمتها العددية
+            ctx.fillStyle = "#FFD700";
+            ctx.font = "bold 16px Arial";
+            ctx.textAlign = "center";
+            
+            // زاوية السقوط بالدرجات (نأخذها من input)
+            const incidentAngleDeg = parseInt(angleInput.value);
+            
+            // موقع النص: أبعد قليلاً عن القوس
+            ctx.fillText(`θ₁ = ${incidentAngleDeg}°`, 
+                centerX + Math.cos(incidentAngleRad/2) * (radius + 40), 
+                interfaceY - Math.sin(incidentAngleRad/2) * (radius + 30)
+            );
+            
+            // زاوية الانكسار أو الانعكاس
+            if (isTotalInternalReflection) {
+                // زاوية الانعكاس (تساوي زاوية السقوط)
+                ctx.beginPath();
+                ctx.arc(centerX, interfaceY, radius, Math.PI, Math.PI + incidentAngleRad);
+                ctx.stroke();
+                
+                ctx.fillText(`θᵣ = ${incidentAngleDeg}°`, 
+                    centerX + Math.cos(Math.PI + incidentAngleRad/2) * (radius + 40), 
+                    interfaceY - Math.sin(incidentAngleRad/2) * (radius + 30)
+                );
+            } else {
+                // زاوية الانكسار
+                ctx.beginPath();
+                ctx.arc(centerX, interfaceY, radius, Math.PI, Math.PI + refractionAngleRad);
+                ctx.stroke();
+                
+                const refractionAngleDeg = Math.round(refractionAngleRad * (180 / Math.PI));
+                ctx.fillText(`θ₂ = ${refractionAngleDeg}°`, 
+                    centerX + Math.cos(Math.PI + refractionAngleRad/2) * (radius + 40), 
+                    interfaceY + Math.sin(refractionAngleRad/2) * (radius + 30)
+                );
+            }
+        }
+        
+        // دورة الرسم الرئيسية
+        function draw() {
+            // مسح الـcanvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // رسم المكونات
+            drawGrid();
+            drawMedia();
+            drawNormalLine();
+            drawLaserBeam();
+            
+            // استدعاء الرسم في الإطار التالي
+            requestAnimationFrame(draw);
+        }
+        
+        // تهيئة المحاكاة
+        function initSimulation() {
+            setupEventListeners();
+            calculateCriticalAngle();
+            updateAngle();
+            draw();
+        }
+        
+        // بدء المحاكاة عند تحميل الصفحة
+        window.addEventListener('load', initSimulation);
+    </script>
+</body>
+</html>

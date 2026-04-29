@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معمل الفيزياء التفاعلي | المرحلة الثانوية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0f172a;
+            --primary-dark: #020617;
+            --secondary: #3b82f6;
+            --accent: #f59e0b;
+            --accent-light: #fbbf24;
+            --glass: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(15, 23, 42, 0.85);
+            --text-light: #f1f5f9;
+            --text-muted: #94a3b8;
+            --shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.4);
+            --transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: radial-gradient(ellipse at 30% 40%, #0a0f1e, #030614);
+            color: var(--text-light);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(59,130,246,0.15), transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(245,158,11,0.1), transparent 60%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            background: rgba(8, 12, 24, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo i {
+            color: var(--accent);
+            font-size: 1.8rem;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 600;
+            transition: 0.2s;
+            font-size: 1rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .mobile-menu {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+        }
+
+        /* hero */
+        .hero {
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin-top: 80px;
+            position: relative;
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, var(--accent-light), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .hero-content p {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .btn-hero {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(90deg, var(--secondary), #2563eb);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            margin-top: 2rem;
+            transition: 0.2s;
+        }
+
+        .btn-hero:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px -10px rgba(59,130,246,0.5);
+            gap: 16px;
+        }
+
+        /* section */
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            position: relative;
+            display: inline-block;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            right: 0;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            border-radius: 4px;
+        }
+
+        /* year cards grid */
+        .year-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .year-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 2rem;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .year-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .year-card:hover {
+            transform: translateY(-12px);
+            border-color: rgba(59,130,246,0.4);
+            box-shadow: var(--shadow);
+        }
+        .year-card:hover::before {
+            opacity: 1;
+        }
+
+        .year-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .year-card h3 {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .year-card p {
+            color: var(--text-muted);
+            margin-bottom: 1.8rem;
+        }
+
+        .btn-year {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(59,130,246,0.2);
+            color: white;
+            padding: 0.7rem 1.8rem;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.2s;
+            border: 1px solid rgba(59,130,246,0.3);
+        }
+
+        .btn-year:hover {
+            background: var(--secondary);
+            gap: 14px;
+            border-color: transparent;
+        }
+
+        /* footer */
+        footer {
+            margin-top: 5rem;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid var(--glass-border);
+            padding: 2.5rem 0;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .footer-links a:hover { color: var(--accent); }
+
+        .copyright {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--glass-border);
+            color: var(--text-muted);
+        }
+
+        /* progress bar */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            z-index: 1001;
+        }
+        .progress-bar {
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            width: 0%;
+            transition: width 0.2s;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .mobile-menu { display: block; }
+            .hero-content h1 { font-size: 2.5rem; }
+            .section-title { font-size: 1.8rem; }
+            .container { padding: 0 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<nav class="navbar">
+    <div class="navbar-container container">
+        <a href="#" class="logo">
+            <i class="fas fa-atom"></i> معمل الفيزياء
+        </a>
+        <ul class="nav-links">
+            <li><a href="#">الرئيسية</a></li>
+            <li><a href="#year-selection">اختيار الصف</a></li>
+            <li><a href="#about">حول</a></li>
+            <li><a href="#contact">اتصل بنا</a></li>
+        </ul>
+        <div class="mobile-menu">
+            <i class="fas fa-bars"></i>
+        </div>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1>✨ مختبر الفيزياء الافتراضي ✨</h1>
+            <p>تجارب تفاعلية ثلاثية الأبعاد لطلاب المرحلة الثانوية. تعلم الكهرباء، المغناطيسية، الضوء والموائع بطريقة عملية وشيقة.</p>
+            <a href="#year-selection" class="btn-hero">استكشف التجارب <i class="fas fa-arrow-left"></i></a>
+        </div>
+    </div>
+</section>
+
+<section id="year-selection" style="padding: 3rem 0;">
+    <div class="container">
+        <h2 class="section-title">📚 اختر صفك الدراسي</h2>
+        <div class="year-cards">
+            <!-- الصف الثاني -->
+            <div class="year-card">
+                <div class="year-icon"><i class="fas fa-bolt"></i></div>
+                <h3>الصف الثاني الثانوي</h3>
+                <p>تجارب متوسطة: الدوائر الكهربائية، الضغط في السوائل، الغازات، انعكاس وانكسار الضوء.</p>
+                <a href="2nd.html" class="btn-year">التجارب <i class="fas fa-arrow-left"></i></a>
+            </div>
+            <!-- الصف الثالث -->
+            <div class="year-card">
+                <div class="year-icon"><i class="fas fa-atom"></i></div>
+                <h3>الصف الثالث الثانوي</h3>
+                <p>فيزياء متقدمة: الحث الكهرومغناطيسي، التداخل، الحيود، النظريات الحديثة.</p>
+                <a href="3rd.html" class="btn-year">التجارب <i class="fas fa-arrow-left"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="about" style="padding: 2rem 0 4rem;">
+    <div class="container">
+        <div style="background: var(--card-bg); backdrop-filter: blur(12px); border-radius: 32px; padding: 2.5rem; border: 1px solid var(--glass-border);">
+            <h2 style="color: var(--accent); margin-bottom: 1.5rem;">🧪 عن معمل الفيزياء</h2>
+            <p style="font-size: 1.1rem; color: var(--text-light); margin-bottom: 1rem;">
+                منصة تعليمية تفاعلية تهدف إلى تحويل المفاهيم الفيزيائية المجردة إلى تجارب رقمية حية. جميع المحاكيات مصممة لتتماشى مع المناهج المصرية والعربية، وتسمح للطلاب بتغيير المتغيرات ورصد النتائج في الوقت الفعلي.
+            </p>
+            <p style="color: var(--text-muted);">
+                ✓ متوافق مع الأجهزة اللوحية والهواتف  ✓ واجهات عربية سهلة  ✓ محاكاة دقيقة للقوانين.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section id="contact" style="padding: 2rem 0 4rem;">
+    <div class="container">
+        <div style="background: var(--card-bg); backdrop-filter: blur(12px); border-radius: 32px; padding: 2rem; border: 1px solid var(--glass-border); text-align: center;">
+            <h2 style="margin-bottom: 1rem;">📞 تواصل معنا</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">لديك استفسار أو اقتراح؟ يمكنك مراسلتنا عبر البريد الإلكتروني</p>
+            <a href="mailto:info@physicslab.com" style="color: var(--accent); font-size: 1.2rem; text-decoration: none;">info@physicslab.com</a>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <div class="footer-container">
+            <div>
+                <h3 style="margin-bottom: 12px;">معمل الفيزياء</h3>
+                <p style="color:var(--text-muted)">تجارب محاكاة ثلاثية الأبعاد للمناهج المصرية والعربية.</p>
+            </div>
+            <div>
+                <h4>روابط سريعة</h4>
+                <ul class="footer-links">
+                    <li><a href="#">الرئيسية</a></li>
+                    <li><a href="#year-selection">اختيار الصف</a></li>
+                    <li><a href="2nd.html">تجارب الصف الثاني</a></li>
+                    <li><a href="3rd.html">تجارب الصف الثالث</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>© 2025 معمل الفيزياء – جميع الحقوق محفوظة</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // scroll progress bar
+    window.addEventListener('scroll', () => {
+        const winScroll = document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - window.innerHeight;
+        const scrolled = (winScroll / height) * 100;
+        document.getElementById('progressBar').style.width = scrolled + '%';
+    });
+
+    // mobile menu toggle
+    const mobileBtn = document.querySelector('.mobile-menu');
+    const navLinks = document.querySelector('.nav-links');
+    mobileBtn.addEventListener('click', () => {
+        if (navLinks.style.display === 'flex') navLinks.style.display = 'none';
+        else navLinks.style.display = 'flex';
+    });
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) navLinks.style.display = 'flex';
+        else navLinks.style.display = 'none';
+    });
+    // initial state on small screens
+    if (window.innerWidth <= 768) navLinks.style.display = 'none';
+</script>
+</body>
+</html>
