@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>معمل الانعكاس - محاكاة فيزيائية</title>
+    <title>معمل الانعكاس - قوسا الزاوية الصحيحان</title>
     <style>
         body { 
             margin: 0; 
@@ -14,7 +14,6 @@
             overflow: hidden;
         }
         
-        /* لوحة التحكم الجانبية */
         .sidebar {
             width: 320px;
             background: rgba(20, 20, 30, 0.95);
@@ -226,6 +225,13 @@
         .btn-grid:hover {
             background: rgba(0, 191, 255, 0.3);
         }
+
+        .warning {
+            color: #FF6347;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -233,16 +239,16 @@
     <div class="sidebar">
         <div>
             <h1>✨ محاكاة الانعكاس الضوئي</h1>
-            <p class="description">محاكاة تفاعلية لقانون الانعكاس في الفيزياء</p>
+            <p class="description">قوسا الزاوية الصغيران بين الشعاعين والعمود المقام</p>
         </div>
         
         <div class="control-group">
-            <span class="label-text">زاوية السقوط (θi):</span>
+            <span class="label-text">زاوية السقوط (θᵢ) - حتى 90°:</span>
             <div class="angle-display">
                 <span>درجة</span>
                 <span class="angle-value" id="angleVal">45°</span>
             </div>
-            <input type="range" id="angleInput" min="5" max="85" value="45">
+            <input type="range" id="angleInput" min="1" max="90" value="45">
         </div>
 
         <div class="control-group">
@@ -262,7 +268,8 @@
             </div>
         </div>
 
-        <a href="index2.html" class="back-btn">← العودة للقائمة الرئيسية</a>
+        <a href="#" class="back-btn">← العودة للقائمة الرئيسية</a>
+        <div id="warningMsg" class="warning"></div>
     </div>
 
     <div class="main-content">
@@ -271,8 +278,9 @@
             
             <div class="info-panel">
                 <h3>📌 قانون الانعكاس</h3>
-                <p>زاوية السقوط (θi) = زاوية الانعكاس (θr)</p>
+                <p>زاوية السقوط (θᵢ) = زاوية الانعكاس (θᵣ)</p>
                 <p>الشعاع الساقط والشعاع المنعكس والخط العمودي يقعون في نفس المستوى</p>
+                <p id="statusMsg" style="color: #FFD700; margin-top: 5px;"></p>
             </div>
             
             <div class="law-display">
@@ -290,10 +298,13 @@
         const angleVal = document.getElementById('angleVal');
         const resetBtn = document.getElementById('resetBtn');
         const toggleGridBtn = document.getElementById('toggleGrid');
+        const warningMsgDiv = document.getElementById('warningMsg');
+        const statusMsgSpan = document.getElementById('statusMsg');
         
         // المتغيرات
         let laserColor = "#ff0000";
         let showGrid = true;
+        let currentAngleDeg = 45;
         
         // ضبط أبعاد الـcanvas
         canvas.width = 900;
@@ -304,41 +315,62 @@
         // إعداد أحداث الأزرار
         document.querySelectorAll('.color-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                // إزالة النشط من جميع الأزرار
-                document.querySelectorAll('.color-btn').forEach(b => {
-                    b.classList.remove('active');
-                });
-                // إضافة النشط للزر المضغوط
+                document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 laserColor = this.getAttribute('data-color');
+                draw();
             });
         });
         
-        // حدث إعادة التعيين
+        // إعادة التعيين
         resetBtn.addEventListener('click', function() {
             angleInput.value = 45;
+            currentAngleDeg = 45;
             angleVal.textContent = "45°";
             laserColor = "#ff0000";
-            
-            // إعادة ألوان الأزرار
             document.querySelectorAll('.color-btn').forEach(btn => {
                 btn.classList.remove('active');
-                if (btn.getAttribute('data-color') === "#ff0000") {
-                    btn.classList.add('active');
-                }
+                if (btn.getAttribute('data-color') === "#ff0000") btn.classList.add('active');
             });
+            warningMsgDiv.textContent = "";
+            draw();
         });
         
-        // حدث تبديل الشبكة
+        // تبديل الشبكة
         toggleGridBtn.addEventListener('click', function() {
             showGrid = !showGrid;
             this.textContent = showGrid ? "بدون شبكة" : "عرض الشبكة";
+            draw();
         });
         
-        // تحديث قيمة الزاوية
+        // تغيير الزاوية
         angleInput.addEventListener('input', function() {
-            angleVal.textContent = this.value + "°";
+            currentAngleDeg = parseInt(this.value);
+            angleVal.textContent = currentAngleDeg + "°";
+            
+            if (currentAngleDeg === 90) {
+                warningMsgDiv.textContent = "⚠️ عند زاوية 90° لا يحدث انعكاس (الشعاع موازٍ للسطح)";
+                statusMsgSpan.textContent = "لا انعكاس - زاوية 90°";
+            } else {
+                warningMsgDiv.textContent = "";
+                statusMsgSpan.textContent = `زاوية السقوط = زاوية الانعكاس = ${currentAngleDeg}°`;
+            }
+            draw();
         });
+        
+        // دالة مساعدة لرسم مستطيل مدور
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+                if (w < 2 * r) r = w / 2;
+                if (h < 2 * r) r = h / 2;
+                this.moveTo(x + r, y);
+                this.arcTo(x + w, y, x + w, y + h, r);
+                this.arcTo(x + w, y + h, x, y + h, r);
+                this.arcTo(x, y + h, x, y, r);
+                this.arcTo(x, y, x + w, y, r);
+                return this;
+            };
+        }
         
         // رسم بندقية الليزر
         function drawLaserGun(x, y, angleRad) {
@@ -346,30 +378,14 @@
             ctx.translate(x, y);
             ctx.rotate(angleRad + Math.PI/2);
             
-            // جسم البندقية
             ctx.fillStyle = '#333';
             ctx.beginPath();
-            // الرسم باستخدام خطوط وأقواس بدلاً من roundRect غير المدعم
-            ctx.roundRect = ctx.roundRect || function(x, y, w, h, r) {
-                if (w < 2 * r) r = w / 2;
-                if (h < 2 * r) r = h / 2;
-                this.beginPath();
-                this.moveTo(x + r, y);
-                this.arcTo(x + w, y, x + w, y + h, r);
-                this.arcTo(x + w, y + h, x, y + h, r);
-                this.arcTo(x, y + h, x, y, r);
-                this.arcTo(x, y, x + w, y, r);
-                this.closePath();
-            };
-            
             ctx.roundRect(-15, -50, 30, 60, 5);
             ctx.fill();
             
-            // أنبوب الليزر
             ctx.fillStyle = '#555';
             ctx.fillRect(-18, 0, 36, 12);
             
-            // عدسة الليزر
             ctx.fillStyle = laserColor;
             ctx.shadowBlur = 15;
             ctx.shadowColor = laserColor;
@@ -382,19 +398,14 @@
         // رسم الشبكة
         function drawGrid() {
             if (!showGrid) return;
-            
             ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
             ctx.lineWidth = 1;
-            
-            // خطوط أفقية
             for (let y = 50; y < canvas.height; y += 50) {
                 ctx.beginPath();
                 ctx.moveTo(50, y);
                 ctx.lineTo(canvas.width - 50, y);
                 ctx.stroke();
             }
-            
-            // خطوط رأسية
             for (let x = 50; x < canvas.width; x += 50) {
                 ctx.beginPath();
                 ctx.moveTo(x, 50);
@@ -403,23 +414,52 @@
             }
         }
         
+        /**
+         * رسم قوس صغير بين زاويتين (أقل من 180 درجة) بدون أي نقاط إضافية
+         * @param {number} cx - مركز القوس (نقطة السقوط)
+         * @param {number} cy - مركز القوس
+         * @param {number} radius - نصف قطر القوس (صغير)
+         * @param {number} startAngle - زاوية البداية (راديان)
+         * @param {number} endAngle - زاوية النهاية (راديان)
+         * @param {string} color - لون القوس
+         */
+        function drawSmallCleanArc(cx, cy, radius, startAngle, endAngle, color) {
+            if (Math.abs(startAngle - endAngle) < 0.001) return;
+            
+            // التأكد من أن القوس المرسوم هو الأصغر (أقل من 180 درجة)
+            let diff = endAngle - startAngle;
+            // جعل الفرق في المدى [-PI, PI]
+            while (diff > Math.PI) diff -= 2 * Math.PI;
+            while (diff < -Math.PI) diff += 2 * Math.PI;
+            
+            let anticlockwise = false;
+            let actualStart = startAngle;
+            let actualEnd = endAngle;
+            
+            // إذا كان الفرق سالبًا (أي أن endAngle أصغر من startAngle)
+            if (diff < 0) {
+                // نرسم عكس عقارب الساعة (anticlockwise) للقوس الصغير
+                anticlockwise = true;
+                actualStart = endAngle;
+                actualEnd = startAngle;
+                diff = -diff;
+            }
+            // الآن diff موجب وأقل من أو يساوي PI (لأننا قمنا بتعديله)
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, actualStart, actualEnd, anticlockwise);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+        }
+        
         // الرسم الرئيسي
         function draw() {
-            // مسح الـcanvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // رسم الخلفية
             ctx.fillStyle = "#0d0d0d";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // رسم الشبكة
             drawGrid();
             
-            // الحصول على الزاوية
-            const angleDeg = parseInt(angleInput.value);
-            const angleRad = (angleDeg * Math.PI) / 180;
-            
-            // رسم السطح العاكس
+            // السطح العاكس
             ctx.strokeStyle = "#B0C4DE";
             ctx.lineWidth = 8;
             ctx.lineCap = "round";
@@ -428,9 +468,9 @@
             ctx.lineTo(canvas.width - 50, surfaceY);
             ctx.stroke();
             
-            // رسم الخط العمودي
+            // الخط العمودي (normal)
             ctx.setLineDash([10, 8]);
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(centerX, surfaceY);
@@ -438,10 +478,32 @@
             ctx.stroke();
             ctx.setLineDash([]);
             
-            // حساب طول الشعاع ونقطة انطلاقه
+            // نقطة السقوط
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.arc(centerX, surfaceY, 8, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            const angleDeg = currentAngleDeg;
+            const angleRad = (angleDeg * Math.PI) / 180;
+            
+            // إذا كانت الزاوية 90 درجة، لا نرسم أشعة ولا أقواس
+            if (angleDeg === 90) {
+                ctx.fillStyle = "white";
+                ctx.font = "bold 20px 'Segoe UI'";
+                ctx.fillStyle = "#FF6347";
+                ctx.fillText("⚠️ لا انعكاس عند 90°", centerX - 120, surfaceY - 50);
+                return;
+            }
+            
+            // --- الرسم الطبيعي للزوايا أقل من 90 ---
             const rayLength = 350;
+            // الشعاع الساقط: من نقطة المصدر إلى نقطة السقوط
             const sourceX = centerX - Math.sin(angleRad) * rayLength;
             const sourceY = surfaceY - Math.cos(angleRad) * rayLength;
+            // الشعاع المنعكس: من نقطة السقوط إلى الخارج
+            const reflectedX = centerX + Math.sin(angleRad) * rayLength;
+            const reflectedY = surfaceY - Math.cos(angleRad) * rayLength;
             
             // رسم الشعاع الساقط
             ctx.strokeStyle = laserColor;
@@ -456,53 +518,87 @@
             // رسم الشعاع المنعكس
             ctx.beginPath();
             ctx.moveTo(centerX, surfaceY);
-            ctx.lineTo(centerX + Math.sin(angleRad) * rayLength, surfaceY - Math.cos(angleRad) * rayLength);
+            ctx.lineTo(reflectedX, reflectedY);
             ctx.stroke();
-            
-            // إزالة الظل
             ctx.shadowBlur = 0;
             
-            // رسم بندقية الليزر
+            // بندقية الليزر
             drawLaserGun(sourceX, sourceY, angleRad);
             
-            // رسم النقاط
+            // نقطة مصدر الليزر
             ctx.fillStyle = laserColor;
             ctx.beginPath();
-            ctx.arc(sourceX, sourceY, 8, 0, Math.PI * 2);
+            ctx.arc(sourceX, sourceY, 8, 0, 2 * Math.PI);
             ctx.fill();
             
-            ctx.fillStyle = "white";
-            ctx.beginPath();
-            ctx.arc(centerX, surfaceY, 10, 0, Math.PI * 2);
-            ctx.fill();
+            // ========== رسم القوسين الصغيرين (بدون دائرة كبيرة) ==========
+            // تعريف الزوايا (جميعها بالنسبة لنقطة السقوط):
+            // العمودي: يتجه لأعلى → زاوية -PI/2  (أو 270 درجة ولكن -90 درجة أسهل)
+            const normalAngle = -Math.PI / 2;
+            // زاوية الشعاع الساقط (اتجاه الشعاع القادم من المصدر نحو نقطة السقوط)
+            // الشعاع الساقط يصنع زاوية مقدارها (normalAngle - angleRad) لأن الشعاع يأتي من اليسار عندما تكون الزاوية موجبة
+            const incidentDir = normalAngle - angleRad;
+            // زاوية الشعاع المنعكس (يتجه إلى اليمين)
+            const reflectedDir = normalAngle + angleRad;
             
-            // تسميات الزوايا
+            // نصف قطر القوس الصغير المناسب (قوس صغير وجميل)
+            const arcRadius = 48;
+            
+            // رسم القوس بين العمودي والشعاع الساقط (قوس صغير)
+            drawSmallCleanArc(centerX, surfaceY, arcRadius, normalAngle, incidentDir, "#FFD700");
+            
+            // رسم القوس بين العمودي والشعاع المنعكس (قوس صغير)
+            drawSmallCleanArc(centerX, surfaceY, arcRadius, normalAngle, reflectedDir, "#FFD700");
+            
+            // كتابة قيم الزوايا بجانب كل قوس (بطريقة واضحة)
+            ctx.font = "bold 18px 'Segoe UI'";
             ctx.fillStyle = "#FFD700";
-            ctx.font = "bold 18px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText(`θi = ${angleDeg}°`, centerX - 80, surfaceY - 30);
-            ctx.fillText(`θr = ${angleDeg}°`, centerX + 80, surfaceY - 30);
+            ctx.shadowBlur = 0;
             
-            // رسم أقواس الزوايا
-            ctx.strokeStyle = "#FFD700";
-            ctx.lineWidth = 2;
+            // منتصف قوس السقوط : متوسط الزاويتين (مع مراعاة الدوران السلس)
+            let midIncident = (normalAngle + incidentDir) / 2;
+            // ضبط الزاوية المتوسطة لتكون في المدى الصحيح إذا كان الاختلاف كبير
+            let diffInc = incidentDir - normalAngle;
+            if (diffInc < -Math.PI) diffInc += 2*Math.PI;
+            if (diffInc > Math.PI) diffInc -= 2*Math.PI;
+            // إذا كان القوس مرسوماً بالاتجاه المعاكس، نحتاج منتصف منطقي
+            let midAngleInc = normalAngle + diffInc/2;
+            let textX_inc = centerX + Math.cos(midAngleInc) * (arcRadius + 28);
+            let textY_inc = surfaceY + Math.sin(midAngleInc) * (arcRadius + 18);
+            ctx.fillText(`θᵢ = ${angleDeg}°`, textX_inc - 30, textY_inc - 5);
             
-            // زاوية السقوط
+            // منتصف قوس الانعكاس
+            let diffRef = reflectedDir - normalAngle;
+            if (diffRef < -Math.PI) diffRef += 2*Math.PI;
+            if (diffRef > Math.PI) diffRef -= 2*Math.PI;
+            let midAngleRef = normalAngle + diffRef/2;
+            let textX_ref = centerX + Math.cos(midAngleRef) * (arcRadius + 28);
+            let textY_ref = surfaceY + Math.sin(midAngleRef) * (arcRadius + 18);
+            ctx.fillText(`θᵣ = ${angleDeg}°`, textX_ref + 5, textY_ref - 5);
+            
+            // إضافة تلميع إضافي: سهم صغير عند نهاية كل قوس لتأكيد الزاوية (اختياري، ولكن يزيد التوضيح بدون دائرة)
+            // لا نريد إفساد النظافة، ولكن يمكن رسم نقطة صغيرة جداً عند طرف كل قوس لبيان الامتداد (بدون مبالغة)
+            ctx.fillStyle = "#FFD700";
             ctx.beginPath();
-            ctx.arc(centerX, surfaceY, 60, -angleRad, 0);
-            ctx.stroke();
+            let tipIncAngle = incidentDir;
+            let tipX = centerX + Math.cos(tipIncAngle) * (arcRadius + 3);
+            let tipY = surfaceY + Math.sin(tipIncAngle) * (arcRadius + 3);
+            ctx.arc(tipX, tipY, 2.5, 0, 2*Math.PI);
+            ctx.fill();
             
-            // زاوية الانعكاس
             ctx.beginPath();
-            ctx.arc(centerX, surfaceY, 60, Math.PI, Math.PI + angleRad);
-            ctx.stroke();
-            
-            // الاستدعاء التالي للرسم
-            requestAnimationFrame(draw);
+            let tipRefAngle = reflectedDir;
+            let tipX2 = centerX + Math.cos(tipRefAngle) * (arcRadius + 3);
+            let tipY2 = surfaceY + Math.sin(tipRefAngle) * (arcRadius + 3);
+            ctx.arc(tipX2, tipY2, 2.5, 0, 2*Math.PI);
+            ctx.fill();
         }
         
         // بدء الرسم
         draw();
+        // تحديث الحالة الأولية
+        if (currentAngleDeg === 90) statusMsgSpan.textContent = "لا انعكاس - زاوية 90°";
+        else statusMsgSpan.textContent = `زاوية السقوط = زاوية الانعكاس = ${currentAngleDeg}°`;
     </script>
 </body>
 </html>
